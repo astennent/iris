@@ -1,0 +1,20 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Data\FkeyMenu.js">
+    <Files>
+      <File FileName="Assets\Scripts\Data\Node.js" Line="107" Column="1" />
+      <File FileName="Assets\Scripts\Data\FileMenu.js" Line="174" Column="1" />
+      <File FileName="Assets\Scripts\Data\DataFile.js" Line="3" Column="1" />
+      <File FileName="Assets\Scripts\Display\ColorController.js" Line="73" Column="1" />
+      <File FileName="Assets\Scripts\Data\FkeyMenu.js" Line="26" Column="45" />
+      <File FileName="Assets\Scripts\Data\Connection.js" Line="38" Column="1" />
+      <File FileName="Assets\Scripts\Interface\SecondaryMenu.js" Line="25" Column="1" />
+      <File FileName="Assets\Scripts\Data\AttributeMenu.js" Line="126" Column="12" />
+      <File FileName="Assets\Scripts\Display\DisplayMenu.js" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
