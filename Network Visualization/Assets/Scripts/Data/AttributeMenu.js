@@ -89,7 +89,7 @@ class AttributeMenu extends SecondaryMenu {
 		//determine the number of lines required.
 		var line_count = 1;
 		for (var cur_file : DataFile in fileManager.files){
-			line_count += 3+cur_file.attributes.length;
+			line_count += 3+cur_file.attributes.Count;
 		}
 		
 		fkeyScrollPosition = GUI.BeginScrollView (Rect (x,cur_y+20,width,Screen.height-cur_y), 
