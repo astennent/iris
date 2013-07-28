@@ -31,7 +31,8 @@ var nodes = {};
 var isDemoFile : boolean = false;
 
 var foreignKeyPrefab : ForeignKey;
-var foreignKeys = new List.<ForeignKey>();
+private var foreignKeys = new List.<ForeignKey>();
+private var inactiveKeys = new List.<ForeignKey>();
 
 /*
 	Logic for headers: If the first row has a number int it, it's probably not a header
@@ -197,12 +198,52 @@ function ToggleShown(index : int){
 }
 
 
-function removeFKey(index){
-	//TODO: verification box.
-	//TODO: deactivate connections
-	foreignKeys.RemoveAt(index);
+function removeFkey(fkey : ForeignKey){
+	for (var i = 0 ; i < foreignKeys.Count ; i++){
+		var foreignKey = foreignKeys[i];
+		if (fkey == foreignKey){
+			foreignKeys.RemoveAt(i);
+			return;
+		}
+	}
+	for (var j = 0 ; j < inactiveKeys.Count ; j++){
+		var inactiveKey = inactiveKeys[j];
+		if (fkey == inactiveKey){
+			inactiveKeys.RemoveAt(j);
+			return;
+		}
+	}
 }
 
+//promote or demote a foreign key based on it's number of attributes.
+//called by ForeignKey
+function promoteFkey(fkey : ForeignKey){
+	for (var i = 0 ; i < inactiveKeys.Count ; i++){
+		var inactiveKey = inactiveKeys[i];
+		if (fkey == inactiveKey){
+			foreignKeys.Insert(0, fkey);
+			inactiveKeys.RemoveAt(i);
+			return;
+		}
+	}
+}
+function demoteFkey(fkey : ForeignKey){
+	for (var i = 0 ; i < foreignKeys.Count ; i++){
+		var foreignKey = foreignKeys[i];
+		if (fkey == foreignKey){
+			foreignKeys.RemoveAt(i);
+			inactiveKeys.Insert(0, fkey);
+			return;
+		}
+	}
+}
+
+//creates an empty foreign key and marks it as inactive.
+function createEmptyFkey(other_file : DataFile){
+	var foreignKey = GameObject.Instantiate(foreignKeyPrefab).GetComponent(ForeignKey);
+	foreignKey.to_file = other_file;
+	inactiveKeys.Add(foreignKey);
+}
 
 function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
 	var foreignKey = GameObject.Instantiate(foreignKeyPrefab).GetComponent(ForeignKey);
@@ -213,18 +254,18 @@ function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute
 }
 
 function destroySimpleFkey(from : Attribute, to : Attribute){
-	var doomed_index = getSimpleFkeyIndexOf(from, to);
-	removeFKey(doomed_index);
+	var doomed_key : ForeignKey = getSimpleFkey(from, to);
+	removeFkey(doomed_key);
 }
 
 //only returns true if attribute is found AND the size of that dictionary is 1.
-function getSimpleFkeyIndexOf(from : Attribute, to : Attribute){
-	for (var i : int =0 ; i < foreignKeys.Count ; i++){
-		if (foreignKeys[i].isSimpleFkey(from, to)){
-			return i;
+function getSimpleFkey(from : Attribute, to : Attribute){
+	for (var foreignKey in foreignKeys){
+		if (foreignKey.isSimpleFkey(from, to)){
+			return foreignKey;
 		}
 	}
-	return -1;	
+	return null;	
 }
 
 //returns true if this object can be found anywhere as a referencing foreign key
@@ -238,6 +279,20 @@ function containsFkeyFrom(attribute : Attribute){
 		}
 	}
 	return false;
+}
+
+function getForeignKeys(includeInactive : boolean){
+	if (includeInactive){
+		var output = new List.<ForeignKey>();
+		for (var ikey in inactiveKeys){
+			output.Add(ikey);
+		}
+		for (var key in foreignKeys){
+			output.Add(key);
+		}
+		return output;
+	}
+	return foreignKeys;
 }
 
 function Activate(){
@@ -362,7 +417,6 @@ function GenerateConnectionsForNodeFile(){
 }
 	
 function GenerateConnectionsForLinkingTable(){
-	print ("genereat");
 	try {
 	    var line_index = -1;	
 

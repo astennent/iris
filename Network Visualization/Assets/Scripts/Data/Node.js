@@ -12,7 +12,6 @@ var lineMat : Material;
 var color : Color;
 
 var desiredDistance : float;
-var size : float = 1.0;
 
 var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
 
@@ -26,6 +25,10 @@ var selected : boolean = false;
 
 private var networkController : NetworkController;
 
+var sizing_types = ["By Connections", "Manual", "By Attribute"];
+private var sizing_type = 0;
+private var manual_size : float = 10.0;
+private var size : float = 2.5; //2.5 is the minimum
 
 
 function Start(){
@@ -43,8 +46,8 @@ function Init(){
 	
 	connections = new Array();
 	
-	desiredDistance = Random.Range(50.0,50.0);
-	size = 3;
+	sizing_type = 0; //by # connections
+	UpdateSize();
 		
 	renderer.material = new Material(networkController.nodeTexture);
 	lineMat = new Material(networkController.lineTexture);
@@ -70,16 +73,12 @@ function AddConnection (other : Node, outgoing : boolean){
 	newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
 	newConn.Init(lineMat, color, outgoing, this, other, networkController);
 	connections.Push( newConn );
-
-	size+=2.5;
+	UpdateSize();
 }
 
 function Update () {	
 	
 	var oldRotation = transform.rotation;
-	actualSize = Mathf.Max(5, size);
-	actualSize /=2;
-	transform.localScale = new Vector3(actualSize, actualSize, actualSize);
 
 	for (var i = 0 ; i < connections.length ; i++){
 		var other_node : Node = connections[i].to;
@@ -96,6 +95,32 @@ function Update () {
     if (networkController.flatten){
     	transform.position.z/=1.1;
     }  
+}
+
+function setSizingType(type_index : int){
+	sizing_type = type_index;
+	UpdateSize();
+}
+
+function UpdateSize(){
+	if (sizing_type == 0){ //by # connections
+		size = (3 + connections.length * 2.5)/2;
+	} else if (sizing_type == 1) { //manual
+		size = manual_size;
+	} else if (sizing_type == 2) { //by attribute
+		//TODO
+	}
+
+	size = Mathf.Max(2.5, size);
+	transform.localScale = new Vector3(size, size, size);
+	desiredDistance = Random.Range(50.0, 50.0);
+}
+
+function getManualSize(){
+	return manual_size;
+}
+function setManualSize(s : float){
+	manual_size = s;
 }
 
 function UpdateName(){
@@ -201,11 +226,11 @@ function DeactivateConnections(file : DataFile){
 			connection.Deactivate();
 			size-=2.5;
 		} else {
-			replacement_connections.append(connection);
+			replacement_connections.Push(connection);
 		}
 	}
 	connections = replacement_connections;
-	
+	UpdateSize();
 }
 
 //called by connections to alert the node that they've been killed.

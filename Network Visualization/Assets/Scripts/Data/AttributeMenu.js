@@ -8,6 +8,7 @@ class AttributeMenu extends SecondaryMenu {
 	function Start(){
 		super.Start();
 		parentMenu = GetComponent(FileMenu);
+		title = "Attribute Manager";
 	}
 
 	function setSelectedIndex(index : int){
@@ -23,11 +24,9 @@ class AttributeMenu extends SecondaryMenu {
 		super.OnGUI();
 		GUI.color = Color.white;
 
-		var menuRect = new Rect(x, 0, width, Screen.height);
-		GUI.Box(menuRect, "Attribute Manager");
-		
 		//don't draw if you don't have anything to look at.
 		if (selected_index < 0){
+			DisableDisplay();
 			return;
 		}
 		
@@ -102,7 +101,7 @@ class AttributeMenu extends SecondaryMenu {
 			box.y+=60;
 			box.height = 20;
 			for (var cur_attribute : Attribute in cur_file.attributes){
-				var is_simple_fkey = file.getSimpleFkeyIndexOf(attribute, cur_attribute) != -1;
+				var is_simple_fkey = file.getSimpleFkey(attribute, cur_attribute) != null;
 				
 				if (is_simple_fkey){ GUI.color = new Color(1, .5, 0); } else { GUI.color = Color.white; }
 				var match_att = GUI.Toggle(box, is_simple_fkey, " " + cur_attribute.column_name);
