@@ -4,7 +4,7 @@ var rule_type : int;
 var source : DataFile; //stores name of source
 var cluster_id : int; //stores id of cluster
 var node_pkey : Array;
-var attribute : DataFileAttribute; //stores which attribute you're looking at
+var attribute : Attribute; //stores which attribute you're looking at
 var attribute_value : String = "";
 
 var color : Color;

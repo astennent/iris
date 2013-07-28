@@ -22,18 +22,18 @@ function Start(){
 		var full_group_attrs : DataFile = files[0];
 		var alliance_edge_list : DataFile = files[1];
 		
-		var fga_id : DataFileAttribute = full_group_attrs.attributes[0];
-		var fga_name : DataFileAttribute = full_group_attrs.attributes[1];
+		var fga_id : Attribute = full_group_attrs.attributes[0];
+		var fga_name : Attribute = full_group_attrs.attributes[1];
 		fga_id.is_shown = false;
 		fga_id.is_pkey = false;
 		fga_name.is_pkey = true;
 		full_group_attrs.Activate();
 		
-		var ael_ego : DataFileAttribute = alliance_edge_list.attributes[0];
-		var ael_alter : DataFileAttribute = alliance_edge_list.attributes[1];
+		var ael_ego : Attribute = alliance_edge_list.attributes[0];
+		var ael_alter : Attribute = alliance_edge_list.attributes[1];
 		ael_alter.is_pkey = true;
-		alliance_edge_list.createFkey(full_group_attrs, ael_ego, fga_name);
-		alliance_edge_list.createFkey(full_group_attrs, ael_alter, fga_name);
+		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_ego, fga_name);
+		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_alter, fga_name);
 		alliance_edge_list.linking_table = true;
 		alliance_edge_list.Activate();	
 		//Load("C:\\Users\\Alan\\Desktop\\Dictionaries\\AllianceData\\Alliance Edge List - Names.csv");	

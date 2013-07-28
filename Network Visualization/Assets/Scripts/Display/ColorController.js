@@ -150,7 +150,7 @@ function ColorBySource(file : DataFile, color : Color){
 }
 
 //color nodes based on a certain attribute value.
-function ColorByAttribute(attribute : DataFileAttribute, value : String, color : Color){
+function ColorByAttribute(attribute : Attribute, value : String, color : Color){
 	var file : DataFile = attribute.file;
 	var attr_index : int = file.attributes.IndexOf(attribute);
 	for (var node in file.nodes){

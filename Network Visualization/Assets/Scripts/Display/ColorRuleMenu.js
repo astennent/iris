@@ -220,7 +220,7 @@ class ColorRuleMenu extends SecondaryMenu {
 
 	}
 
-	function updateCachedAttributeValues(attribute : DataFileAttribute){
+	function updateCachedAttributeValues(attribute : Attribute){
 		if (attribute == null){
 			return;
 		}

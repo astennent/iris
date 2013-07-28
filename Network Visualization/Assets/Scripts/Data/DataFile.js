@@ -6,7 +6,7 @@ import System.Collections.Generic;
 var attributePrefab : GameObject;
 var nodePrefab : GameObject;
 
-var attributes : List.<DataFileAttribute>; //Contains an ordered list of attributes of the file (columns)
+var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
 
 //What the computer thinks the types should be.
 var expected_column_types : boolean[]; //This is global for validation on swapping types.
@@ -30,10 +30,8 @@ var nodes = {};
 
 var isDemoFile : boolean = false;
 
-/*
-	[ [reference_file.fname, {self_attr :: reference_attr} ] }
-*/
-var fkeys : Array = new Array(); //array of string/dict tuples
+var foreignKeyPrefab : ForeignKey;
+var foreignKeys = new List.<ForeignKey>();
 
 /*
 	Logic for headers: If the first row has a number int it, it's probably not a header
@@ -63,7 +61,7 @@ function ScanForMetadata(){
 	var on_first_row : boolean= true;
 	var first_row_types : boolean[]; //true = number, false = text
 
-	attributes = new List.<DataFileAttribute>();
+	attributes = new List.<Attribute>();
 	column_types = {};
 	
 	try {
@@ -117,7 +115,7 @@ function ScanForMetadata(){
 	    	} else {
 	    		column_name = 'col'+i;
 	    	}
-    		var attribute = GameObject.Instantiate(attributePrefab).GetComponent(DataFileAttribute);
+    		var attribute = GameObject.Instantiate(attributePrefab).GetComponent(Attribute);
     		attribute.column_name = column_name;
     		attribute.is_numeric = expected_column_types[i];
     		attribute.file = GetComponent(DataFile);
@@ -176,7 +174,7 @@ function shortName(){
 function ToggleUsingHeaders(){
 	using_headers = !using_headers;	
     for (var i = 0 ; i < attributes.Count ; i++){
-    	var attribute : DataFileAttribute = attributes[i];
+    	var attribute : Attribute = attributes[i];
     	if (using_headers){
     		attribute.column_name = first_row[i];
     	} else {
@@ -202,37 +200,27 @@ function ToggleShown(index : int){
 function removeFKey(index){
 	//TODO: verification box.
 	//TODO: deactivate connections
-	fkeys.RemoveAt(index);
+	foreignKeys.RemoveAt(index);
 }
 
-function createFkey(other_file: DataFile, from : DataFileAttribute, to : DataFileAttribute){
-	//generate a simple fkey.
-	var fkey = new Object[3];
-	fkey[0] = other_file;
-	fkey[1] = {};
-	fkey[1][from] = to;
-	fkey[2] = true;  //bidirectional
-	fkeys.Push(fkey);
+
+function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
+	var foreignKey = GameObject.Instantiate(foreignKeyPrefab).GetComponent(ForeignKey);
+	foreignKey.from_file = this;
+	foreignKey.to_file = other_file;
+	foreignKey.addKeyPair(from, to);
+	foreignKeys.Add(foreignKey);
 }
 
-function destroyFkey(from : DataFileAttribute, to : DataFileAttribute){
+function destroySimpleFkey(from : Attribute, to : Attribute){
 	var doomed_index = getSimpleFkeyIndexOf(from, to);
 	removeFKey(doomed_index);
 }
 
 //only returns true if attribute is found AND the size of that dictionary is 1.
-function getSimpleFkeyIndexOf(from : DataFileAttribute, to : DataFileAttribute){
-	for (var i : int =0 ; i < fkeys.length ; i++){
-		fkey = fkeys[i];
-		var found = false;
-		var count = 0;
-		for (var entry in fkey[1]){
-			if (entry.Key == from && entry.Value == to){
-				found = true;
-			}
-			count++;
-		}
-		if (found && count==1){
+function getSimpleFkeyIndexOf(from : Attribute, to : Attribute){
+	for (var i : int =0 ; i < foreignKeys.Count ; i++){
+		if (foreignKeys[i].isSimpleFkey(from, to)){
 			return i;
 		}
 	}
@@ -240,11 +228,11 @@ function getSimpleFkeyIndexOf(from : DataFileAttribute, to : DataFileAttribute){
 }
 
 //returns true if this object can be found anywhere as a referencing foreign key
-function containsFkeyFrom(attribute : DataFileAttribute){
-	for (var fkey in fkeys){
-		for (var entry in fkey[1]){
-			var entry_from_attr = entry.Key;
-			if (attribute == entry_from_attr){
+function containsFkeyFrom(attribute : Attribute){
+	for (var foreignKey in foreignKeys){
+		var keyPairs = foreignKey.getKeyPairs();
+		for (var keyPair in keyPairs){
+			if (keyPair[0] == attribute){
 				return true;
 			}
 		}
@@ -343,23 +331,26 @@ function GenerateConnections(){
 function GenerateConnectionsForNodeFile(){
 	for (var entry in nodes){
 		var from_node : Node = entry.Value;
-		for (var fkey in fkeys){
-			var other_file : DataFile = fkey[0];
+		for (var foreignKey in foreignKeys){
+			var other_file : DataFile = foreignKey.to_file;
+			var fkeyPairs = foreignKey.getKeyPairs;
 			//TODO: special case when the foreign key points exactly to the other file's primary keys.
 			
 			//loop over other file's nodes. This is n^2 argh
 			for (var other_entry in other_file.nodes){
 				var to_node : Node = other_entry.Value;	
 	
-				for (var fkey_pair in fkey[1]){
-					fkey_from_attribute_index = fkey_pair.Key.column_index;	
-					fkey_from_attribute_value = from_node.data[fkey_from_attribute_index];					
-					fkey_to_attribute_index = fkey_pair.Value.column_index;
-					fkey_to_attribute_value = to_node.data[fkey_to_attribute_index];							
+				for (var pair in fkeyPairs){					
+
+					from_attribute_index = pair[0].column_index;	
+					from_attribute_value = from_node.data[from_attribute_index];					
+					
+					to_attribute_index = pair[1].column_index;
+					to_attribute_value = to_node.data[to_attribute_index];							
 					
 					//You found a match. Generate a connection.
-					if (fkey_from_attribute_value == fkey_to_attribute_value){
-						from_node.AddConnection(to_node, fkey[2]); //fkey[2] is bidirectional
+					if (from_attribute_value == to_attribute_value){
+						from_node.AddConnection(to_node, foreignKey.isBidirectional); //fkey[2] is bidirectional
 					}
 					
 				}
@@ -371,6 +362,7 @@ function GenerateConnectionsForNodeFile(){
 }
 	
 function GenerateConnectionsForLinkingTable(){
+	print ("genereat");
 	try {
 	    var line_index = -1;	
 
@@ -415,21 +407,26 @@ function GenerateConnectionsForLinkingTable(){
 	    	}
 	    	
 	    	var matches = new Array(); //Arrays of matching nodes for each fkey.
-	    	
-	    	for (i = 0 ; i < fkeys.length ; i++){
-	    		fkey = fkeys[i];
-	    		other_file = fkey[0];    		
+
+	    	for (i = 0 ; i < foreignKeys.Count ; i++){
+	    		foreignKey = foreignKeys[i];
+	    		other_file = foreignKey.to_file;    		
+				var keyPairs = foreignKey.getKeyPairs();
 				these_matches = new Array();
+
 				//find matches from side of fkey	
 				for (var entry in other_file.nodes){
 					var node : Node = entry.Value;
 					var matching = true;
-					for (fkey_pair in fkey[1]){
+					for (pair in keyPairs){
 						//check if the "to" value is a match
-						var fkey_to_attribute_index = fkey_pair.Value.column_index;	
-						var fkey_to_attribute_value = node.data[fkey_to_attribute_index];
-						var fkey_from_attribute_index = fkey_pair.Key.column_index;
-						if (fkey_to_attribute_value != splitLine[fkey_from_attribute_index]){
+						var from_attribute_index = pair[0].column_index;
+						var from_attribute_value = splitLine[from_attribute_index];
+
+						var to_attribute_index = pair[1].column_index;	
+						var to_attribute_value = node.data[to_attribute_index];
+						
+						if (from_attribute_value != to_attribute_value){
 							matching = false;
 						} 
 					}
@@ -442,6 +439,7 @@ function GenerateConnectionsForLinkingTable(){
 				
 			//TODO: make n-way connections.
 			//TODO: handle bidirectionality being false
+
 			if (matches.length == 2){
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
@@ -508,10 +506,12 @@ function UpdatePKeyIndices(){
 	pkey_indices = output;
 }
 
+/*
+
 function GetFKeyFromIndices(fkey){
 	var output = new Array();
 	for (var entry in fkey[1]){
-		var from : DataFileAttribute = entry.Value;
+		var from : Attribute = entry.Value;
 		output.Push(from.column_index);
 	}
 	return output.sort();	
@@ -520,23 +520,20 @@ function GetFKeyFromIndices(fkey){
 function GetFKeyToIndices(fkey){
 	var output = new Array();
 	for (var entry in fkey[1]){
-		var to : DataFileAttribute = entry.Key;
+		var to : Attribute = entry.Key;
 		output.Push(to.column_index);
 	}
 	return output.sort();	
 }
 
+*/
+
 function Deactivate() {
-	for (var fkey in fkeys){
-		var from = fkey[0];
-		//get the files that the linking table combines. 
-		//You only need to look at the first, since they're all the same. //TODO: enforce that.
-		for (var attr_pair in fkey[1]){
-			var to = attr_pair.Value.file;
-			break;
-		}
-		from.DeactivateConnections(to);
-		to.DeactivateConnections(from);
+	for (var foreignKey in foreignKeys){
+		var from_file = foreignKey.from_file;
+		var to_file = foreignKey.to_file;
+		from_file.DeactivateConnections(to_file);
+		to_file.DeactivateConnections(from_file);
 	}
 	for (var node in nodes) {
 	 	node.Value.Deactivate();

@@ -101,7 +101,7 @@ class AttributeMenu extends SecondaryMenu {
 			GUI.Label(box, cur_file.fname);
 			box.y+=60;
 			box.height = 20;
-			for (var cur_attribute : DataFileAttribute in cur_file.attributes){
+			for (var cur_attribute : Attribute in cur_file.attributes){
 				var is_simple_fkey = file.getSimpleFkeyIndexOf(attribute, cur_attribute) != -1;
 				
 				if (is_simple_fkey){ GUI.color = new Color(1, .5, 0); } else { GUI.color = Color.white; }
@@ -109,10 +109,10 @@ class AttributeMenu extends SecondaryMenu {
 				if (match_att != is_simple_fkey){
 					if (match_att){	
 						//generate an fkey	
-						file.createFkey(cur_attribute.file, attribute, cur_attribute);		
+						file.createSimpleFkey(cur_attribute.file, attribute, cur_attribute);		
 					} else {
 						//destroy the matching fkey.
-						file.destroyFkey(attribute, cur_attribute);
+						file.destroySimpleFkey(attribute, cur_attribute);
 					}
 				} 		
 				box.y+=20;

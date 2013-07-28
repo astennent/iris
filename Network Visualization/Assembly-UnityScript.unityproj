@@ -46,15 +46,16 @@
   <ItemGroup>
      <Compile Include="Assets\Demo\DemoStreamReader.js" />
      <Compile Include="Assets\Scripts\Camera\NetworkCamera.js" />
+     <Compile Include="Assets\Scripts\Data\Attribute.js" />
      <Compile Include="Assets\Scripts\Data\AttributeMenu.js" />
      <Compile Include="Assets\Scripts\Data\ClusterController.js" />
      <Compile Include="Assets\Scripts\Data\Connection.js" />
      <Compile Include="Assets\Scripts\Data\DataFile.js" />
-     <Compile Include="Assets\Scripts\Data\DataFileAttribute.js" />
      <Compile Include="Assets\Scripts\Data\DrawLine.js" />
      <Compile Include="Assets\Scripts\Data\FileManager.js" />
      <Compile Include="Assets\Scripts\Data\FileMenu.js" />
      <Compile Include="Assets\Scripts\Data\FkeyMenu.js" />
+     <Compile Include="Assets\Scripts\Data\ForeignKey.js" />
      <Compile Include="Assets\Scripts\Data\NetworkController.js" />
      <Compile Include="Assets\Scripts\Data\Node.js" />
      <Compile Include="Assets\Scripts\Display\ColorController.js" />

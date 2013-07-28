@@ -4,11 +4,11 @@ class FkeyMenu extends SecondaryMenu {
 
 	private var creating : boolean;
 	private var temp_key : Object[];
-	private var temp_self_attr : DataFileAttribute;
-	private var temp_foreign_attr : DataFileAttribute;
+	private var temp_self_attr : Attribute;
+	private var temp_foreign_attr : Attribute;
 
 	private var adding_index : int = -1;
-	private var adding_from_attr : DataFileAttribute;
+	private var adding_from_attr : Attribute;
 
 	private var tempFileScrollPosition : Vector2 = Vector2.zero;
 
@@ -95,7 +95,7 @@ class FkeyMenu extends SecondaryMenu {
 				tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
 					tempFileScrollPosition, Rect (0, 0, width-10, 22*file.attributes.length));			
 				file_box = new Rect(0, 0, width-20, 22);
-				for (var attribute : DataFileAttribute in file.attributes){
+				for (var attribute : Attribute in file.attributes){
 					if (GUI.Button(file_box, attribute.column_name)){
 						temp_self_attr = attribute;
 					}
@@ -132,7 +132,7 @@ class FkeyMenu extends SecondaryMenu {
 				tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
 					tempFileScrollPosition, Rect (0, 0, width-10, 22*temp_key[0].attributes.length));			
 				file_box = new Rect(0, 0, width-20, 22);
-				for (var attribute : DataFileAttribute in temp_key[0].attributes){
+				for (var attribute : Attribute in temp_key[0].attributes){
 					if (attribute.is_numeric == temp_self_attr.is_numeric){ GUI.color = new Color(.5, 1, 0);}  else { GUI.color = new Color(1, .5, 0); }	
 					if (attribute.column_name == temp_self_attr.column_name){ GUI.color = Color.green; }
 					if (attribute == temp_self_attr){ GUI.color = Color.white; }
@@ -205,8 +205,8 @@ class FkeyMenu extends SecondaryMenu {
 			cur_y += 30;
 			
 			for (var entry in fkey[1]){
-				var from_attr : DataFileAttribute = entry.Key;
-				var to_attr : DataFileAttribute = entry.Value;
+				var from_attr : Attribute = entry.Key;
+				var to_attr : Attribute = entry.Value;
 				
 				var content = new GUIContent(from_attr.column_name);
 	   			var size = GUI.skin.label.CalcSize(content);
@@ -254,7 +254,7 @@ class FkeyMenu extends SecondaryMenu {
 					tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
 						tempFileScrollPosition, Rect (0, 0, width-10, 20*file.attributes.length));			
 					file_box = new Rect(0, 0, width-20, 20);
-					for (var attr : DataFileAttribute in file.attributes){
+					for (var attr : Attribute in file.attributes){
 						if (GUI.Button(file_box, attr.column_name)){
 							adding_from_attr = attr;
 						}
@@ -284,7 +284,7 @@ class FkeyMenu extends SecondaryMenu {
 					tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
 						tempFileScrollPosition, Rect (0, 0, width-10, 20*fkey[0].attributes.length));			
 					file_box = new Rect(0, 0, width-20, 20);
-					for (var attr : DataFileAttribute in fkey[0].attributes){
+					for (var attr : Attribute in fkey[0].attributes){
 						if (GUI.Button(file_box, attr.column_name)){
 							fkey[1][adding_from_attr] = attr;
 							resetCreation();
