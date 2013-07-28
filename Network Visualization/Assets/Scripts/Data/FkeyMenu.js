@@ -27,10 +27,16 @@ class FkeyMenu extends SecondaryMenu {
 		var file = fileManager.files[file_index];			
 
 		
-		var cur_y = 0;
+		var cur_y = 40;
 		//display menu for choosing a file for the new fkey
-		reference_box = new Rect (x,40,width,180);
 		if (creating){ 	
+			add_box = new Rect(x+20, cur_y, width-40, 30);
+			if (GUI.Button(add_box, "Cancel")){
+				creating = false;
+			}
+			cur_y+=40;
+			reference_box = new Rect (x,cur_y,width,180);
+
 			//select a referencing attribute
 			GUI.Box(reference_box, "Reference File:");
 			reference_box.height -= 30;
@@ -46,13 +52,12 @@ class FkeyMenu extends SecondaryMenu {
 				file_box.y+=25;
 			}
 			GUI.EndScrollView();
-			cur_y += 180;
+			cur_y += 150;
 		} else {
-			add_box = new Rect(x+20, 40, width-40, 30);
+			add_box = new Rect(x+20, cur_y, width-40, 30);
 			if (GUI.Button(add_box, "Create Foreign Key")){
 				creating = true;
 			}
-			cur_y+=40;
 		}
 					
 		//display all active keys
@@ -64,21 +69,24 @@ class FkeyMenu extends SecondaryMenu {
 			var keyPairs = foreignKey.getKeyPairs();
 			var pair_count = keyPairs.Count;
 			
-			var fkey_box = new Rect(x, cur_y, width, pair_count*20 + 95);
+			var fkey_box = new Rect(x, cur_y, width, pair_count*20 + 115);
 
+			//deletes the foreign key.
+			if (GUI.Button(new Rect(x+width-30, cur_y+7, 23, 23), "X")){
+				file.removeFkey(foreignKey);
+				continue;
+			}
 
 			GUI.Box(fkey_box, foreignKey.to_file.shortName()); 
 			
 			cur_y += 30;
 			foreignKey.isBidirectional = GUI.Toggle(new Rect(x+5, cur_y, 100, 20),
 					foreignKey.isBidirectional, "bi-directional");
-			
-			//deletes the foreign key.
-			if (GUI.Button(new Rect(x+width-30, cur_y, 20, 20), "X")){
-				file.removeFkey(foreignKey);
-				continue;
-			}
-			
+						
+			cur_y += 20;
+
+			GUI.Label(new Rect(x+10, cur_y, width, 20), "Connection Weight: " + foreignKey.connectionWeight.ToString("f1"));
+			foreignKey.connectionWeight = GUI.HorizontalSlider(Rect(x+155, cur_y+5, width-180, 20), foreignKey.connectionWeight, 0.0, 10.0);
 			cur_y += 30;
 			
 			for (var pair in keyPairs){
@@ -98,8 +106,14 @@ class FkeyMenu extends SecondaryMenu {
 	   			size = GUI.skin.label.CalcSize(content);
 	   			attr_box.width = size.x+20;
 				GUI.Button(attr_box, content);
+
+				//deletes the key pair.
+				if (GUI.Button(new Rect(x+width-30, cur_y, 20, 20), "X")){
+					foreignKey.removeKeyPair(from_attr, to_attr);
+					return; //stop rendering, otherwise you get an invalid pointer from the deletion.
+				}
 				
-				cur_y += 20;
+				cur_y += 21;
 			}
 			cur_y += 5;
 			add_box = new Rect(x+20, cur_y, 140, 20);

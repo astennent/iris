@@ -5,6 +5,7 @@ var from_file : DataFile; //
 var to_file : DataFile;
 var isBidirectional : boolean = true;
 var activated : boolean = false;
+var connectionWeight : float = 1.0;
 
 //add a from/to keyPair pair. 
 function addKeyPair(from : Attribute, to : Attribute){
