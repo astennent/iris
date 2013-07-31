@@ -405,7 +405,7 @@ function GenerateConnectionsForNodeFile(){
 					
 					//You found a match. Generate a connection.
 					if (from_attribute_value == to_attribute_value){
-						from_node.AddConnection(to_node, foreignKey.isBidirectional); //fkey[2] is bidirectional
+						from_node.AddConnection(to_node, true, foreignKey); 
 					}
 					
 				}
@@ -433,8 +433,7 @@ function GenerateConnectionsForLinkingTable(){
 	    while (  (sr != null && sr.Peek() != -1)   || (dsr != null && dsr.Peek() != -1)  ){
 	    	if (sr != null) { 	var line : String = sr.ReadLine(); } 
 	    	else { line = dsr.ReadLine(); }
-    		
-    		
+    		    		
     		
     		line_index++;	    		
 	    	//skip the first line if using headers.
@@ -449,7 +448,7 @@ function GenerateConnectionsForLinkingTable(){
 	    	//determine data values 
 	    	var splitLine : String[] = line.Split(delimiter);
 	    	for (var i : int = 0 ; i < splitLine.length ; i++){
-	    		if (i < attributes.Count){ //in case there are stray commas or whatever
+	    		if (i < attributes.Count){  //check against attributes count in case there aren't enough commas.
 		    		var attribute = attributes[i];
 		    		var val : String = splitLine[i];
 		    		if (attribute.is_numeric){
@@ -460,13 +459,13 @@ function GenerateConnectionsForLinkingTable(){
 	    		}
 	    	}
 	    	
-	    	var matches = new Array(); //Arrays of matching nodes for each fkey.
+	    	var matches = new List.<List.<Node> >(); //Arrays of matching nodes for each fkey.
 
 	    	for (i = 0 ; i < foreignKeys.Count ; i++){
 	    		foreignKey = foreignKeys[i];
 	    		other_file = foreignKey.to_file;    		
 				var keyPairs = foreignKey.getKeyPairs();
-				these_matches = new Array();
+				these_matches = new List.<Node>();
 
 				//find matches from side of fkey	
 				for (var entry in other_file.nodes){
@@ -485,20 +484,19 @@ function GenerateConnectionsForLinkingTable(){
 						} 
 					}
 					if (matching){
-						these_matches.Push(node);
+						these_matches.Add(node);
 					}
 				}
-				matches.Push(these_matches);
+				matches.Add(these_matches);
 			}
 				
 			//TODO: make n-way connections.
-			//TODO: handle bidirectionality being false
 
-			if (matches.length == 2){
+			if (matches.Count == 2){
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
-						from_node.AddConnection(to_node, true);	
-						to_node.AddConnection(from_node, false);								
+						from_node.AddConnection(to_node, true, foreignKeys[0]);	
+						to_node.AddConnection(from_node, false, foreignKeys[1]);								
 					}
 				}
 			}

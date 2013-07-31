@@ -32,8 +32,6 @@ class SearchMenu extends PrimaryMenu {
 			}
 		}
 		var top_display = GUIContent(title);		
-		//GUI.Box (Rect (x, 0, width, Screen.height), top_display);
-
 		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,Screen.height-60),
 	    scrollPosition, Rect (0, 0, 400, matches.length*30));
 	    
@@ -69,8 +67,9 @@ class SearchMenu extends PrimaryMenu {
 	       		}
 	       	} else if (e.keyCode == KeyCode.Return && matches.length > 0){
 				Camera.main.GetComponent(NetworkCamera).JumpTo(matches[match_index].name);     		
-	       	} 
-	       	
+	       	} else if (e.keyCode == KeyCode.Escape){
+	       		DisableDisplay();
+	       	}
 	       	
 	   	}
 		

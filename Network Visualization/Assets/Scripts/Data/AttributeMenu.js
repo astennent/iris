@@ -44,7 +44,7 @@ class AttributeMenu extends SecondaryMenu {
 		
 		//toggles
 		var box = new Rect(x+10, cur_y, 200, 20);
-		if (attribute.is_shown){ GUI.color = new Color(1, 0, 1); } 
+		if (attribute.is_shown){ GUI.color = new Color(.5, 1, .5); } 
 		else { GUI.color = Color.white; }
 		var shown_toggle = GUI.Toggle (box, attribute.is_shown, " Shown in 3D view");
 		if (shown_toggle != attribute.is_shown){
@@ -61,7 +61,7 @@ class AttributeMenu extends SecondaryMenu {
 		}
 		
 		box.y += 20;
-		if (attribute.is_pkey){ GUI.color = Color.yellow; } 
+		if (attribute.is_pkey){ GUI.color = new Color(1, .5, .5);} 
 		else { GUI.color = Color.white; }
 		attribute.is_pkey = GUI.Toggle (box, attribute.is_pkey, " Part of Primary Key");		
 

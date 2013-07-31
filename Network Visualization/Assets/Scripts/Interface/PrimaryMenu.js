@@ -84,6 +84,5 @@ class PrimaryMenu extends MonoBehaviour {
 
 	function DisableDisplay(){
 		displaying = false;
-		GUI.FocusControl("");
 	}
 }

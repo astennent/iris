@@ -2,22 +2,24 @@
 
 var mat : Material; //the material drawn by the connection.
 var color : Color; //line color
-var outgoing : boolean; //is the connection an outgoing one? Determines offset, hides self if false and bidirectional is false.
+var isOutgoing : boolean; //is the connection an outgoing one? Determines offset, hides self if false and bidirectional is false.
 var from : Node;
 var to : Node;
+var foreignKey : ForeignKey; //the foreign key that gave rise to this connection.
 private var lineRenderer : LineRenderer;
 private var networkController : NetworkController;
 
-function Init (m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController) {
+function Init (m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
 	mat = m;
 	color = c;
-	outgoing = o;
+	isOutgoing = o;
 	from = f;
 	to = t;
 	lineRenderer = GetComponent(LineRenderer);
 	lineRenderer.material = mat;
 	lineRenderer.material.color = color;
 	networkController = nC;
+	foreignKey = fkey;
 }
 
 function LateUpdate () {
@@ -28,7 +30,7 @@ function LateUpdate () {
 	//Adjust the line to match the from and to nodes.
 	lineRenderer.enabled = true;
 	var incomingAdjust : Vector3;
-	if (outgoing){
+	if (isOutgoing){
 		incomingAdjust = Vector3.zero;
 	} else {
 		incomingAdjust = Vector3.up*.4;

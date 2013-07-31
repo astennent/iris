@@ -64,14 +64,14 @@ function SetColor(c : Color, colorConnections : boolean){
 	}
 }
 
-function AddConnection (other : Node, outgoing : boolean){
+function AddConnection (other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
 	for (var conn in connections){
 		if (conn == other){
 			return;
 		}
 	}
 	newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
-	newConn.Init(lineMat, color, outgoing, this, other, networkController);
+	newConn.Init(lineMat, color, isOutgoing, this, other, networkController, foreignKey);
 	connections.Push( newConn );
 	UpdateSize();
 }
@@ -82,10 +82,17 @@ function Update () {
 
 	for (var i = 0 ; i < connections.length ; i++){
 		var other_node : Node = connections[i].to;
-		var other_size = other_node.size;
-		var other_connections = other_node.connections;
+		var connectionWeight : float = connections[i].foreignKey.connectionWeight;
+		moveRelativeTo(other_node.transform.position, other_node.size, false, connectionWeight);
 
-		moveRelativeTo(other_node.transform.position, other_size, true, other_connections);
+		if (Camera.main.GetComponent(NetworkCamera).dragging){
+			var other_connections = other_node.connections;
+			for (var other_connection : Connection in other_connections){
+				var other_other_node = other_connection.to;
+				moveRelativeTo(other_other_node.transform.position, other_node.size, true, connectionWeight);
+			}
+		}
+
 
 	}
 
@@ -138,42 +145,23 @@ function UpdateName(){
 }
 
 
-function moveRelativeTo(target : Vector3, other_size: float, recurse : boolean, other_connections : Array){
-	if (networkController.paused){
+function moveRelativeTo(target : Vector3, other_size: float, second_level : boolean, connectionWeight : float){
+	if (networkController.paused || connectionWeight == 0){
 		return;
 	}
 	transform.LookAt(target);
 	var sizeCompensation = (size+other_size)/10;
-
-	
-	//Make nodes move away from each other so they don't collide.
-	if (recurse == false){
-		sizeCompensation*=3;
-	}
-	
-	speed = other_size*(Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )/1000;
+	speed = other_size*(Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )/1000*connectionWeight;
 	
 	//only move away if you're recursing.
-	if (!recurse){
+	if (second_level){
 		speed = Mathf.Clamp(speed, -1, 0);
 	}	
 	
 	//To prevent infinite sliding, don't allow nodes to back
 	//off from each other unless you are dragging them around.
 	if (Camera.main.GetComponent(NetworkCamera).dragging){
-		speed = Mathf.Clamp(speed, -1, 1);
-		
-		//Also, look at nodes that are connected to this node to avoid some collisions.
-		if (recurse){
-			for ( var j=0 ; j <other_connections.length ; j++){
-				var other_other_node : Node = other_connections[j].to;
-				if (other_other_node != this){
-					moveRelativeTo(other_other_node.transform.position, other_other_node.size, false, null);
-				}
-			}
-		}
-		
-		
+		speed = Mathf.Clamp(speed, -1, 1);		
 	} else {
 		speed = Mathf.Clamp(speed, 0, 1);
 	}	

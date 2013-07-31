@@ -74,18 +74,23 @@ class FileMenu extends PrimaryMenu {
 			file.ToggleUsingHeaders();
 		}
 		
-		toggle_box.y+=25;
+		toggle_box.x+=160;
 		file.linking_table = GUI.Toggle (toggle_box, file.linking_table, " Linking Table");
 		
-		cur_y+=50;
-		var fkey_box = new Rect(x+10, cur_y, width-20, 25);
+		cur_y+=28;
+		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
 		GUI.color = new Color(1, .5, 0);
-		if (GUI.Button(fkey_box, "Manage Foreign Key References")){
+		if (GUI.Button(fkey_box, "Foreign Keys")){
+			fkeyMenu.ToggleDisplay();
+		}
+		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);
+		GUI.color = new Color(.8, .5, 1);
+		if (GUI.Button(details_box, "File Details")){
 			fkeyMenu.ToggleDisplay();
 		}
 		
 		GUI.color = Color.white;	
-		cur_y += 55;
+		cur_y += 35;
 		//File Attributes (columns)
 		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,Screen.height-cur_y-50), 
 			attributeScrollPosition, Rect (0, 0, width, 20*file.attributes.Count+20));
@@ -107,7 +112,7 @@ class FileMenu extends PrimaryMenu {
 			var attribute = file.attributes[i];
 						
 			//is shown toggles
-			if (attribute.is_shown){ GUI.color = new Color(1, 0, 1); } 
+			if (attribute.is_shown){ GUI.color = new Color(.5, 1, .5); } 
 			else { GUI.color = Color.white; }		
 			is_name_box = new Rect(18, attribute_y, 20, 20);
 			var is_shown_value = GUI.Toggle (is_name_box, attribute.is_shown, "");	
@@ -125,7 +130,7 @@ class FileMenu extends PrimaryMenu {
 			}
 			
 			//pkey toggles
-			if (attribute.is_pkey){ GUI.color = Color.yellow; } 
+			if (attribute.is_pkey){ GUI.color = new Color(1, .5, .5); } 
 			else { GUI.color = Color.white; }		
 			is_pkey_box = new Rect(116, attribute_y, 20, 20);
 			var pkey_value = GUI.Toggle (is_pkey_box, attribute.is_pkey, "");	
