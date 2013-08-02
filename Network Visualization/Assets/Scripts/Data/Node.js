@@ -11,17 +11,15 @@ var connectionPrefab : GameObject;
 var lineMat : Material;
 var color : Color;
 
+var reticlePrefab : Reticle; //used to instantiate reticle
+private var reticle : Reticle; //singleton reticle, instantiated on target
+
+
 var desiredDistance : float;
 
 var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
 
-private var controller : CharacterController;
-private var spawntime;
-
 private var activated = true;
-
-
-var selected : boolean = false;
 
 private var networkController : NetworkController;
 
@@ -30,15 +28,11 @@ private var sizing_type = 0;
 private var manual_size : float = 10.0;
 private var size : float = 2.5; //2.5 is the minimum
 
-
-function Start(){
-	controller = GetComponent(CharacterController);
-	spawntime = Time.time;
-}
+private var selectionController : SelectionController;
 
 function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
-
+	selectionController = networkController.GetComponent(SelectionController);
 	label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 	label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 	label.transform.parent = this.transform;
@@ -77,6 +71,7 @@ function AddConnection (other : Node, isOutgoing : boolean, foreignKey : Foreign
 }
 
 function Update () {	
+	GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0);
 	
 	var oldRotation = transform.rotation;
 
@@ -85,7 +80,7 @@ function Update () {
 		var connectionWeight : float = connections[i].foreignKey.connectionWeight;
 		moveRelativeTo(other_node.transform.position, other_node.size, false, connectionWeight);
 
-		if (Camera.main.GetComponent(NetworkCamera).dragging){
+		if (selectionController.dragging){
 			var other_connections = other_node.connections;
 			for (var other_connection : Connection in other_connections){
 				var other_other_node = other_connection.to;
@@ -160,7 +155,7 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 	
 	//To prevent infinite sliding, don't allow nodes to back
 	//off from each other unless you are dragging them around.
-	if (Camera.main.GetComponent(NetworkCamera).dragging){
+	if (selectionController.dragging){
 		speed = Mathf.Clamp(speed, -1, 1);		
 	} else {
 		speed = Mathf.Clamp(speed, 0, 1);
@@ -171,15 +166,10 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 	transform.position += motion;
 }
 
-//deprecate
 function OnMouseOver() {
-	if(Input.GetMouseButtonDown(0)){
-       	//left click
-		Camera.main.GetComponent(NetworkCamera).NodeClick(gameObject);
-		print (name + " " + group_id);
-    } else if(Input.GetMouseButtonDown(1)) {
-       	//right click action?
-    }
+	if(Input.GetMouseButton(0)){
+		selectionController.NodeClick(this);
+    } 
 }
 
 function LateUpdate () {
@@ -195,10 +185,16 @@ function LateUpdate () {
 
 //functions for camera targetting.
 function alertTarget(){
-	selected = true;
+	if (reticle == null){
+		reticle = gameObject.Instantiate(reticlePrefab);
+		reticle.Init(this);
+	}
 }
 function alertUntarget(){
-	selected = false;
+	if (reticle != null){
+		Destroy(reticle.gameObject);
+		reticle = null; //unneeded?
+	}
 }
 
 function Deactivate(){

@@ -11,7 +11,6 @@ var x : float = 0;
 var y : float = 0;
 var r : float = 0;
 
-//var distance : float = 100;
 var desired_distance : float = 100;
 var bubbleSize : int = 0;
 
@@ -29,9 +28,7 @@ function Update () {
 		//camera is controlled by moving around 
 		UpdateLocked();
 	}
-	
-	ProcessDrag();
-	
+		
 	//spacebar to switch camera type.
 	if (Input.GetButtonDown("Jump")){
 		ToggleLocked();
@@ -116,68 +113,16 @@ function UpdateLocked(){
 
 }
 
-function NodeClick(obj){
-	node = obj.GetComponent(Node);
-	nodetarget = obj.transform;
-	bubbleSize = node.size;
-	
-	if (target != nodetarget){
-		//switch targets
-		node.alertTarget();		
-		if (target != null && target.GetComponent(Node) != null){
-			target.GetComponent(Node).alertUntarget();
-		}
-		
-		target = nodetarget;
-		if (!freeCamera){
-			transform.parent = transform;
-		}
-	} 
-	dragging = true;
+
+function setTarget(n : Node){
+	target = n.transform;
+	if (!freeCamera){
+		transform.parent = target;
+	}
 }
 
 function Untarget(){
-	if (target != null && target.GetComponent(Node) != null){
-		target.GetComponent(Node).alertUntarget();
-	}
-	transform.parent = null;
 	target = null;
-}
-
-var dragging : boolean = false;
-function ProcessDrag(){
-	if(!Input.GetMouseButton(0) || !freeCamera || target == null){
-		dragging = false;
-		return;
-	}
-	
-	var dist = Vector3.Distance(transform.position, target.position);
-	
-	if (dragging){
-		var coordinates = Camera.main.WorldToScreenPoint(target.position);
-		var mouseCoords = Input.mousePosition;
-		
-		var x1 = (mouseCoords.x - coordinates.x);
-		var y1 = (mouseCoords.y - coordinates.y);
-				
-		target.position += transform.right*x1*0.0005*dist;
-		target.position += transform.up*y1*0.0005*dist;
-		
-		//check the coords again to make sure you didn't pass the mouse
-		//this is to avoid the "shaking effect"
-		var new_coords = Camera.main.WorldToScreenPoint(target.position);
-		x2 = (mouseCoords.x - new_coords.x);
-		y2 = (mouseCoords.y - new_coords.y);
-		if (x1 > 0 && x2 < 0 || x1 < 0 && x2 > 0){
-			target.position -= transform.right*x1*0.0005*dist;
-		}
-		if (y1 > 0 && y2 < 0 || y1 < 0 && y2 > 0){
-			target.position -= transform.up*y1*0.0005*dist;
-		}
-		
-		
-		
-	}
 }
 
 //called by the search function
