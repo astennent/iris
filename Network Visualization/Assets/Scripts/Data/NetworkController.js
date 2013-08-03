@@ -20,6 +20,7 @@ var currentSeedIndex : int = 0;
 //used to clone the node texture material so you can control the color at runtime.
 var nodeTexture : Material;
 var lineTexture : Material;
+var reticleTexture : Material;
 
 var fileManager : FileManager;
 

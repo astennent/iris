@@ -7,8 +7,8 @@ var boxing : boolean = false;
 private var clearedSelectionSinceBoxStart = false; 
 private var startCoords : Vector2; //corner of selection box
 
-var targets = new List.<Node>(); //list of all selected nodes
-var selectedTarget : Node; //the focused selected node
+var nodes = new List.<Node>(); //list of all selected nodes
+var primaryNode : Node; //the focused selected node
 var networkCamera : NetworkCamera;
 var cameraTransform : Transform;
 
@@ -20,10 +20,10 @@ function Start(){
 	fileManager = GetComponent(FileManager);
 }
 
+var last_click_time = 0.0;
 function NodeClick(node : Node){
-	print (Time.time);
-
-	var already_selected = targets.Contains(node);
+	last_click_time = Time.time;
+	var already_selected = nodes.Contains(node);
 	var ctrl = Input.GetButton("Ctrl");
 
 	if (already_selected && ctrl){
@@ -41,7 +41,9 @@ function NodeClick(node : Node){
 	dragging = true;
 }
 
+var updated = false;
 function Update () {
+	upated = true;
 	if (dragging){
 		ProcessDrag();
 	}
@@ -58,6 +60,10 @@ function Update () {
     }
 }
 
+function LateUpdate(){
+	updated = false;
+}
+
 function ProcessDrag(){
 	if(!Input.GetMouseButton(0)  || !networkCamera.freeCamera){
 		dragging = false;
@@ -65,7 +71,7 @@ function ProcessDrag(){
 	}
 		
 	if (dragging){
-		var target = selectedTarget.transform;
+		var target = primaryNode.transform;
 		var original_position = target.position;
 		
 		var mouseCoords = Input.mousePosition;
@@ -91,8 +97,8 @@ function ProcessDrag(){
 
 		//move all selected nodes the same distance.
 		var positionDelta =  target.position - original_position;
-		for (var node in targets){
-			if (node != selectedTarget){
+		for (var node in nodes){
+			if (node != primaryNode){
 				node.transform.position += positionDelta;
 			}
 		}		
@@ -107,8 +113,7 @@ function ProcessBoxing(){
 	}
 	if (!boxing && Input.GetMouseButtonDown(0)){
 		startBoxing();
-	}
-	if (boxing && Input.GetMouseButtonUp(0)){
+	} else if (boxing && Input.GetMouseButtonUp(0)){
 		stopBoxing();
 	}
 }
@@ -149,7 +154,7 @@ function OnGUI(){
 }
 
 function selectBoxedItems(){
-	if (!Input.GetButton("Ctrl")){
+	if (!Input.GetButton("Ctrl") && Time.time - last_click_time > 0.1){
 		clearSelectedNodes();
 	}
 
@@ -169,17 +174,17 @@ function selectBoxedItems(){
 			if (node_coords.z > 0 &&
 					node_coords.x >= left && node_coords.x <= right &&
 					node_coords.y <= bottom && node_coords.y >= top){
-				targets.Add(node);
+				nodes.Add(node);
 			}
 		}
 	}
 
-	for (node in targets){
-		node.alertTarget();
+	for (node in nodes){
+		node.setSelected(true);
 	}
 
-	if (targets.Count == 1){
-		networkCamera.setTarget(targets[0]);
+	if (nodes.Count == 1){
+		networkCamera.setTarget(nodes[0]);
 	}
 }
 
@@ -188,8 +193,8 @@ function selectAllInGroup(group_id : int){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);
 			if (node.group_id == group_id){
-				targets.Add(node);
-				node.alertTarget();
+				nodes.Add(node);
+				node.setSelected(true);
 			}
 		}
 	}
@@ -199,31 +204,30 @@ function selectAll(){
 	for (var file : DataFile in fileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);
-			targets.Add(node);
-			node.alertTarget();	
+			nodes.Add(node);
+			node.setSelected(true);	
 		}
 	}
 }
 
 function clearSelectedNodes(){
-	for (node in targets){
-		node.alertUntarget();
+	for (node in nodes){
+		node.setSelected(false);
 	}
-	targets = new List.<Node>();
+	nodes = new List.<Node>();
 }
 
 function deselectNode(node : Node){
-	targets.Remove(node);
-	node.alertUntarget();
+	nodes.Remove(node);
+	node.setSelected(false);
 }
 
 function selectNode(node : Node){
-	targets.Add(node);
-	node.alertTarget();
+	nodes.Add(node);
+	node.setSelected(true);
 }
 
 function selectPrimaryNode(node : Node){
 	networkCamera.setTarget(node);	
-	selectedTarget = node;
-	//node.alertPrimaryTarget(); TODO
+	primaryNode = node;
 }

@@ -70,6 +70,7 @@ function AddConnection (other : Node, isOutgoing : boolean, foreignKey : Foreign
 	UpdateSize();
 }
 
+
 function Update () {	
 	GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0);
 	
@@ -156,9 +157,9 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 	//To prevent infinite sliding, don't allow nodes to back
 	//off from each other unless you are dragging them around.
 	if (selectionController.dragging){
-		speed = Mathf.Clamp(speed, -1, 1);		
+		speed = Mathf.Clamp(speed, -.2, 1);		
 	} else {
-		speed = Mathf.Clamp(speed, 0, 1);
+		speed = Mathf.Clamp(speed, -.1, 1);
 	}	
 	
 
@@ -167,7 +168,7 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 }
 
 function OnMouseOver() {
-	if(Input.GetMouseButton(0)){
+	if(Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 		selectionController.NodeClick(this);
     } 
 }
@@ -183,18 +184,17 @@ function LateUpdate () {
 	}
 }
 
-//functions for camera targetting.
-function alertTarget(){
-	if (reticle == null){
+function setSelected(selected : boolean){
+	if (selected && reticle == null){
 		reticle = gameObject.Instantiate(reticlePrefab);
 		reticle.Init(this);
-	}
-}
-function alertUntarget(){
-	if (reticle != null){
+	} else if (!selected && reticle != null){
 		Destroy(reticle.gameObject);
 		reticle = null; //unneeded?
 	}
+}
+function isSelected(){
+	return (reticle != null);
 }
 
 function Deactivate(){
