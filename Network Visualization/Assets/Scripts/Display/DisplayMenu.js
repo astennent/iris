@@ -51,6 +51,7 @@ class DisplayMenu extends PrimaryMenu {
 			colorController.createRule();
 			colorRuleMenu.EnableDisplay();
 			colorRuleMenu.setRuleIndex(colorController.rules.length-1);
+			colorRuleColorMenu.setRuleIndex(colorController.rules.length-1);
 		}
 
 		if (GUI.Button(new Rect(x+120, y, 120, 25), "Apply All Rules")){
@@ -84,6 +85,8 @@ class DisplayMenu extends PrimaryMenu {
 			var buttonRect = new Rect(35, temp_y, width-85, 30);
 			if (GUI.Button(buttonRect, rule.getDisplayName())){
 				colorRuleMenu.setRuleIndex(i);
+				colorRuleColorMenu.setRuleIndex(i);
+				colorSchemeMenu.DisableDisplay();
 				if (current_rule_id == i){
 					colorRuleMenu.DisableDisplay();
 				} else {

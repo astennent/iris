@@ -1,6 +1,6 @@
 class ColorSchemeMenu extends SecondaryMenu {
 	private var scrollPosition : Vector2 = Vector2.zero;
-	
+
 	function Start(){
 		super.Start();
 		width = 180;
@@ -30,32 +30,18 @@ class ColorSchemeMenu extends SecondaryMenu {
 				var current_rule = colorController.rules[rule_index];
 			}
 
-			if (rule_index == -1 && current_scheme == scheme) { 
+			if (current_scheme == scheme) { 
 				GUI.color = colorController.button_color; 
-			} else if (rule_index != -1 && i == current_rule.color_scheme) {
-				GUI.color = current_rule.color;
 			} else {
 				GUI.color = Color.white; 
 			}
 
 			if (GUI.Button(schemeRect, scheme)){
-				if (rule_index == -1) {
-					colorController.setScheme(i);
-				} else {
-					current_rule.setScheme(i);
-				}
+				colorController.setScheme(i);
 			}
 			y+=30;
 		}
 
 		GUI.EndScrollView();
 	}
-
-	function DisableDisplay(){
-		super.DisableDisplay();
-		if (colorRuleMenu.displaying){
-			colorRuleMenu.DisableDisplay();
-		}
-	}
-
 }

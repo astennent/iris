@@ -81,19 +81,20 @@ function ApplyAllRules(){
 function ApplyRule(index : int) {
 	var rule = rules[index].GetComponent(ColorRule);
 	var color = rule.color;
+	var variation : float = rule.variation;
 	if (rule.rule_type == 0) {  //source
 		if (rule.source != null) {
-			ColorBySource(rule.source, color);
+			ColorBySource(rule.source, color, variation);
 		}
 	} else if (rule.rule_type == 1) { //cluster
 		if (rule.cluster_id != -1) {
-			ColorByCluster(rule.cluster_id, color);
+			ColorByCluster(rule.cluster_id, color, variation);
 		}
 	} else if (rule.rule_type == 2) { //node
 		//TODO
 	} else if (rule.rule_type == 3){ //attr
 		if (rule.attribute != null) {
-			ColorByAttribute(rule.attribute, rule.attribute_value, color);
+			ColorByAttribute(rule.attribute, rule.attribute_value, color, variation);
 		}
 	}
 }
@@ -126,13 +127,13 @@ function ColorByCluster(){
 	var color_dict = {};
 	for (var entry in group_dict){ //loop over the cluster ids
 		var color : Color = GenRandomColor();
-		ColorByCluster(entry.Key, color);
+		ColorByCluster(entry.Key, color, 0.3);
 	}	
 }
-function ColorByCluster(cluster_id : int, color : Color){
+function ColorByCluster(cluster_id : int, color : Color, variation : float){
 	var nodes : Array = clusterController.group_dict[cluster_id];	
 	for (var node in nodes){
-		node.GetComponent(Node).SetColor(NudgeColor(color), true);
+		node.GetComponent(Node).SetColor(NudgeColor(color, variation), true);
 	}
 }
 
@@ -140,22 +141,22 @@ function ColorByCluster(cluster_id : int, color : Color){
 function ColorBySource(){
 	for (var file : DataFile in fileManager.files){
 		var color : Color = GenRandomColor();
-		ColorBySource(file, color);
+		ColorBySource(file, color, 0.3);
 	}
 }
-function ColorBySource(file : DataFile, color : Color){
+function ColorBySource(file : DataFile, color : Color, variation : float){
 	for (var node in file.nodes){
-		node.Value.SetColor(NudgeColor(color), true);
+		node.Value.SetColor(NudgeColor(color, variation), true);
 	}
 }
 
 //color nodes based on a certain attribute value.
-function ColorByAttribute(attribute : Attribute, value : String, color : Color){
+function ColorByAttribute(attribute : Attribute, value : String, color : Color, variation : float){
 	var file : DataFile = attribute.file;
 	var attr_index : int = file.attributes.IndexOf(attribute);
 	for (var node in file.nodes){
 		if (""+node.Value.data[attr_index] == value) { 
-			node.Value.SetColor(NudgeColor(color), true);
+			node.Value.SetColor(NudgeColor(color, variation), true);
 		}
 	}
 }

@@ -16,6 +16,8 @@ class PrimaryMenu extends MonoBehaviour {
     var searchController : SearchController;
     var colorSchemeMenu : ColorSchemeMenu;
     var colorRuleMenu : ColorRuleMenu;
+    var colorRuleColorMenu : ColorRuleColorMenu;
+    var colorPicker : ColorPicker;
 
     var title : String = ""; //must be set in individual menus.
 	
@@ -33,6 +35,8 @@ class PrimaryMenu extends MonoBehaviour {
 		searchController = GetComponent(SearchController);
 		colorSchemeMenu = GetComponent(ColorSchemeMenu);
 		colorRuleMenu = GetComponent(ColorRuleMenu);
+		colorRuleColorMenu = GetComponent(ColorRuleColorMenu);
+		colorPicker = GetComponent(ColorPicker);
 	}
 
 	function Update () {	

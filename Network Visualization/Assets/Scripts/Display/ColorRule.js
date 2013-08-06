@@ -7,8 +7,8 @@ var node_pkey : Array;
 var attribute : Attribute; //stores which attribute you're looking at
 var attribute_value : String = "";
 
+var color_scheme : int = 0;
 var color : Color;
-var color_scheme : int;
 var variation : float;
 
 var colorController : ColorController;

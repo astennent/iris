@@ -20,9 +20,9 @@ class ColorRuleMenu extends SecondaryMenu {
 	function Start(){
 		super.Start();
 		width = 200;
-		desired_x_without_details += 180; //based on color scheme menu width
-		desired_x_with_details += 180;
-		parentMenu = GetComponent(ColorSchemeMenu);
+		desired_x_without_details += 200; //based on color rule color menu width
+		desired_x_with_details += 200;
+		parentMenu = GetComponent(ColorRuleColorMenu);
 		title = "Coloring Rules";
 	}
 
@@ -37,7 +37,6 @@ class ColorRuleMenu extends SecondaryMenu {
 		}
 		var rule : ColorRule = colorController.rules[rule_index];
 		title = rule.getDisplayName();
-		parentMenu.title = "Color Scheme \n for \"" + rule.getDisplayName() + "\"";
 
 		var y = 40;
 		for (var i : int = 0 ; i < colorController.rule_types.length ; i++){
@@ -250,13 +249,13 @@ class ColorRuleMenu extends SecondaryMenu {
 	function EnableDisplay(){
 		super.EnableDisplay();
 		parentMenu.EnableDisplay();
+
 	}
 
 	function DisableDisplay(){
 		super.DisableDisplay();
 		parentMenu.DisableDisplay();
 		rule_index = -1;
-		parentMenu.title = "Color Schemes";
 		GUI.FocusControl("");
 	}
 

@@ -5,11 +5,11 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{E60A38D2-DC90-02CF-9CF9-BA90F6D8F41E}</ProjectGuid>
+	<ProjectGuid>{279C9152-4F18-D5D6-062C-386B32FB3FB7}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-UnityScript</AssemblyName>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
 	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
 	<FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,39 +44,11 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Demo\DemoStreamReader.js" />
-     <Compile Include="Assets\Scripts\Camera\NetworkCamera.js" />
-     <Compile Include="Assets\Scripts\Data\Attribute.js" />
-     <Compile Include="Assets\Scripts\Data\AttributeMenu.js" />
-     <Compile Include="Assets\Scripts\Data\ClusterController.js" />
-     <Compile Include="Assets\Scripts\Data\Connection.js" />
-     <Compile Include="Assets\Scripts\Data\DataFile.js" />
-     <Compile Include="Assets\Scripts\Data\DrawLine.js" />
-     <Compile Include="Assets\Scripts\Data\FileManager.js" />
-     <Compile Include="Assets\Scripts\Data\FileMenu.js" />
-     <Compile Include="Assets\Scripts\Data\FkeyMenu.js" />
-     <Compile Include="Assets\Scripts\Data\ForeignKey.js" />
-     <Compile Include="Assets\Scripts\Data\NetworkController.js" />
-     <Compile Include="Assets\Scripts\Data\Node.js" />
-     <Compile Include="Assets\Scripts\Display\ColorController.js" />
-     <Compile Include="Assets\Scripts\Display\ColorRule.js" />
-     <Compile Include="Assets\Scripts\Display\ColorRuleColorMenu.js" />
-     <Compile Include="Assets\Scripts\Display\ColorRuleMenu.js" />
-     <Compile Include="Assets\Scripts\Display\ColorSchemeMenu.js" />
-     <Compile Include="Assets\Scripts\Display\DisplayMenu.js" />
-     <Compile Include="Assets\Scripts\Display\Reticle.js" />
-     <Compile Include="Assets\Scripts\Interface\ColorPicker.js" />
-     <Compile Include="Assets\Scripts\Interface\MainMenu.js" />
-     <Compile Include="Assets\Scripts\Interface\PrimaryMenu.js" />
-     <Compile Include="Assets\Scripts\Interface\SecondaryMenu.js" />
-     <Compile Include="Assets\Scripts\Search\SearchController.js" />
-     <Compile Include="Assets\Scripts\Search\SearchMenu.js" />
-     <Compile Include="Assets\Scripts\Selection\SelectionController.js" />
+     <Compile Include="Assets\Scripts\Interface\ColorPicker.cs" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">
-      <Project>{4F04CD35-AA2D-B3FC-ADD1-F8A27DCAB0CA}</Project>      <Name>Assembly-UnityScript-firstpass</Name>    </ProjectReference>
+ <Reference Include="Assembly-UnityScript-firstpass">
+ <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
