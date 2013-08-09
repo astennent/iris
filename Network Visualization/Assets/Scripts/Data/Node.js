@@ -30,6 +30,8 @@ private var size : float = 2.5; //2.5 is the minimum
 
 private var selectionController : SelectionController;
 
+private var haloColor;
+
 function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	selectionController = networkController.GetComponent(SelectionController);
@@ -45,7 +47,8 @@ function Init(){
 		
 	renderer.material = new Material(networkController.nodeTexture);
 	lineMat = new Material(networkController.lineTexture);
-	renderer.material.color = color;		
+	renderer.material.color = color;	
+	resetHaloColor();	
 }
 
 function SetColor(c : Color, colorConnections : boolean){
@@ -195,6 +198,19 @@ function setSelected(selected : boolean){
 }
 function isSelected(){
 	return (reticle != null);
+}
+
+function resetHaloColor(){
+	var c : Color = this.color;
+	c.a = .5;
+	setHaloColor(c);
+}
+function setHaloColor(c : Color){
+	haloColor = c;
+}
+
+function getHaloColor() {
+	return haloColor;
 }
 
 function Deactivate(){

@@ -7,9 +7,11 @@ var node_pkey : Array;
 var attribute : Attribute; //stores which attribute you're looking at
 var attribute_value : String = "";
 
-var color_scheme : int = 0;
 var color : Color;
 var variation : float;
+
+var halo : boolean;
+var halo_always_on : boolean;
 
 var colorController : ColorController;
 
@@ -21,14 +23,12 @@ function Init(){
 	cluster_id = -1;
 
 	colorController = GameObject.FindGameObjectWithTag("GameController").GetComponent(ColorController);
-	color_scheme = 0; //BRIGHT
-	color = colorController.GenRandomColor(color_scheme);
+	color = colorController.GenRandomColor(0); //BRIGHT
 	variation = 0.3;
 }
 
 function setScheme(index : int){
 	color = colorController.GenRandomColor(index);
-	color_scheme = index;
 }
 
 function getDisplayName(){

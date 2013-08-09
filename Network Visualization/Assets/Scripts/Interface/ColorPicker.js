@@ -61,6 +61,7 @@ function OnGUI(){
 		alphaValue = GUI.VerticalSlider(alphaRect, alphaValue, 100, 0);
 
 		var newChosenColor : Color = brightnessValues[brightnessValue];
+		newChosenColor.a = alphaValue/100.0;
 		GUI.color.a = alphaValue/100.0;
 		var selectedColorTexture = new Texture2D(1, 1);
 		selectedColorTexture.SetPixel(0, 0, newChosenColor);
@@ -127,7 +128,7 @@ function OnGUI(){
 		}
 
 		if (newChosenColor != chosenColor){
-			print(newChosenColor);
+			//print(newChosenColor);
 			chosenColor = newChosenColor;
 		}
 

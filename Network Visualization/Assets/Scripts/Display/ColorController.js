@@ -73,6 +73,15 @@ function moveRuleDown(i : int){
 }
 
 function ApplyAllRules(){
+
+	//reset all halos.
+	for (var file : DataFile in fileManager.files){
+		for (var entry in file.nodes){
+			var node : Node = entry.Value;
+			node.resetHaloColor();
+		}
+	}
+
 	for (var x = 0; x < rules.length ; x++){
 		ApplyRule(x);
 	}
@@ -80,21 +89,26 @@ function ApplyAllRules(){
 
 function ApplyRule(index : int) {
 	var rule = rules[index].GetComponent(ColorRule);
+	ApplyRule(rule);
+}
+
+function ApplyRule(rule : ColorRule) {
 	var color = rule.color;
 	var variation : float = rule.variation;
+	var halo = rule.halo;
 	if (rule.rule_type == 0) {  //source
 		if (rule.source != null) {
-			ColorBySource(rule.source, color, variation);
+			ColorBySource(rule.source, color, variation, halo);
 		}
 	} else if (rule.rule_type == 1) { //cluster
 		if (rule.cluster_id != -1) {
-			ColorByCluster(rule.cluster_id, color, variation);
+			ColorByCluster(rule.cluster_id, color, variation, halo);
 		}
 	} else if (rule.rule_type == 2) { //node
 		//TODO
 	} else if (rule.rule_type == 3){ //attr
 		if (rule.attribute != null) {
-			ColorByAttribute(rule.attribute, rule.attribute_value, color, variation);
+			ColorByAttribute(rule.attribute, rule.attribute_value, color, variation, halo);
 		}
 	}
 }
@@ -127,13 +141,14 @@ function ColorByCluster(){
 	var color_dict = {};
 	for (var entry in group_dict){ //loop over the cluster ids
 		var color : Color = GenRandomColor();
-		ColorByCluster(entry.Key, color, 0.3);
+		ColorByCluster(entry.Key, color, 0.3, false);
 	}	
 }
-function ColorByCluster(cluster_id : int, color : Color, variation : float){
+
+function ColorByCluster(cluster_id : int, color : Color, variation : float, halo : boolean){
 	var nodes : Array = clusterController.group_dict[cluster_id];	
 	for (var node in nodes){
-		node.GetComponent(Node).SetColor(NudgeColor(color, variation), true);
+		ColorNodeForRule(node, color, variation, halo);
 	}
 }
 
@@ -141,23 +156,30 @@ function ColorByCluster(cluster_id : int, color : Color, variation : float){
 function ColorBySource(){
 	for (var file : DataFile in fileManager.files){
 		var color : Color = GenRandomColor();
-		ColorBySource(file, color, 0.3);
+		ColorBySource(file, color, 0.3, false);
 	}
 }
-function ColorBySource(file : DataFile, color : Color, variation : float){
+function ColorBySource(file : DataFile, color : Color, variation : float, halo : boolean){
 	for (var node in file.nodes){
-		node.Value.SetColor(NudgeColor(color, variation), true);
+		ColorNodeForRule(node.Value, color, variation, halo);
 	}
 }
-
 //color nodes based on a certain attribute value.
-function ColorByAttribute(attribute : Attribute, value : String, color : Color, variation : float){
+function ColorByAttribute(attribute : Attribute, value : String, color : Color, variation : float, halo : boolean){
 	var file : DataFile = attribute.file;
 	var attr_index : int = file.attributes.IndexOf(attribute);
 	for (var node in file.nodes){
 		if (""+node.Value.data[attr_index] == value) { 
-			node.Value.SetColor(NudgeColor(color, variation), true);
+			ColorNodeForRule(node.Value, color, variation, halo);
 		}
+	}
+}
+
+function ColorNodeForRule(node : Node, color : Color, variation : float, halo : boolean){
+	if (halo){
+		node.setHaloColor(NudgeColor(color, variation));
+	} else {
+		node.SetColor(NudgeColor(color, variation), true);
 	}
 }
 

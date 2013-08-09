@@ -1,3 +1,5 @@
+#pragma strict
+
 class PrimaryMenu extends MonoBehaviour {
 	var displaying : boolean;
 
@@ -7,6 +9,8 @@ class PrimaryMenu extends MonoBehaviour {
 	var width : float;
 	var display_disabling_suspended : boolean = false;
 
+	/* List of all classes attached to the NetworkController,
+		used for easy referencing between menus*/
 	var clusterController : ClusterController;
 	var fileManager : FileManager;
 	var fileMenu : FileMenu;
@@ -18,9 +22,16 @@ class PrimaryMenu extends MonoBehaviour {
     var colorRuleMenu : ColorRuleMenu;
     var colorRuleColorMenu : ColorRuleColorMenu;
     var colorPicker : ColorPicker;
+    var searchMenu : SearchMenu;
+    var displayMenu : DisplayMenu;
 
-    var title : String = ""; //must be set in individual menus.
+
+    /* The text displayed at the top of the menu */
+    var title : String = ""; //must be set separately in each menu.
 	
+    /* Any menus that will appear to the right of the current menu */
+    var children : PrimaryMenu[];
+
 	function Start(){
 		desired_x_without_details = 45;
 		desired_x_with_details = 160;
@@ -37,6 +48,8 @@ class PrimaryMenu extends MonoBehaviour {
 		colorRuleMenu = GetComponent(ColorRuleMenu);
 		colorRuleColorMenu = GetComponent(ColorRuleColorMenu);
 		colorPicker = GetComponent(ColorPicker);
+		searchMenu = GetComponent(SearchMenu);
+		displayMenu = GetComponent(DisplayMenu);
 	}
 
 	function Update () {	
@@ -60,7 +73,7 @@ class PrimaryMenu extends MonoBehaviour {
 		var menuRect = new Rect(x, 0, width, Screen.height);
 		GUI.Box(menuRect, title);
 
-		box = new Rect(x+width-30, 4, 26, 26);
+		var box = new Rect(x+width-30, 4, 26, 26);
 		if (GUI.Button(box, "X")){
 			DisableDisplay();
 		};
