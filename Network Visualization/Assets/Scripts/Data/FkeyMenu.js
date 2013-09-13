@@ -1,6 +1,6 @@
 //Handles the display of the fkey section in the file menu.
 
-class FkeyMenu extends SecondaryMenu {
+class FkeyMenu extends PrimaryMenu {
 
 	private var adding_index : int = -1;
 	private var adding_from_attr : Attribute;
@@ -11,9 +11,10 @@ class FkeyMenu extends SecondaryMenu {
 	private var tempFileScrollPosition : Vector2 = Vector2.zero;
 
 	function Start(){
+		parent = GetComponent(FileMenu);
 		super.Start();
-		parentMenu = GetComponent(FileMenu);
 		title = "Foreign Key Manager";
+		width = 250;
 	}
    
 	function OnGUI(){

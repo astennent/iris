@@ -516,7 +516,7 @@ function GenerateConnectionsForLinkingTable(){
 	
 function CreateNode(data){
 	var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-	var randColor : Color = colorController.GenRandomColor();
+	var randColor : Color = colorController.GenRandomColor(0); //random bright color
 	var node : Node = GameObject.Instantiate(nodePrefab, randPos, transform.rotation).GetComponent(Node);
 	node.gameObject.name = "X";
 	node.data = data;

@@ -42,21 +42,22 @@ function UpdateFree(){
 		
 		transform.RotateAround(transform.right, -y);
 		transform.RotateAround(transform.up, x);
-		
-		if (Input.GetButton("Shift")){
-			speed = 2;
-		} else {
-			speed = 1;
-		}
-		
-		var h : float = Input.GetAxis("Horizontal")*speed;
-		var f : float = Input.GetAxis("Vertical")*speed;
-		var v : float = Input.GetAxis("StrafeVertical")*speed;
-		
-		transform.position += f*transform.forward;
-		transform.position += h*transform.right;
-		transform.position += v*transform.up;
 	}
+
+	if (Input.GetButton("Shift")){
+		speed = 2;
+	} else {
+		speed = 1;
+	}
+	
+	var h : float = Input.GetAxis("Horizontal")*speed;
+	var f : float = Input.GetAxis("Vertical")*speed;
+	var v : float = Input.GetAxis("StrafeVertical")*speed;
+	
+	transform.position += f*transform.forward;
+	transform.position += h*transform.right;
+	transform.position += v*transform.up;
+	
 
 }
 

@@ -30,7 +30,7 @@ private var size : float = 2.5; //2.5 is the minimum
 
 private var selectionController : SelectionController;
 
-private var haloColor;
+private var haloColor : Color;
 
 function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);

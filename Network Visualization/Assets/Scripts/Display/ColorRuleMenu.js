@@ -1,6 +1,6 @@
 #pragma downcast
 
-class ColorRuleMenu extends SecondaryMenu {
+class ColorRuleMenu extends PrimaryMenu {
 	private var sourceScrollPosition : Vector2 = Vector2.zero;
 	private var clusterScrollPosition : Vector2 = Vector2.zero;
 	private var nodeScrollPosition : Vector2 = Vector2.zero;
@@ -15,34 +15,41 @@ class ColorRuleMenu extends SecondaryMenu {
 	private var oldSearchString : String = "";
 	private var attributeMatchCount : int = 0;
 
-	var rule_index : int = -1;
-
 	function Start(){
+		parent = GetComponent(ColorRuleColorMenu);
 		super.Start();
 		width = 200;
-		desired_x_without_details += 200; //based on color rule color menu width
-		desired_x_with_details += 200;
-		parentMenu = GetComponent(ColorRuleColorMenu);
 		title = "Coloring Rules";
 	}
 
-	function setRuleIndex(i : int){
-		rule_index = i;
-	}
 
 	function OnGUI(){
 		super.OnGUI();
-		if (rule_index < 0 || rule_index >= colorController.rules.length){
+
+		var rule_index = displayMenu.rule_index;
+
+		if (rule_index >= 1) {
+			if (!displaying){
+				EnableDisplay();
+			}
+		} else{ 
+			if (displaying) {
+				DisableDisplay();
+			}
 			return;
 		}
+
 		var rule : ColorRule = colorController.rules[rule_index];
+
 		title = rule.getDisplayName();
 
 		var y = 40;
 		for (var i : int = 0 ; i < colorController.rule_types.length ; i++){
-			var rule_type : String = colorController.rule_types[i];
-			if (GUI.Toggle (Rect (x+5, y, width-5, 20), (i == rule.rule_type), rule_type)){
-				rule.rule_type = i;
+			var type_name : String = colorController.rule_types[i];
+			var selected_current = GUI.Toggle(Rect (x+5, y, width-5, 20), (i == rule.getRuleType()), type_name);
+
+			if (selected_current && ! (rule.getRuleType() == i)) {
+				rule.setRuleType(i);
 			}
 			y+=20;
 		}
@@ -55,24 +62,26 @@ class ColorRuleMenu extends SecondaryMenu {
 		scrollBox.height -= 20;
 
 		var temp_y = 0;
-		if (rule.rule_type == 0){
+
+		var rule_type = rule.getRuleType(); 
+		if (rule_type == 0){
 			var files = fileManager.files;
 
 			sourceScrollPosition = GUI.BeginScrollView (scrollBox, 
 				sourceScrollPosition, Rect (0, 0, width, 20*files.length+20));
 
-			for (var file : DataFile in files){
-
-				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (file == rule.source), file.shortName())){
-					rule.source = file;
-				}
-			
+			for (var file : DataFile in files) {
+				var usedSourceBefore = rule.usesSource(file);
+				var usedSourceAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file)), file.shortName());
+				if (usedSourceAfter != usedSourceBefore) {
+					rule.toggleSource(file);
+				}			
 				temp_y+=20;
 			}
 
 			GUI.EndScrollView();
 
-		} else if (rule.rule_type == 1){
+		} else if (rule_type == 1){
 
 			if (found_unconnected_cluster){
 				scrollBox.y += 20;
@@ -80,7 +89,6 @@ class ColorRuleMenu extends SecondaryMenu {
 			}	
 			
 			found_unconnected_cluster = false;
-
 			var cluster_dict = clusterController.group_dict;
 
 			clusterScrollPosition = GUI.BeginScrollView (scrollBox, 
@@ -102,11 +110,9 @@ class ColorRuleMenu extends SecondaryMenu {
 					display_string = cluster_key+" ("+ cluster_size + " nodes)";
 				}
 
-
-
-				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (cluster_key == rule.cluster_id),
+				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (cluster_key == rule.getClusterId()),
 						display_string)) {
-					rule.cluster_id = cluster_key;
+					rule.setClusterId(cluster_key);
 				}
 			
 				temp_y+=20;
@@ -124,7 +130,7 @@ class ColorRuleMenu extends SecondaryMenu {
 				}
 			}
 		
-		} else if (rule.rule_type == 2) {
+		} else if (rule_type == 2) {
 			/* TODO
 
 			var line_count : int  = 0;
@@ -147,7 +153,7 @@ class ColorRuleMenu extends SecondaryMenu {
 			}
 
 			GUI.EndScrollView();*/
-		} else if (rule.rule_type == 3){
+		} else if (rule_type == 3){
 			line_count = 0;
 			for (var file : DataFile in fileManager.files){
 				line_count += file.attributes.Count + 1;
@@ -162,11 +168,11 @@ class ColorRuleMenu extends SecondaryMenu {
 				temp_y += 20;
 
 				for (var attribute in file.attributes){
-					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.attribute), attribute.column_name)){
-						if (attribute != rule.attribute) {
+					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.getAttribute()), attribute.column_name)){
+						if (attribute != rule.getAttribute()) {
 							updateCachedAttributeValues(attribute);
 						}
-						rule.attribute = attribute;
+						rule.setAttribute(attribute);
 					}
 					temp_y += 20;
 				}
@@ -182,7 +188,7 @@ class ColorRuleMenu extends SecondaryMenu {
 			searchString = GUI.TextField(searchRect, searchString, 20);
 			if (searchString != oldSearchString){
 				oldSearchString = searchString;
-				updateCachedAttributeValues(rule.attribute);
+				updateCachedAttributeValues(rule.getAttribute());
 			}
 
 			scrollBox.y += 40;
@@ -197,14 +203,14 @@ class ColorRuleMenu extends SecondaryMenu {
 
 			for (var entry in attributeValueCache){
 				var value = entry.Key+"";
-				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (value == rule.attribute_value), value)){
-					rule.attribute_value = value;
+				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (value == rule.getAttributeValue()), value)){
+					rule.setAttributeValue(value);
 				}
 				temp_y += 20;
 			}
 
 			message_box = new Rect(5, temp_y, width-5, 20);
-			if (rule.attribute == null){
+			if (rule.getAttribute() == null){
 				GUI.Label(message_box, "Select an attribute");
 			} else if (attributeMatchCount == 0){
 				GUI.Label(message_box, "No Matches");
@@ -227,7 +233,7 @@ class ColorRuleMenu extends SecondaryMenu {
 		var file = attribute.file;
 		var attribute_index : int = -1;
 		for (var i : int = 0 ; i < file.attributes.Count; i++){
-			if (file.attributes[i] == attribute){
+			if (file.attributes[i] == attribute) {
 				attribute_index = i;
 				break;
 			}
@@ -246,17 +252,12 @@ class ColorRuleMenu extends SecondaryMenu {
 		}	
 	}
 
-	function EnableDisplay(){
-		super.EnableDisplay();
-		parentMenu.EnableDisplay();
-
-	}
-
 	function DisableDisplay(){
+		print ("Disabling ColorRuleMenu");
+		//special case: when you're on the fallback rule, don't reset the rule when you close.
+		if (displayMenu.rule_index != 0) {
+			displayMenu.setRuleIndex(-1);
+		}
 		super.DisableDisplay();
-		parentMenu.DisableDisplay();
-		rule_index = -1;
-		GUI.FocusControl("");
 	}
-
 }

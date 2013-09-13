@@ -4,68 +4,44 @@ private var networkController : NetworkController;
 private var clusterController : ClusterController;
 private var fileManager : FileManager;
 
-private var mode : int = 0;
-var RANDOM : int = 0;
-var BY_CLUSTER : int = 1;
-var BY_SOURCE : int = 2;
-
-
-var scheme : int = 1; //default to bright colors.
 var button_color : Color;
 private var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight", "Forest Glade", 
 					"Aqua"];
 
-var rules : Array = new Array();
+var rules : List.<ColorRule> = new List.<ColorRule>();
 var rule_types = ["Source", "Cluster", "Node", "Attribute"];
 var colorRulePrefab : ColorRule;
 
-function getSchemes(){
+function getSchemeNames() {
 	return schemes;
 }
-function getSchemeName(){
-	return schemes[scheme];
-}
-function getScheme(){
-	return scheme;
-}
-function setScheme(s : int){
-	scheme = s;
-	ApplyColors();
-	button_color = GenRandomColor();
-}
-
-function getMode(){
-	return mode;
-}
-function setMode(m : int){
-	mode = m;
-}
-
 
 function Start(){
 	networkController = this.GetComponent(NetworkController);
 	clusterController = this.GetComponent(ClusterController);
 	fileManager = this.GetComponent(FileManager);
-	setScheme(0);
+
+	createRule();
+	rules[0].is_fallback = true;
 }
 
 function createRule(){
 	var new_rule : ColorRule = GameObject.Instantiate(colorRulePrefab).GetComponent(ColorRule);
 	new_rule.Init();
-	rules.Push(new_rule);
+	rules.Add(new_rule);
 }
 function removeRule(i : int){
 	rules.RemoveAt(i);
 }
 function moveRuleUp(i : int){
-	if (i > 0){
+	if (i > 1){
 		var temp = rules[i];
 		rules[i] = rules[i-1];
 		rules[i-1] = temp;
 	}
 }
 function moveRuleDown(i : int){
-	if (i < rules.length -1) {
+	if (i < rules.Count -1) {
 		var temp = rules[i];
 		rules[i] = rules[i+1];
 		rules[i+1] = temp;
@@ -73,7 +49,6 @@ function moveRuleDown(i : int){
 }
 
 function ApplyAllRules(){
-
 	//reset all halos.
 	for (var file : DataFile in fileManager.files){
 		for (var entry in file.nodes){
@@ -82,7 +57,7 @@ function ApplyAllRules(){
 		}
 	}
 
-	for (var x = 0; x < rules.length ; x++){
+	for (var x = 0; x < rules.Count ; x++){
 		ApplyRule(x);
 	}
 }
@@ -93,39 +68,46 @@ function ApplyRule(index : int) {
 }
 
 function ApplyRule(rule : ColorRule) {
-	var color = rule.color;
+	var color : Color;
+	if (rule.uses_scheme) { 
+		color = GenRandomColor(rule.getScheme());
+	} else {
+		color = rule.color;
+	}
 	var variation : float = rule.variation;
 	var halo = rule.halo;
-	if (rule.rule_type == 0) {  //source
-		if (rule.source != null) {
-			ColorBySource(rule.source, color, variation, halo);
+	var rule_type = rule.getRuleType();
+	if (rule_type == 0) {  //source
+
+		//the fallback rule transparently applies itself to all files.
+		if (rule.is_fallback) {
+			var fallback_sources = fileManager.files;
+			for (var source : DataFile in fallback_sources) {
+				ColorBySource(source, color, variation, halo);
+			}
+		} else { //seperate loops because dataManager stores DataFiles in a List, rather than a HashSet.
+			sources = rule.getSources();
+			for (var source : DataFile in sources) {
+				ColorBySource(source, color, variation, halo);
+			}
 		}
-	} else if (rule.rule_type == 1) { //cluster
-		if (rule.cluster_id != -1) {
-			ColorByCluster(rule.cluster_id, color, variation, halo);
+
+
+	} else if (rule_type == 1) { //cluster
+		if (rule.getClusterId() != -1) {
+			ColorByCluster(rule.getClusterId(), color, variation, halo);
 		}
-	} else if (rule.rule_type == 2) { //node
+	} else if (rule_type == 2) { //node
 		//TODO
-	} else if (rule.rule_type == 3){ //attr
-		if (rule.attribute != null) {
-			ColorByAttribute(rule.attribute, rule.attribute_value, color, variation, halo);
+	} else if (rule_type == 3){ //attr
+		if (rule.getAttribute() != null) {
+			ColorByAttribute(rule.getAttribute(), rule.getAttributeValue(), color, variation, halo);
 		}
 	}
 }
 
-function ApplyColors(){
-	if (mode == RANDOM){
-		ColorRandom();
-	} else if (mode == BY_CLUSTER){
-		ColorByCluster();
-	} else if (mode == BY_SOURCE){
-		ColorBySource();
-	}
-	ApplyAllRules();
-}
-
-//Color all nodes randomly
-function ColorRandom(){
+/*//Color all nodes randomly
+function ColorAllByNode(){
 	for (var file in fileManager.files){
 		nodes = file.nodes;
 		for (var entry in nodes){
@@ -136,14 +118,14 @@ function ColorRandom(){
 }
 
 //Color nodes based on their groups.
-function ColorByCluster(){
+function ColorAllByCluster(){
 	var group_dict = clusterController.group_dict;
 	var color_dict = {};
 	for (var entry in group_dict){ //loop over the cluster ids
 		var color : Color = GenRandomColor();
 		ColorByCluster(entry.Key, color, 0.3, false);
 	}	
-}
+}*/
 
 function ColorByCluster(cluster_id : int, color : Color, variation : float, halo : boolean){
 	var nodes : Array = clusterController.group_dict[cluster_id];	
@@ -151,14 +133,15 @@ function ColorByCluster(cluster_id : int, color : Color, variation : float, halo
 		ColorNodeForRule(node, color, variation, halo);
 	}
 }
-
+/*
 //color nodes based on what file they came from.
-function ColorBySource(){
+function ColorAllBySource(){
 	for (var file : DataFile in fileManager.files){
 		var color : Color = GenRandomColor();
 		ColorBySource(file, color, 0.3, false);
 	}
 }
+*/
 function ColorBySource(file : DataFile, color : Color, variation : float, halo : boolean){
 	for (var node in file.nodes){
 		ColorNodeForRule(node.Value, color, variation, halo);
@@ -189,21 +172,12 @@ function NudgeColor(c : Color){
 }
 
 function NudgeColor(c : Color, dist : float){
-	if (scheme == 2){
-		dist = 0;
-	}
-
 	var red : float = c.r + Random.Range(-dist, dist);
 	var green : float = c.g + Random.Range(-dist, dist);
 	var blue : float = c.b + Random.Range(-dist, dist);
 	return new Color(red, green, blue);	
 }
 
-
-
-function GenRandomColor(){
-	return GenRandomColor(scheme);
-}
 function GenRandomColor(scheme_index : int){
 	if (scheme_index == 0){ //bright
 		return GenScaledColor(false);

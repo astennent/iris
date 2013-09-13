@@ -9,6 +9,11 @@ class SearchMenu extends PrimaryMenu {
 	private var scrollPosition : Vector2 = Vector2.zero;
 	private var lastScrollTime : float = 0;
 
+	function Start(){
+		parent = GetComponent(MainMenu);
+		super.Start();
+	}
+
 	function OnGUI(){
 		super.OnGUI();
 		GUI.SetNextControlName("searchbar");
@@ -20,6 +25,7 @@ class SearchMenu extends PrimaryMenu {
 			oldSearchString = searchString;
 			searchController.UpdateMatches(searchString);
 		}
+
 		var matches = searchController.matches;
 		
 		if (matches != null && matches.length > 0){
@@ -73,11 +79,6 @@ class SearchMenu extends PrimaryMenu {
 	       	
 	   	}
 		
-	}
-
-	function DisableDisplay(){
-		super.DisableDisplay();
-		GUI.FocusControl("");
 	}
 
 	function EnableDisplay(){

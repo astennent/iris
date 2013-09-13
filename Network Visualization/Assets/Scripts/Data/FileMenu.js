@@ -18,6 +18,7 @@ class FileMenu extends PrimaryMenu {
 	var selected_file_index : int = -1; //used to decide what to display below the line.
 
 	function Start(){
+		parent = GetComponent(MainMenu);
 		super.Start();
 		title = "File Manager";
 	}
