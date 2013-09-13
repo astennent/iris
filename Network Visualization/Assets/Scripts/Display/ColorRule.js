@@ -34,6 +34,14 @@ function Init(){
 	variation = 0.3;
 }
 
+function getColor(){
+	if (uses_scheme) {
+		return colorController.GenRandomColor(scheme_index);
+	} else {
+		return color;
+	}
+}
+
 function setScheme(index : int){
 	scheme_index = index;
 	color = colorController.GenRandomColor(scheme_index);

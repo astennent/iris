@@ -1,0 +1,128 @@
+System:
+  OS: Windows 8  (6.2.9200) 64bit
+  CPU: Intel(R) Core(TM) i5 CPU M 540 @ 2.53GHz, count: 4
+  Physical RAM: 3766 MB
+  Addressable RAM: 2048 MB
+
+D3D9:
+  Renderer: Intel(R) Graphics Media Accelerator HD
+  VendorID: 8086
+  Driver: igdumdx32.dll 8.15.10.2021
+  VRAM: 941 (via DXGI)
+
+OpenGL:
+  Version: 2.1.0 - Build 8.15.10.2021
+  Vendor: Intel
+  Renderer: Intel(R) Graphics Media Accelerator HD
+  VRAM: 941 (via DXGI)
+  Extensions: GL_EXT_blend_minmax GL_EXT_blend_subtract GL_EXT_blend_color GL_EXT_abgr GL_EXT_texture3D GL_EXT_clip_volume_hint GL_EXT_compiled_vertex_array GL_SGIS_texture_edge_clamp GL_SGIS_generate_mipmap GL_EXT_draw_range_elements GL_SGIS_texture_lod GL_EXT_rescale_normal GL_EXT_packed_pixels GL_EXT_separate_specular_color GL_ARB_multitexture GL_EXT_texture_env_combine GL_EXT_bgra GL_EXT_blend_func_separate GL_EXT_secondary_color GL_EXT_fog_coord GL_EXT_texture_env_add GL_ARB_texture_cube_map GL_ARB_transpose_matrix GL_ARB_texture_env_add GL_IBM_texture_mirrored_repeat GL_EXT_multi_draw_arrays GL_NV_blend_square GL_ARB_texture_compression GL_3DFX_texture_compression_FXT1 GL_EXT_texture_filter_anisotropic GL_ARB_texture_border_clamp GL_ARB_point_parameters GL_ARB_texture_env_combine GL_ARB_texture_env_dot3 GL_ARB_texture_env_crossbar GL_EXT_texture_compression_s3tc GL_ARB_shadow GL_ARB_window_pos GL_EXT_shadow_funcs GL_EXT_stencil_wrap GL_ARB_vertex_program GL_EXT_texture_rectangle GL_ARB_fragment_program GL_EXT_stencil_two_side GL_ATI_separate_stencil GL_ARB_vertex_buffer_object GL_EXT_texture_lod_bias GL_ARB_occlusion_query GL_ARB_fragment_shader GL_ARB_shader_objects GL_ARB_shading_language_100 GL_ARB_texture_non_power_of_two GL_ARB_vertex_shader GL_NV_texgen_reflection GL_ARB_point_sprite GL_EXT_blend_equation_separate GL_ARB_depth_texture GL_ARB_texture_rectangle GL_ARB_draw_buffers GL_ARB_pixel_buffer_object GL_WIN_swap_hint GL_EXT_framebuffer_object GL_EXT_texture_sRGB GL_ARB_color_buffer_float GL_ARB_half_float_pixel GL_ARB_texture_float GL_NV_conditional_render GL_EXT_texture_swizzle GL_ARB_draw_instanced 
+
+User locale: en-US
+System locale: en-US
+
+Running processes:
+googledrivesync.exe (6444)
+    path: C:\Program Files (x86)\Google\Drive\googledrivesync.exe
+    company:  Google
+    product:  Google Drive
+    filedesc: Google Drive
+    filever:  1.11.4865.2530
+    prodver:  1.11.4865.2530
+GoogleDesktop.exe (6884)
+    path: C:\Program Files (x86)\Google\Google Desktop Search\GoogleDesktop.exe
+    company:  Google
+    product:  Google Desktop
+    filedesc: Google Desktop
+    filever:  5.9.1005.12335
+    prodver:  5.9.1005.12335
+HpqSRmon.exe (7296)
+    path: C:\Program Files (x86)\HP\Digital Imaging\bin\HpqSRmon.exe
+    company:  Hewlett-Packard
+    product:  HpqSRmon Application
+    filedesc: HpqSRmon
+    filever:  12.0.0.223
+    prodver:  12.0.0.223
+googledrivesync.exe (7332)
+    path: C:\Program Files (x86)\Google\Drive\googledrivesync.exe
+    company:  Google
+    product:  Google Drive
+    filedesc: Google Drive
+    filever:  1.11.4865.2530
+    prodver:  1.11.4865.2530
+IAStorIcon.exe (7416)
+    path: C:\Program Files (x86)\Intel\Intel(R) Rapid Storage Technology\IAStorIcon.exe
+    company:  Intel Corporation
+    product:  IAStorIcon
+    filedesc: IAStorIcon
+    filever:  9.6.0.1014
+    prodver:  9.6.0.1014
+ISBMgr.exe (7980)
+    path: C:\Program Files (x86)\Sony\ISB Utility\ISBMgr.exe
+    company:  Sony Corporation
+    product:  ISB Utility
+    filedesc: 
+    filever:  4.1.0.8170
+    prodver:  4.1.0.8170
+PMBVolumeWatcher.exe (8080)
+    path: C:\Program Files (x86)\Sony\PMB\PMBVolumeWatcher.exe
+    company:  Sony Corporation
+    product:  PMB
+    filedesc: Media Check Tool
+    filever:  2.0.0.10240
+    prodver:  5.0.0.10240
+CCP.exe (7492)
+    path: C:\Program Files (x86)\Sony\SmartWi Connection Utility\CCP.exe
+    company:  
+    product:  CCP
+    filedesc: CCP
+    filever:  1.0.0.0
+    prodver:  1.0.0.0
+hpwuschd2.exe (7580)
+    path: C:\Program Files (x86)\HP\HP Software Update\hpwuschd2.exe
+    company:  Hewlett-Packard
+    product:   hpwuSchd Application
+    filedesc: hpwuSchd Application
+    filever:  80.1.1.0
+    prodver:  80.1.1.0
+ThirdPartyAppMgr.exe (7800)
+    path: C:\Program Files (x86)\Sony\SmartWi Connection Utility\ThirdPartyAppMgr.exe
+    company:  
+    product:  ThirdPartyAppMgr
+    filedesc: ThirdPartyAppMgr
+    filever:  1.0.0.0
+    prodver:  1.0.0.0
+PowerManager.exe (7816)
+    path: C:\Program Files (x86)\Sony\SmartWi Connection Utility\PowerManager.exe
+    company:  
+    product:  PowerManager
+    filedesc: PowerManager
+    filever:  1.0.0.0
+    prodver:  1.0.0.0
+SmartWi.exe (6620)
+    path: C:\Program Files (x86)\Sony\SmartWi Connection Utility\SmartWi.exe
+    company:  
+    product:  
+    filedesc:  
+    filever:  0.0.0.0
+    prodver:  0.0.0.0
+listener.exe (7952)
+    path: C:\Program Files\Sony\VAIO Care\listener.exe
+    company:  
+    product:  VaioCare Sample Collector Service
+    filedesc: VaioCare Window Listener Application
+    filever:  3.0.0.407
+    prodver:  3.0.0.407
+adb.exe (1356)
+    path: C:\Users\Alan\Desktop\adt-bundle-windows-x86_64-20130219\adt-bundle-windows-x86_64-20130219\sdk\platform-tools\adb.exe
+    company:  
+    product:  
+    filedesc: 
+    filever:  0.0.0.0
+    prodver:  0.0.0.0
+UnityBugReporter.exe (6104)
+    path: C:\Program Files (x86)\Unity\Editor\UnityBugReporter.exe
+    company:  Unity Technologies ApS
+    product:  Unity Bug Reporter
+    filedesc: Unity Bug Reporter
+    filever:  4.0.0.62010
+    prodver:  4.0.0.62010

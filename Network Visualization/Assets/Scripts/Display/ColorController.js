@@ -68,12 +68,7 @@ function ApplyRule(index : int) {
 }
 
 function ApplyRule(rule : ColorRule) {
-	var color : Color;
-	if (rule.uses_scheme) { 
-		color = GenRandomColor(rule.getScheme());
-	} else {
-		color = rule.color;
-	}
+	var color : Color = rule.getColor();
 	var variation : float = rule.variation;
 	var halo = rule.halo;
 	var rule_type = rule.getRuleType();
@@ -81,24 +76,46 @@ function ApplyRule(rule : ColorRule) {
 
 		//the fallback rule transparently applies itself to all files.
 		if (rule.is_fallback) {
-			var fallback_sources = fileManager.files;
-			for (var source : DataFile in fallback_sources) {
+			for (var source : DataFile in fileManager.files) {
+				color = rule.getColor();
 				ColorBySource(source, color, variation, halo);
 			}
 		} else { //seperate loops because dataManager stores DataFiles in a List, rather than a HashSet.
-			sources = rule.getSources();
-			for (var source : DataFile in sources) {
+			for (var source : DataFile in rule.getSources()) {
 				ColorBySource(source, color, variation, halo);
 			}
 		}
 
 
 	} else if (rule_type == 1) { //cluster
-		if (rule.getClusterId() != -1) {
-			ColorByCluster(rule.getClusterId(), color, variation, halo);
+
+		//the fallback rule transparently applies itself to all groups.
+		if (rule.is_fallback) {
+			for (var entry in clusterController.group_dict){ //loop over the cluster ids
+				color = rule.getColor();
+				ColorByCluster(entry.Key, color, variation, halo);
+			}
+		} else {
+			if (rule.getClusterId() != -1) {
+				ColorByCluster(rule.getClusterId(), color, variation, halo);
+			}
 		}
+
 	} else if (rule_type == 2) { //node
-		//TODO
+
+		//the fallback rule transparently applies itself to all groups.
+		if (rule.is_fallback) {
+			for (var file in fileManager.files){
+				nodes = file.nodes;
+				for (var entry in nodes){
+					var node : Node = entry.Value;
+					ColorNodeForRule(node, rule.getColor(), variation, halo);
+				}
+			}
+		}
+
+		//TODO non-fallback
+
 	} else if (rule_type == 3){ //attr
 		if (rule.getAttribute() != null) {
 			ColorByAttribute(rule.getAttribute(), rule.getAttributeValue(), color, variation, halo);
@@ -120,7 +137,6 @@ function ColorAllByNode(){
 //Color nodes based on their groups.
 function ColorAllByCluster(){
 	var group_dict = clusterController.group_dict;
-	var color_dict = {};
 	for (var entry in group_dict){ //loop over the cluster ids
 		var color : Color = GenRandomColor();
 		ColorByCluster(entry.Key, color, 0.3, false);

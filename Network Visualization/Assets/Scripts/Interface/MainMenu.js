@@ -11,6 +11,7 @@ class MainMenu extends PrimaryMenu {
 	var search : Texture;
 	var display : Texture;
 	var upload : Texture;
+	var zoom_to_fit : Texture;
 
 	function Start() {
 		super.Start();
@@ -117,9 +118,16 @@ class MainMenu extends PrimaryMenu {
 				networkController.gameSpeed=next_speed;
 			}
 
+			button_position = new Rect(x+5, 310, 35, 35);
+			GUI.color = new Color(1, .8, .3);
+			if (GUI.Button(button_position, zoom_to_fit)){
+				print("clicked");
+			}
+			if (button_position.Contains(mousePosition)){}
+
 			
 						
-			button_position = new Rect(x+5, 320, 35, 35);
+			button_position = new Rect(x+5, 360, 35, 35);
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, upload)){
 				this.GetComponent(SearchMenu).DisableDisplay();
