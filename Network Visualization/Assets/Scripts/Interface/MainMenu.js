@@ -118,13 +118,14 @@ class MainMenu extends PrimaryMenu {
 				networkController.gameSpeed=next_speed;
 			}
 
+			/*
 			button_position = new Rect(x+5, 310, 35, 35);
 			GUI.color = new Color(1, .8, .3);
 			if (GUI.Button(button_position, zoom_to_fit)){
 				print("clicked");
 			}
 			if (button_position.Contains(mousePosition)){}
-
+			*/
 			
 						
 			button_position = new Rect(x+5, 360, 35, 35);

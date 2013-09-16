@@ -52,7 +52,7 @@ function escapeQuotedDelimiters(line : String){
 function Update(){
 	if (Input.GetButtonDown("Scatter")){
 		for (var file in fileManager.files){
-			nodes = file.nodes;
+			var nodes = file.nodes;
 			for (entry in nodes){ //loop over the node names
 				var node = entry.Value;
 				var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));

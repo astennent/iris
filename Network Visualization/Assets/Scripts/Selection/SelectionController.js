@@ -1,5 +1,7 @@
 #pragma downcast
 
+private var BOX_RANGE : float = 1000;
+
 var dragging : boolean = false;
 var boxing : boolean = false;
 
@@ -7,7 +9,8 @@ var boxing : boolean = false;
 private var clearedSelectionSinceBoxStart = false; 
 private var startCoords : Vector2; //corner of selection box
 
-var nodes = new List.<Node>(); //list of all selected nodes
+
+var nodes = new HashSet.<Node>(); //list of all selected nodes
 var primaryNode : Node; //the focused selected node
 var networkCamera : NetworkCamera;
 var cameraTransform : Transform;
@@ -43,7 +46,7 @@ function NodeClick(node : Node){
 
 var updated = false;
 function Update () {
-	upated = true;
+	updated = true;
 	if (dragging){
 		ProcessDrag();
 	}
@@ -120,7 +123,6 @@ function ProcessBoxing(){
 
 function startBoxing(){
 	boxing = true;
-	boxDelay = true;
 	clearedSelectionSinceBoxStart = false;
 	startCoords = Input.mousePosition;
 	startCoords.y = Screen.height - startCoords.y; //stupid unity.
@@ -169,12 +171,14 @@ function selectBoxedItems(){
 	for (var file : DataFile in fileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);
-			var node_coords = Camera.main.WorldToScreenPoint(node.transform.position);
-			node_coords.y = Screen.height - node_coords.y; //stupid unity.
-			if (node_coords.z > 0 &&
-					node_coords.x >= left && node_coords.x <= right &&
-					node_coords.y <= bottom && node_coords.y >= top){
-				nodes.Add(node);
+			if (Vector3.Distance(node.transform.position, Camera.main.transform.position) < BOX_RANGE) {
+				var node_coords = Camera.main.WorldToScreenPoint(node.transform.position);
+				node_coords.y = Screen.height - node_coords.y; //stupid unity.
+				if (node_coords.z > 0 &&
+						node_coords.x >= left && node_coords.x <= right &&
+						node_coords.y <= bottom && node_coords.y >= top){
+					nodes.Add(node);
+				}
 			}
 		}
 	}
@@ -184,7 +188,9 @@ function selectBoxedItems(){
 	}
 
 	if (nodes.Count == 1){
-		networkCamera.setTarget(nodes[0]);
+		var enumerator = nodes.GetEnumerator();
+		enumerator.MoveNext();
+		networkCamera.setTarget(enumerator.Current);
 	}
 }
 
@@ -214,7 +220,7 @@ function clearSelectedNodes(){
 	for (node in nodes){
 		node.setSelected(false);
 	}
-	nodes = new List.<Node>();
+	nodes.Clear();
 }
 
 function deselectNode(node : Node){

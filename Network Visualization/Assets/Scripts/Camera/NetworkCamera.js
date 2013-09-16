@@ -1,8 +1,11 @@
-#pragma downcast
+#pragma strict
 
+var selectionController : SelectionController;
 var target: Transform;
+var selectionCenter : Vector3;
 function Start () {
 	target = GameObject.FindGameObjectWithTag("GameController").transform;
+	selectionController = GameObject.FindGameObjectWithTag("GameController").GetComponent(SelectionController);
 	transform.parent = target;
 }
 
@@ -21,11 +24,10 @@ function Update () {
 		freeCamera = true;	
 	}	
 
-	if (freeCamera){
-		//camera is controlled with arrow keys
+	if (freeCamera){ //camera is controlled with arrow keys
 		UpdateFree();
-	} else {
-		//camera is controlled by moving around 
+	} else { //camera is controlled by moving around 
+		CalculateSelectionCenter();
 		UpdateLocked();
 	}
 		
@@ -44,6 +46,7 @@ function UpdateFree(){
 		transform.RotateAround(transform.up, x);
 	}
 
+	var speed : int;
 	if (Input.GetButton("Shift")){
 		speed = 2;
 	} else {
@@ -62,7 +65,7 @@ function UpdateFree(){
 }
 
 function UpdateLocked(){
-	var coordinates = Camera.main.WorldToScreenPoint(target.position);
+	var coordinates = Camera.main.WorldToScreenPoint(selectionCenter);
 	var mouseCoords = Input.mousePosition;
 
 	
@@ -103,11 +106,11 @@ function UpdateLocked(){
 
 	desired_distance = Mathf.Clamp(desired_distance+z, 20, 1000);
 
-	var current_distance : float = Vector3.Distance(target.position, targetPosition);
+	var current_distance : float = Vector3.Distance(selectionCenter, targetPosition);
 	transform.position += transform.forward * (current_distance - desired_distance) / 12;
 	
 	
-	transform.LookAt(target, transform.up);
+	transform.LookAt(selectionCenter, transform.up);
 	transform.RotateAround(transform.forward, r);
 	transform.position = transform.position*.75 + targetPosition*.25;
 	transform.rotation = Quaternion.Slerp(originalRotation, transform.rotation,.3);
@@ -116,19 +119,21 @@ function UpdateLocked(){
 
 
 function setTarget(n : Node){
-	target = n.transform;
+	if (n != null) {
+		target = n.transform;
+		desired_distance = 100;
+	} else {
+		target = null;
+	}
+
 	if (!freeCamera){
 		transform.parent = target;
 	}
 }
 
-function Untarget(){
-	target = null;
-}
-
 //called by the search function
 function JumpTo(goal : String){
-	node = GameObject.Find(goal);
+	var node = GameObject.Find(goal);
 	if (node.GetComponent(Node)){
 		freeCamera = false;
 		target = node.transform;
@@ -141,5 +146,26 @@ function ToggleLocked(){
 		transform.parent = null;
 	} else {
 		transform.parent = target;
+	}
+}
+
+function CalculateSelectionCenter() {
+	var selected_nodes = selectionController.nodes;
+	if (selected_nodes.Count < 2) {
+		selectionCenter = target.position;
+	} else {
+		selectionCenter = Vector3.zero;
+		for (var node : Node in selected_nodes) {
+			selectionCenter += node.transform.position;	
+		}
+		selectionCenter /= selected_nodes.Count;
+		var max_distance = 0.0;
+		for (var node : Node in selected_nodes) {
+			var distance = Vector3.Distance(node.transform.position, selectionCenter);
+			if (distance > max_distance) {
+				max_distance = distance;
+			}
+		}
+		desired_distance = max_distance*2;
 	}
 }
