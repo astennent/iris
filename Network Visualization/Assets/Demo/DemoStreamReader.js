@@ -7,7 +7,7 @@ function setCurrentFile(fname:String){
 	currentFile = fname;
 	index = 0;
 }
-function ReadLine(){
+function ReadLine() : String{
 	var data_array : Array = all_data[currentFile];
 	return data_array[index++];
 }

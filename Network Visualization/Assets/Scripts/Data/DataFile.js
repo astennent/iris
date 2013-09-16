@@ -1,5 +1,7 @@
 //Keeps track of metadata for files and is in charge of creating nodes.
 
+#pragma strict
+
 import System.IO;
 import System.Collections.Generic;
 
@@ -21,12 +23,12 @@ var imported : boolean = false; //used to determine if the file has been importe
 
 var linking_table : boolean = false;
 
-var pkey_indices;
-var shown_indices;
+var pkey_indices : int[];
+var shown_indices : int[];
 
 var first_row : String[]; 
 
-var nodes = {};
+var nodes = new Dictionary.<Array, Node>();
 
 var isDemoFile : boolean = false;
 
@@ -63,13 +65,12 @@ function ScanForMetadata(){
 	var first_row_types : boolean[]; //true = number, false = text
 
 	attributes = new List.<Attribute>();
-	column_types = {};
 	
 	try {
 		//Choose between a StreamReader (java.IO) or the custom DemoStreamReader.
 		//These serve the same function as each other, but the IO version cannot access files unless running as an exe.
-	    var sr = null;
-	    var dsr = null;
+	    var sr : StreamReader = null;
+	    var dsr : DemoStreamReader = null;
 		if (isDemoFile){
 			dsr = fileManager.demoPrefab.GetComponent(DemoStreamReader);
 			dsr.setCurrentFile(fname);
@@ -110,7 +111,8 @@ function ScanForMetadata(){
     		on_first_row = false;
 	    }
 	    
-	    for (i = 0 ; i < first_row.Length ; i++){
+	    for (var i = 0 ; i < first_row.Length ; i++){
+	    	var column_name : String;
 	    	if (using_headers){
 	    		column_name = first_row[i];
 	    	} else {
@@ -185,7 +187,7 @@ function ToggleUsingHeaders(){
 }
 
 function ToggleNumeric(index : int){
-	expected_column_type = expected_column_types[index];
+	var expected_column_type = expected_column_types[index];
 	if (expected_column_type){ //You can only switch if each cell in the column is a valid number.
 		attributes[index].is_numeric = !attributes[index].is_numeric;
 	} else {
@@ -296,7 +298,7 @@ function getForeignKeys(includeInactive : boolean){
 }
 
 function Activate(){
-	required_files = fileManager.determineDependencies(GetComponent(DataFile)); //not implemented.
+	var required_files : List.<DataFile> = fileManager.determineDependencies(GetComponent(DataFile)); //not implemented.
 	for (var required_file in required_files){
 		if (!required_file.linking_table){
 			required_file.GenerateNodes();
@@ -315,14 +317,14 @@ function Activate(){
 
 function GenerateNodes(){
 	//TODO: destroy nodes and connections.
-	nodes = {};
+	nodes = new Dictionary.<Array, Node>();
 	UpdatePKeyIndices();
 	UpdateShownIndices();
 	try {
 		//Choose between a StreamReader (java.IO) or the custom DemoStreamReader.
 		//These serve the same function as each other, but the IO version cannot access files unless running as an exe.
-	    var sr = null;
-	    var dsr = null;
+	    var sr : StreamReader = null;
+	    var dsr : DemoStreamReader = null;
 		if (isDemoFile){
 			dsr = fileManager.demoPrefab.GetComponent(DemoStreamReader);
 			dsr.setCurrentFile(fname);
@@ -388,7 +390,7 @@ function GenerateConnectionsForNodeFile(){
 		var from_node : Node = entry.Value;
 		for (var foreignKey in foreignKeys){
 			var other_file : DataFile = foreignKey.to_file;
-			var fkeyPairs = foreignKey.getKeyPairs;
+			var fkeyPairs = foreignKey.getKeyPairs();
 			//TODO: special case when the foreign key points exactly to the other file's primary keys.
 			
 			//loop over other file's nodes. This is n^2 argh
@@ -397,11 +399,11 @@ function GenerateConnectionsForNodeFile(){
 	
 				for (var pair in fkeyPairs){					
 
-					from_attribute_index = pair[0].column_index;	
-					from_attribute_value = from_node.data[from_attribute_index];					
+					var from_attribute_index = pair[0].column_index;	
+					var from_attribute_value = from_node.data[from_attribute_index];					
 					
-					to_attribute_index = pair[1].column_index;
-					to_attribute_value = to_node.data[to_attribute_index];							
+					var to_attribute_index = pair[1].column_index;
+					var to_attribute_value = to_node.data[to_attribute_index];							
 					
 					//You found a match. Generate a connection.
 					if (from_attribute_value == to_attribute_value){
@@ -422,8 +424,8 @@ function GenerateConnectionsForLinkingTable(){
 
 		//Choose between a StreamReader (java.IO) or the custom DemoStreamReader.
 		//These serve the same function as each other, but the IO version cannot access files unless running as an exe.
-	    var sr = null;
-	    var dsr = null;
+	    var sr : StreamReader = null;
+	    var dsr : DemoStreamReader = null;
 		if (isDemoFile){
 			dsr = fileManager.demoPrefab.GetComponent(DemoStreamReader);
 			dsr.setCurrentFile(fname);
@@ -462,10 +464,10 @@ function GenerateConnectionsForLinkingTable(){
 	    	var matches = new List.<List.<Node> >(); //Arrays of matching nodes for each fkey.
 
 	    	for (i = 0 ; i < foreignKeys.Count ; i++){
-	    		foreignKey = foreignKeys[i];
-	    		other_file = foreignKey.to_file;    		
+	    		var foreignKey = foreignKeys[i];
+	    		var other_file = foreignKey.to_file;    		
 				var keyPairs = foreignKey.getKeyPairs();
-				these_matches = new List.<Node>();
+				var these_matches = new List.<Node>();
 
 				//find matches from side of fkey	
 				for (var entry in other_file.nodes){
@@ -514,7 +516,7 @@ function GenerateConnectionsForLinkingTable(){
 }
 	
 	
-function CreateNode(data){
+function CreateNode(data : Array){
 	var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
 	var randColor : Color = colorController.GenRandomColor(0); //random bright color
 	var node : Node = GameObject.Instantiate(nodePrefab, randPos, transform.rotation).GetComponent(Node);
@@ -550,7 +552,7 @@ function UpdatePKeyIndices(){
 	}
 	
 	//use all attributes if none are selected.
-	if (output.Length == 0){
+	if (output.length == 0){
 		for (i = 0 ; i < attributes.Count ; i++){
 			output.Push(i);
 		}
@@ -593,7 +595,7 @@ function Deactivate() {
 	searchController.ReInit();
 	clusterController.ReInit();
 	imported = false;
-	nodes = {};
+	var nodes = new Dictionary.<Array, Node>();
 }
 
 //called by linking table files, executed by non-linking tables.
@@ -601,4 +603,4 @@ function DeactivateConnections(file : DataFile){
 	for (var node in nodes){
 		node.Value.DeactivateConnections(file);
 	}
-}
+} 

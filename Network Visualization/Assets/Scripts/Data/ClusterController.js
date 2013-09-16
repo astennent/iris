@@ -1,10 +1,12 @@
 //Allows disconnected entities in the graph to move toward each other without colliding.
 
+#pragma strict
+
 var preferred_distance : float = 200;
 
 private var networkController : NetworkController;
-var leaders : Array;
-var group_dict  = {}; //2d dict of keys points to arrays of nodes
+var leaders : Node[];
+var group_dict =  new Dictionary.<int, List.<Node> >(); //2d dict of keys points to arrays of nodes
 
 private var fileManager : FileManager;
 
@@ -18,7 +20,7 @@ function ReInit(){
 	
 	//Reset group ids
 	for (var file in fileManager.files){
-		nodes = file.nodes;
+		var nodes = file.nodes;
 		for (var entry in nodes){
 			var node : Node = entry.Value;
 			node.group_id = -1;
@@ -26,7 +28,7 @@ function ReInit(){
 	}
 	
 	var current_id = 0;
-	group_dict = {};
+	group_dict.Clear();
 
 	for (var file in fileManager.files){
 		nodes = file.nodes;
@@ -35,16 +37,17 @@ function ReInit(){
 	
 			//if you haven't seen this node before, create a new group for it.
 			if (node.group_id == -1){			
-				var to_be_checked : Array = new Array();
-				to_be_checked.Push(node);
+				var to_be_checked : List.<Node> = new List.<Node>();
+				to_be_checked.Add(node);
 				
-				while (to_be_checked.length > 0){
-					current_node = to_be_checked.Pop();
+				while (to_be_checked.Count > 0){
+					var current_node = to_be_checked[to_be_checked.Count-1];
+					to_be_checked.RemoveAt(to_be_checked.Count-1);
 					current_node.group_id = current_id;			
 					for (var connection : Connection in current_node.connections){
 						var other_node = connection.to;
 						if (other_node.group_id == -1){
-							to_be_checked.Push(other_node);
+							to_be_checked.Add(other_node);
 						}
 					}
 				
@@ -64,12 +67,12 @@ function ReInit(){
 		nodes = file.nodes;		
 		for (var entry in nodes){ //loop over the node names
 			node = entry.Value;
-			if (group_dict[node.group_id] == null){
-				group_dict[node.group_id] = new Array();
+			if (!group_dict.ContainsKey(node.group_id)){
+				group_dict[node.group_id] = new List.<Node>();
 				leaders[index] = node;
 				index++;
 			}			
-			group_dict[node.group_id].Push(node);
+			group_dict[node.group_id].Add(node);
 			
 		}
 	}
@@ -79,7 +82,7 @@ function ReInit(){
 function Update() {
 	if (false && !networkController.paused){
 		
-		var index=0; 
+		var index = 0; 
 		for (var leader in leaders){
 			//loop over all nodes from the current key and find the shortest distance to the leader node.
 			
@@ -103,7 +106,7 @@ function Update() {
 					total_direction += (target - node.transform.position);
 				}	
 				
-				var average_dist = total_dist / group_dict[this_group_id].length;
+				var average_dist = total_dist / group_dict[this_group_id].Count;
 				var direction = total_direction.normalized;
 										
 				average_dist -= preferred_distance; //distance between groups.

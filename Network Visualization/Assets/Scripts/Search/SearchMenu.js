@@ -28,8 +28,8 @@ class SearchMenu extends PrimaryMenu {
 
 		var matches = searchController.matches;
 		
-		if (matches != null && matches.length > 0){
-			title = matches.length + " matches.";
+		if (matches != null && matches.Count > 0){
+			title = matches.Count + " matches.";
 		} else {
 			if (searchString.Length > 0){
 				title = "No matches found.";
@@ -39,7 +39,7 @@ class SearchMenu extends PrimaryMenu {
 		}
 		var top_display = GUIContent(title);		
 		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,Screen.height-60),
-	    scrollPosition, Rect (0, 0, 400, matches.length*30));
+	    scrollPosition, Rect (0, 0, 400, matches.Count*30));
 	    
 	    var count = 0;
 	    GUI.skin.button.alignment = TextAnchor.MiddleLeft;
@@ -62,7 +62,7 @@ class SearchMenu extends PrimaryMenu {
 			var e : Event = Event.current;
 
 			if (Time.time-lastScrollTime > .15 && e.keyCode == KeyCode.DownArrow){
-	       		if (match_index < matches.length-1){
+	       		if (match_index < matches.Count-1){
 	       			match_index+=1;
 	       			lastScrollTime = Time.time;
 	       		}
@@ -71,7 +71,7 @@ class SearchMenu extends PrimaryMenu {
 	       			match_index-=1;
 	       			lastScrollTime = Time.time;
 	       		}
-	       	} else if (e.keyCode == KeyCode.Return && matches.length > 0){
+	       	} else if (e.keyCode == KeyCode.Return && matches.Count > 0){
 				Camera.main.GetComponent(NetworkCamera).JumpTo(matches[match_index].name);     		
 	       	} else if (e.keyCode == KeyCode.Escape){
 	       		DisableDisplay();

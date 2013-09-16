@@ -1,3 +1,4 @@
+#pragma strict
 
 var data = new Array(); //all information contained in a node file
 var source : DataFile;
@@ -6,7 +7,7 @@ var labelObject : GameObject;
 
 private var label : GameObject;
 
-var connections : Array;
+var connections : List.<Connection>;
 var connectionPrefab : GameObject;
 var lineMat : Material;
 var color : Color;
@@ -40,7 +41,7 @@ function Init(){
 	label.transform.parent = this.transform;
 	UpdateName();
 	
-	connections = new Array();
+	connections = new List.<Connection>();
 	
 	sizing_type = 0; //by # connections
 	UpdateSize();
@@ -67,9 +68,9 @@ function AddConnection (other : Node, isOutgoing : boolean, foreignKey : Foreign
 			return;
 		}
 	}
-	newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
+	var newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
 	newConn.Init(lineMat, color, isOutgoing, this, other, networkController, foreignKey);
-	connections.Push( newConn );
+	connections.Add( newConn );
 	UpdateSize();
 }
 
@@ -79,7 +80,7 @@ function Update () {
 	
 	var oldRotation = transform.rotation;
 
-	for (var i = 0 ; i < connections.length ; i++){
+	for (var i = 0 ; i < connections.Count ; i++){
 		var other_node : Node = connections[i].to;
 		var connectionWeight : float = connections[i].foreignKey.connectionWeight;
 		moveRelativeTo(other_node.transform.position, other_node.size, false, connectionWeight);
@@ -110,7 +111,7 @@ function setSizingType(type_index : int){
 
 function UpdateSize(){
 	if (sizing_type == 0){ //by # connections
-		size = (3 + connections.length * 2.5)/2;
+		size = (3 + connections.Count * 2.5)/2;
 	} else if (sizing_type == 1) { //manual
 		size = manual_size;
 	} else if (sizing_type == 2) { //by attribute
@@ -150,7 +151,7 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 	}
 	transform.LookAt(target);
 	var sizeCompensation = (size+other_size)/10;
-	speed = other_size*(Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )/1000*connectionWeight;
+	var speed = other_size*(Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )/1000*connectionWeight;
 	
 	//only move away if you're recursing.
 	if (second_level){
@@ -219,14 +220,14 @@ function Deactivate(){
 
 //deactivate connections that go to a certain file, presumably because you just deactivated it.
 function DeactivateConnections(file : DataFile){
-	var replacement_connections = new Array();
-	for (var x = 0 ; x < connections.length ; x++){
+	var replacement_connections = new List.<Connection>();
+	for (var x = 0 ; x < connections.Count ; x++){
 		var connection = connections[x];
 		if (connection.to.source == file){
 			connection.Deactivate();
 			size-=2.5;
 		} else {
-			replacement_connections.Push(connection);
+			replacement_connections.Add(connection);
 		}
 	}
 	connections = replacement_connections;
@@ -235,9 +236,9 @@ function DeactivateConnections(file : DataFile){
 
 //called by connections to alert the node that they've been killed.
 function alertConnectionDeactivated(connection : Connection){
-	for (var x = 0 ; x < connections.length ; x++){
+	for (var x = 0 ; x < connections.Count ; x++){
 		if (connections[x] == connection) {
-			connections.remove(x);
+			connections.RemoveAt(x);
 		}
 	}
 }

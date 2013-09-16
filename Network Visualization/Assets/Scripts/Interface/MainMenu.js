@@ -1,4 +1,4 @@
-	#pragma strict
+#pragma strict
 class MainMenu extends PrimaryMenu {
 
 	var gear : Texture;

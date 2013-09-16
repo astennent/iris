@@ -1,5 +1,7 @@
 //Handles the display of the fkey section in the file menu.
 
+#pragma strict
+
 class FkeyMenu extends PrimaryMenu {
 
 	private var adding_index : int = -1;
@@ -21,7 +23,7 @@ class FkeyMenu extends PrimaryMenu {
 		super.OnGUI();
 		GUI.color = Color.white;
 		
-		file_index = fileMenu.selected_file_index;
+		var file_index = fileMenu.selected_file_index;
 		if (file_index < 0){
 			return;
 		}	
@@ -31,20 +33,20 @@ class FkeyMenu extends PrimaryMenu {
 		var cur_y = 40;
 		//display menu for choosing a file for the new fkey
 		if (creating){ 	
-			add_box = new Rect(x+20, cur_y, width-40, 30);
+			var add_box = new Rect(x+20, cur_y, width-40, 30);
 			if (GUI.Button(add_box, "Cancel")){
 				creating = false;
 			}
 			cur_y+=40;
-			reference_box = new Rect (x,cur_y,width,180);
+			var reference_box = new Rect (x,cur_y,width,180);
 
 			//select a referencing attribute
 			GUI.Box(reference_box, "Reference File:");
 			reference_box.height -= 30;
 			reference_box.y+= 30;
 			cFileScrollPosition = GUI.BeginScrollView (reference_box, 
-				cFileScrollPosition, Rect (0, 0, width-10, 25*fileManager.files.length));			
-			file_box = new Rect(0, 0, width-20, 25);
+				cFileScrollPosition, Rect (0, 0, width-10, 25*fileManager.files.Count));			
+			var file_box = new Rect(0, 0, width-20, 25);
 			for (var ref_file : DataFile in fileManager.files){
 				if (GUI.Button(file_box, ref_file.shortName())){
 					file.createEmptyFkey(ref_file);
@@ -96,7 +98,7 @@ class FkeyMenu extends PrimaryMenu {
 				
 				var content = new GUIContent(from_attr.column_name);
 	   			var size = GUI.skin.label.CalcSize(content);
-				attr_box = new Rect(x+20, cur_y, size.x+20, 20);
+				var attr_box = new Rect(x+20, cur_y, size.x+20, 20);
 				GUI.Button(attr_box, content);
 				
 				attr_box.x += size.x+25;

@@ -1,10 +1,12 @@
 import System.IO;
 
-var files = Array(); //holds File objects.
+#pragma strict
+
+var files = new List.<DataFile>(); //holds File objects.
 var filePrefab : GameObject;		
 
-var dest_directories : Array = new Array();
-var dest_files : Array = new Array();
+var dest_directories = new List.<DirectoryInfo>();
+var dest_files = new List.<FileInfo>();
 
 var demoMode = true;
 var demoPrefab : GameObject;
@@ -13,7 +15,6 @@ private var fileMenu : FileMenu;
 
 function Start(){
 	fileMenu = GetComponent(FileMenu);
-	groupController = GetComponent(FileMenu);
 	if (demoMode){
 		Load("Full Group Attributes", true);
 		Load("Alliance Edge List - Names", true);
@@ -45,21 +46,21 @@ function UpdateDirectoryData(dest : String){
 	UpdateDirectoryData(dest, true, "");
 }
 function UpdateDirectoryData(dest : String, can_recurse : boolean, ending : String){
-	dest_directories = new Array();
-	dest_files = new Array();
+	dest_directories = new List.<DirectoryInfo>();
+	dest_files = new List.<FileInfo>();
 	try {
 		var dest_directory_names = Directory.GetDirectories(dest);
 		for (var entry in dest_directory_names){
 			var di : DirectoryInfo = new DirectoryInfo(entry);
 			if (can_recurse || di.Name.StartsWith(ending)){
-				dest_directories.Push(di);
+				dest_directories.Add(di);
 			}
 		}
 		var dest_file_names = Directory.GetFiles(dest);	
 		for (var entry in dest_file_names){
 			var fi : FileInfo = new FileInfo(entry);
 			if (can_recurse || fi.Name.StartsWith(ending)){
-				dest_files.Push(fi);
+				dest_files.Add(fi);
 			}
 		}
 	} catch (err){
@@ -78,9 +79,9 @@ function UpdateDirectoryData(dest : String, can_recurse : boolean, ending : Stri
 		}
 	}
 	
-	if (dest_directories.length == 1 && dest_files.length == 1 && 
+	if (dest_directories.Count == 1 && dest_files.Count == 1 && 
 			dest_files[0].Name == dest_directories[0].Name){
-		dest_directories = new Array();
+		dest_directories = new List.<DirectoryInfo>();
 	}
 	
 }
@@ -103,11 +104,11 @@ function Load(fname : String, isDemo : boolean){
 		newfile.fname = fname;
 		newfile.isDemoFile = isDemo;
 		newfile.gameObject.name = fname;
-		files.Push(newfile);	
+		files.Add(newfile);	
 		
 		newfile.ScanForMetadata();
 	
-		return files.length-1;
+		return files.Count-1;
 	} else if (Directory.Exists(fname)){
 		fileMenu.error_message = "That's a directory. Select a file.";
 		return -2;
@@ -117,18 +118,18 @@ function Load(fname : String, isDemo : boolean){
 	}
 }
 
-function DeactivateFile(index){
+function DeactivateFile(index : int){
 	files[index].Deactivate();
 }
 
-function ActivateFile(index){
+function ActivateFile(index : int){
 	files[index].Activate();
 }
 
 
 //TODO
-function determineDependencies(file : DataFile){
-	var output = new Array();
-	output.Push(file);
+function determineDependencies(file : DataFile) {
+	var output = new List.<DataFile>();
+	output.Add(file);
 	return output;
 }

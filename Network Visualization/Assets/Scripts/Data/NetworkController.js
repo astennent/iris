@@ -1,4 +1,4 @@
-#pragma downcast
+#pragma strict
 import System.IO;
 
 var nodeObject : GameObject;
@@ -43,7 +43,7 @@ function escapeQuotedDelimiters(line : String){
 		if (line[x] == "\""[0]){ //match on quotes
 			escaped = !escaped;
 		} else if (escaped && line[x] == delimiter){
-			line = line.slice(0,x) + "\\" + line.slice(x);
+			line = line.Substring(0,x) + "\\" + line.Substring(x);
 		}
 	}
 	return line;

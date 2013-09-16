@@ -1,4 +1,5 @@
 //TODO: tooltips over all buttons
+#pragma strict 
 
 import System.IO;
 
@@ -28,7 +29,7 @@ class FileMenu extends PrimaryMenu {
 		cur_y = 40;
 		//make buttons for each of the files.
 		var button_position : Rect;
-		for (var i=0 ; i<fileManager.files.length ; i++){
+		for (var i=0 ; i<fileManager.files.Count ; i++){
 			button_position = new Rect(x+10, cur_y, width-20, 30);
 			var file : DataFile = fileManager.files[i];
 			if (i == selected_file_index){ GUI.color = Color.yellow; } else { GUI.color = Color.white;	}
@@ -59,7 +60,7 @@ class FileMenu extends PrimaryMenu {
 
 	//displays information / actions for imported files.
 	function DrawLoadedFileDetails(){
-		file = fileManager.files[selected_file_index];
+		var file = fileManager.files[selected_file_index];
 
 		var menuRect = new Rect(x, cur_y, width, Screen.height-cur_y);
 		if (file.imported){
@@ -69,8 +70,8 @@ class FileMenu extends PrimaryMenu {
 		}
 		GUI.Box(menuRect, title);
 		cur_y += 20;
-		var toggle_box = new Rect(x+5, cur_y, width-10, 25);
-		using_headers = GUI.Toggle (toggle_box, file.using_headers, " File uses headers");
+		var toggle_box = new Rect(x+5, cur_y, 150, 25);
+		var using_headers = GUI.Toggle (toggle_box, file.using_headers, " File uses headers");
 		if (file.using_headers != using_headers){
 			file.ToggleUsingHeaders();
 		}
@@ -115,7 +116,7 @@ class FileMenu extends PrimaryMenu {
 			//is shown toggles
 			if (attribute.is_shown){ GUI.color = new Color(.5, 1, .5); } 
 			else { GUI.color = Color.white; }		
-			is_name_box = new Rect(18, attribute_y, 20, 20);
+			var is_name_box = new Rect(18, attribute_y, 20, 20);
 			var is_shown_value = GUI.Toggle (is_name_box, attribute.is_shown, "");	
 			if (is_shown_value != attribute.is_shown){
 				attribute.ToggleShown();
@@ -124,7 +125,7 @@ class FileMenu extends PrimaryMenu {
 			//numeric toggles
 			if (attribute.is_numeric){ GUI.color = new Color(.5, .5, 1); } 
 			else { GUI.color = Color.white; }
-			numeric_box = new Rect(72, attribute_y, 20, 20);
+			var numeric_box = new Rect(72, attribute_y, 20, 20);
 			var numeric_toggle = GUI.Toggle (numeric_box, attribute.is_numeric, "");		
 			if (numeric_toggle != attribute.is_numeric){
 				file.ToggleNumeric(i);
@@ -133,7 +134,7 @@ class FileMenu extends PrimaryMenu {
 			//pkey toggles
 			if (attribute.is_pkey){ GUI.color = new Color(1, .5, .5); } 
 			else { GUI.color = Color.white; }		
-			is_pkey_box = new Rect(116, attribute_y, 20, 20);
+			var is_pkey_box = new Rect(116, attribute_y, 20, 20);
 			var pkey_value = GUI.Toggle (is_pkey_box, attribute.is_pkey, "");	
 			if (pkey_value != attribute.is_pkey){
 				attribute.TogglePkey();
@@ -156,6 +157,7 @@ class FileMenu extends PrimaryMenu {
 		
 		GUI.EndScrollView();
 		
+		var import_button : Rect;
 		if (file.imported){
 			//Disable button
 			GUI.color = new Color(1, .7, 0);
@@ -177,10 +179,11 @@ class FileMenu extends PrimaryMenu {
 		//Remove button
 		GUI.color = Color.red;
 		cur_y += 30;
-		remove_button = new Rect(x+width/2+5, Screen.height-40, width/2-12.5, 30);
+		var remove_button = new Rect(x+width/2+5, Screen.height-40, width/2-12.5, 30);
 		if (GUI.Button(remove_button, "Remove File")){
-			fileManager.removeFile(selected_file_index);
-			selected_file_index = -1;
+			//TODO: Removing files from workspace
+			//fileManager.removeFile(selected_file_index);
+			//selected_file_index = -1;
 		}
 		
 	}
@@ -234,7 +237,7 @@ class FileMenu extends PrimaryMenu {
 	function DrawDirectoryData(){
 		//loop over directories
 		directoryScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,Screen.height-cur_y), 
-			directoryScrollPosition, Rect (0, 0, width, 20*fileManager.dest_directories.length + 20*fileManager.dest_files.length));
+			directoryScrollPosition, Rect (0, 0, width, 20*fileManager.dest_directories.Count + 20*fileManager.dest_files.Count));
 		cur_y = 0;
 		
 		GUI.color = new Color(0, .8, .8);

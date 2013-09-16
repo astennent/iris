@@ -1,3 +1,4 @@
+#pragma downcast
 
 class AttributeMenu extends PrimaryMenu {
 
@@ -68,11 +69,8 @@ class AttributeMenu extends PrimaryMenu {
 			else { GUI.color = Color.white; }
 			attribute.is_pkey = GUI.Toggle (box, attribute.is_pkey, " Part of Primary Key");		
 
-			
-			box.y+=40;	
-			if (attribute.is_fkey){ GUI.color = new Color(1, .5, 0);}
-			else { GUI.color = Color.white; }
 			box.y+=20;
+			GUI.color = Color.white;
 			GUI.Label(box, "For multi-attribute references, use");
 			box.y+=20;
 			GUI.color = new Color(1, .5, 0);
@@ -82,8 +80,7 @@ class AttributeMenu extends PrimaryMenu {
 			GUI.color = Color.white;
 			box.x+=30;
 			box.y+=40;
-			cur_y += 30;
-			cur_y += 120;
+			cur_y += 110;
 
 			var fkey_rect = new Rect(x, cur_y, width, Screen.height-cur_y);
 			GUI.Box(fkey_rect, "Select Referencing Attributes");

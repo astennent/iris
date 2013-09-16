@@ -1,7 +1,8 @@
+#pragma strict
 
 private var fileManager : FileManager;
 private var searchMenu : SearchMenu;
-var matches : Array = new Array();
+var matches = new List.<Node>();
 
 function Start(){
 	fileManager = GetComponent(FileManager);
@@ -9,18 +10,17 @@ function Start(){
 }
 
 function ReInit(){	
-	matches = new Array();
+	matches = new List.<Node>();
 }
 
 function UpdateMatches(searchString : String){	
-	scrollPosition = Vector2.zero;			
-	matches = new Array();
+	matches = new List.<Node>();
 
 	for (var file in fileManager.files){
 		for (var entry in file.nodes){
 			var node = entry.Value;
 			if (searchString != "" && node.gameObject.name.Contains(searchString)){
-				matches.push(node);
+				matches.Add(node);
 			}					
 		}		
 	}	

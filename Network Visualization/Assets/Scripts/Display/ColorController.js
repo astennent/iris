@@ -1,4 +1,4 @@
-#pragma downcast
+#pragma strict
 
 private var networkController : NetworkController;
 private var clusterController : ClusterController;
@@ -106,7 +106,7 @@ function ApplyRule(rule : ColorRule) {
 		//the fallback rule transparently applies itself to all groups.
 		if (rule.is_fallback) {
 			for (var file in fileManager.files){
-				nodes = file.nodes;
+				var nodes = file.nodes;
 				for (var entry in nodes){
 					var node : Node = entry.Value;
 					ColorNodeForRule(node, rule.getColor(), variation, halo);
@@ -144,7 +144,7 @@ function ColorAllByCluster(){
 }*/
 
 function ColorByCluster(cluster_id : int, color : Color, variation : float, halo : boolean){
-	var nodes : Array = clusterController.group_dict[cluster_id];	
+	var nodes = clusterController.group_dict[cluster_id];	
 	for (var node in nodes){
 		ColorNodeForRule(node, color, variation, halo);
 	}

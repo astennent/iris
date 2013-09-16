@@ -1,4 +1,4 @@
-#pragma downcast
+#pragma strict
 
 class ColorRuleMenu extends PrimaryMenu {
 	private var sourceScrollPosition : Vector2 = Vector2.zero;
@@ -10,7 +10,7 @@ class ColorRuleMenu extends PrimaryMenu {
 	private var hiding_unconnected_clusters : boolean = false;
 	private var found_unconnected_cluster : boolean = false;
 
-	private var attributeValueCache;
+	private var attributeValueCache : HashSet.<String>;
 	private var searchString : String = "";
 	private var oldSearchString : String = "";
 	private var attributeMatchCount : int = 0;
@@ -68,7 +68,7 @@ class ColorRuleMenu extends PrimaryMenu {
 			var files = fileManager.files;
 
 			sourceScrollPosition = GUI.BeginScrollView (scrollBox, 
-				sourceScrollPosition, Rect (0, 0, width, 20*files.length+20));
+				sourceScrollPosition, Rect (0, 0, width, 20*files.Count+20));
 
 			for (var file : DataFile in files) {
 				var usedSourceBefore = rule.usesSource(file);
@@ -154,7 +154,7 @@ class ColorRuleMenu extends PrimaryMenu {
 
 			GUI.EndScrollView();*/
 		} else if (rule_type == 3){
-			line_count = 0;
+			var line_count = 0;
 			for (var file : DataFile in fileManager.files){
 				line_count += file.attributes.Count + 1;
 			}
@@ -201,15 +201,14 @@ class ColorRuleMenu extends PrimaryMenu {
 			
 			temp_y = 0;
 
-			for (var entry in attributeValueCache){
-				var value = entry.Key+"";
+			for (var value in attributeValueCache){
 				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (value == rule.getAttributeValue()), value)){
 					rule.setAttributeValue(value);
 				}
 				temp_y += 20;
 			}
 
-			message_box = new Rect(5, temp_y, width-5, 20);
+			var message_box = new Rect(5, temp_y, width-5, 20);
 			if (rule.getAttribute() == null){
 				GUI.Label(message_box, "Select an attribute");
 			} else if (attributeMatchCount == 0){
@@ -229,7 +228,7 @@ class ColorRuleMenu extends PrimaryMenu {
 		if (attribute == null){
 			return;
 		}
-		attributeValueCache = {};
+		attributeValueCache = new HashSet.<String>();
 		var file = attribute.file;
 		var attribute_index : int = -1;
 		for (var i : int = 0 ; i < file.attributes.Count; i++){
@@ -243,9 +242,9 @@ class ColorRuleMenu extends PrimaryMenu {
 			var data = node.Value.data;
 			var value = data[attribute_index];
 			var value_string = (value+"")/*.ToLower()*/;
-			if (value_string.StartsWith(searchString/*.ToLower()*/) && !attributeValueCache.ContainsKey(value)){
+			if (value_string.StartsWith(searchString/*.ToLower()*/) && !attributeValueCache.Contains(value)){
 				if (attributeMatchCount < 20){
-					attributeValueCache[value] = null; //add to dict
+					attributeValueCache.Add(value);
 				}
 				attributeMatchCount++;
 			}
