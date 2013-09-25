@@ -64,8 +64,8 @@
      <Compile Include="Assets\Scripts\Display\ColorRuleMenu.js" />
      <Compile Include="Assets\Scripts\Display\DisplayMenu.js" />
      <Compile Include="Assets\Scripts\Display\Reticle.js" />
+     <Compile Include="Assets\Scripts\Interface\BaseMenu.js" />
      <Compile Include="Assets\Scripts\Interface\MainMenu.js" />
-     <Compile Include="Assets\Scripts\Interface\PrimaryMenu.js" />
      <Compile Include="Assets\Scripts\Search\SearchController.js" />
      <Compile Include="Assets\Scripts\Search\SearchMenu.js" />
      <Compile Include="Assets\Scripts\Selection\SelectionController.js" />
