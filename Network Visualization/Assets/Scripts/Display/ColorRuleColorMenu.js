@@ -1,6 +1,6 @@
 #pragma strict
 
-class ColorRuleColorMenu extends PrimaryMenu {
+class ColorRuleColorMenu extends BaseMenu {
 	private var schemeScrollPosition : Vector2 = Vector2.zero;
 	private var rule : ColorRule;
 	function Start(){
@@ -103,7 +103,6 @@ class ColorRuleColorMenu extends PrimaryMenu {
 	}
 
 	function DisableDisplay(){
-		print ("Disabling CRCM");
 		displayMenu.setRuleIndex(-1);
 		super.DisableDisplay();
 	}

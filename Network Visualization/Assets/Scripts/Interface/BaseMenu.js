@@ -1,6 +1,6 @@
 #pragma strict
 
-class PrimaryMenu extends MonoBehaviour {
+class BaseMenu extends MonoBehaviour {
 	var displaying : boolean;
 
 	var desired_x : float; //the left side of the menu while displaying
@@ -30,10 +30,10 @@ class PrimaryMenu extends MonoBehaviour {
     var title : String = ""; //must be set separately in each menu.
 	
     /* Any menus that will appear to the right of the current menu */
-    var children : List.<PrimaryMenu>;
+    var children : List.<BaseMenu>;
 
     /* The single menu immediately to the left of the current menu */
-    var parent : PrimaryMenu;
+    var parent : BaseMenu;
 
 	function Start(){
 		if (parent != null) {
@@ -80,7 +80,7 @@ class PrimaryMenu extends MonoBehaviour {
 		};
 	}
 
-	function AddChild(child : PrimaryMenu) {
+	function AddChild(child : BaseMenu) {
 		children.Add(child);
 	}
 

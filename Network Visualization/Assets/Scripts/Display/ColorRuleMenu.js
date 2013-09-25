@@ -1,6 +1,6 @@
 #pragma strict
 
-class ColorRuleMenu extends PrimaryMenu {
+class ColorRuleMenu extends BaseMenu {
 	private var sourceScrollPosition : Vector2 = Vector2.zero;
 	private var clusterScrollPosition : Vector2 = Vector2.zero;
 	private var nodeScrollPosition : Vector2 = Vector2.zero;
@@ -252,7 +252,6 @@ class ColorRuleMenu extends PrimaryMenu {
 	}
 
 	function DisableDisplay(){
-		print ("Disabling ColorRuleMenu");
 		//special case: when you're on the fallback rule, don't reset the rule when you close.
 		if (displayMenu.rule_index != 0) {
 			displayMenu.setRuleIndex(-1);

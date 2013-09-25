@@ -3,7 +3,7 @@
 
 import System.IO;
 
-class FileMenu extends PrimaryMenu {
+class FileMenu extends BaseMenu {
 
 	private var cur_y : float;
 	private var directoryScrollPosition : Vector2 = Vector2.zero;

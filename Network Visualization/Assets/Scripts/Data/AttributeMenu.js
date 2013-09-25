@@ -1,6 +1,6 @@
 #pragma downcast
 
-class AttributeMenu extends PrimaryMenu {
+class AttributeMenu extends BaseMenu {
 
 	var selected_index : int = -1; //used for displaying the foreign key menu to the side of the file menu.
 

@@ -1,5 +1,5 @@
 #pragma strict
-class MainMenu extends PrimaryMenu {
+class MainMenu extends BaseMenu {
 
 	var gear : Texture;
 	var play : Texture;

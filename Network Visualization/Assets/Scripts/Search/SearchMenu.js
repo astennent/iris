@@ -1,6 +1,6 @@
 #pragma downcast
 
-class SearchMenu extends PrimaryMenu {
+class SearchMenu extends BaseMenu {
 
 	private var searchString : String = "";
 	private var oldSearchString : String = "";

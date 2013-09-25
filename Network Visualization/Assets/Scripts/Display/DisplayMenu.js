@@ -1,6 +1,6 @@
 #pragma strict
 
-class DisplayMenu extends PrimaryMenu {
+class DisplayMenu extends BaseMenu {
 	private var scrollPosition : Vector2 = Vector2.zero;
 
 	var rule_index : int = -1;

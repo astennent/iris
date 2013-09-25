@@ -2,7 +2,7 @@
 
 #pragma strict
 
-class FkeyMenu extends PrimaryMenu {
+class FkeyMenu extends BaseMenu {
 
 	private var adding_index : int = -1;
 	private var adding_from_attr : Attribute;
