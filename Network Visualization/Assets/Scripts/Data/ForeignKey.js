@@ -47,3 +47,19 @@ function getKeyPairs(){
 function isSimpleFkey(from : Attribute, to : Attribute){
 	return keyPairs.Count == 1 && keyPairs[0][0] == from && keyPairs[0][1] == to;
 }
+
+//check if the key maps directly onto the target file's primary key. 
+//This allows for O(1) mapping, rather than O(n).
+function mapsToPrimary(){
+	var other_file_pkey_indices = to_file.pkey_indices;
+	if (other_file_pkey_indices.length == keyPairs.Count) {
+		for (var attr_index = 0 ; attr_index < other_file_pkey_indices.length; attr_index++) {
+			var fkey_to_attribute = keyPairs[attr_index][1];
+			var other_attribute = to_file.attributes[other_file_pkey_indices[attr_index]]; //oof
+			if (fkey_to_attribute != other_attribute) {
+				return false;
+			}
+		}
+	}
+	return true;
+}

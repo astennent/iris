@@ -9,7 +9,6 @@ var dest_directories = new List.<DirectoryInfo>();
 var dest_files = new List.<FileInfo>();
 
 var demoMode = true;
-var demoPrefab : GameObject;
 
 private var fileMenu : FileMenu;
 

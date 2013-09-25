@@ -1,4 +1,8 @@
-#pragma downcast
+//Reads in compiled Strings for use on the web
+
+#pragma strict
+
+public class DemoStreamReader implements IrisStreamReader {
 
 private var currentFile : String;
 private var index = 0;
@@ -7,16 +11,22 @@ function setCurrentFile(fname:String){
 	currentFile = fname;
 	index = 0;
 }
+
 function ReadLine() : String{
 	var data_array : Array = all_data[currentFile];
 	return data_array[index++];
 }
+
 function Peek(){
 	var data_array : Array = all_data[currentFile];
 	if (index >= data_array.length || index < 0){
 		return -1;
 	}
 	return index;
+}
+
+function Close(){
+	//No-op
 }
 
 var all_data = { "Full Group Attributes" : ["id,name,start data,end date,age,active,size,size.1,goal,scope,sponsor,ended,victory,income,gdp,physint,averagepts,primary.base,region,mideast,bases.of.operation,polity2,classification.1,classification.2,classification.3,classification.4,nationalist,religious,anti.globalization,anarchist,communist.socialist,environmental,leftist,racist,right.wing.conservative,right.wing.reactionary,other,count,1+.ally,>1.ally,betweeness,eigenvector,attempted.attacks,attacks,success.rate,closeness",
@@ -1136,4 +1146,4 @@ var all_data = { "Full Group Attributes" : ["id,name,start data,end date,age,act
  "Revolutionary Movement of October 8 (MR-8),VAR-Palmares",
  "Aryan Nations (AN),White Patriot Party (WPP)",
  "\"Order, The\",White Patriot Party (WPP)"] };
- 
+ }

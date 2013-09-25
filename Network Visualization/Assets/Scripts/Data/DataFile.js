@@ -28,7 +28,7 @@ var shown_indices : int[];
 
 var first_row : String[]; 
 
-var nodes = new Dictionary.<Array, Node>();
+var nodes = new Dictionary.<String, Node>();
 
 var isDemoFile : boolean = false;
 
@@ -67,19 +67,16 @@ function ScanForMetadata(){
 	attributes = new List.<Attribute>();
 	
 	try {
-		//Choose between a StreamReader (java.IO) or the custom DemoStreamReader.
-		//These serve the same function as each other, but the IO version cannot access files unless running as an exe.
-	    var sr : StreamReader = null;
-	    var dsr : DemoStreamReader = null;
+		var sr : IrisStreamReader = null; //StreamReader interface.
 		if (isDemoFile){
-			dsr = fileManager.demoPrefab.GetComponent(DemoStreamReader);
-			dsr.setCurrentFile(fname);
+			sr = new DemoStreamReader();
+			sr.setCurrentFile(fname);
 		} else {
-			sr = new StreamReader(fname);
+			sr = new DefaultStreamReader();
+			sr.setCurrentFile(fname);
 		}
-	    while (  (sr != null && sr.Peek() != -1)   || (dsr != null && dsr.Peek() != -1)  ){
-	    	if (sr != null) { 	var line : String = sr.ReadLine(); } 
-	    	else { line = dsr.ReadLine(); }
+	    while (  sr != null && sr.Peek() != -1  ){
+	    	var line : String = sr.ReadLine();
 	    	
 	    	line = escapeQuotedDelimiters(line);	    
 	    		
@@ -317,25 +314,21 @@ function Activate(){
 
 function GenerateNodes(){
 	//TODO: destroy nodes and connections.
-	nodes = new Dictionary.<Array, Node>();
+	nodes = new Dictionary.<String, Node>();
 	UpdatePKeyIndices();
 	UpdateShownIndices();
 	try {
-		//Choose between a StreamReader (java.IO) or the custom DemoStreamReader.
-		//These serve the same function as each other, but the IO version cannot access files unless running as an exe.
-	    var sr : StreamReader = null;
-	    var dsr : DemoStreamReader = null;
+		var line_index = -1;
+		var sr : IrisStreamReader = null; //StreamReader interface.
 		if (isDemoFile){
-			dsr = fileManager.demoPrefab.GetComponent(DemoStreamReader);
-			dsr.setCurrentFile(fname);
+			sr = new DemoStreamReader();
+			sr.setCurrentFile(fname);
 		} else {
-			sr = new StreamReader(fname);
+			sr = new DefaultStreamReader();
+			sr.setCurrentFile(fname);
 		}
-	    var line_index = -1;
-
-	    while (  (sr != null && sr.Peek() != -1)   || (dsr != null && dsr.Peek() != -1)  ){
-	    	if (sr != null) { 	var line : String = sr.ReadLine(); } 
-	    	else { line = dsr.ReadLine(); }
+	    while (  sr != null && sr.Peek() != -1  ){
+	    	var line : String = sr.ReadLine();
     		
     		line_index++;
 	    	//skip the first line if using headers.
@@ -367,7 +360,7 @@ function GenerateNodes(){
 	    	for (var pkey_index in pkey_indices){
 	    		key.Push(data[pkey_index]);
 	    	}
-	    	nodes[key] = node;	    	
+	    	nodes[key.toString()] = node;	    	
 	    }
 	   
 	   if (sr != null) sr.Close();
@@ -421,21 +414,16 @@ function GenerateConnectionsForNodeFile(){
 function GenerateConnectionsForLinkingTable(){
 	try {
 	    var line_index = -1;	
-
-		//Choose between a StreamReader (java.IO) or the custom DemoStreamReader.
-		//These serve the same function as each other, but the IO version cannot access files unless running as an exe.
-	    var sr : StreamReader = null;
-	    var dsr : DemoStreamReader = null;
+		var sr : IrisStreamReader = null; //StreamReader interface.
 		if (isDemoFile){
-			dsr = fileManager.demoPrefab.GetComponent(DemoStreamReader);
-			dsr.setCurrentFile(fname);
+			sr = new DemoStreamReader();
+			sr.setCurrentFile(fname);
 		} else {
-			sr = new StreamReader(fname);
+			sr = new DefaultStreamReader();
+			sr.setCurrentFile(fname);
 		}
-	    while (  (sr != null && sr.Peek() != -1)   || (dsr != null && dsr.Peek() != -1)  ){
-	    	if (sr != null) { 	var line : String = sr.ReadLine(); } 
-	    	else { line = dsr.ReadLine(); }
-    		    		
+	    while (  sr != null && sr.Peek() != -1  ){
+	    	var line : String = sr.ReadLine();    		    		
     		
     		line_index++;	    		
 	    	//skip the first line if using headers.
@@ -469,27 +457,45 @@ function GenerateConnectionsForLinkingTable(){
 				var keyPairs = foreignKey.getKeyPairs();
 				var these_matches = new List.<Node>();
 
-				//find matches from side of fkey	
-				for (var entry in other_file.nodes){
-					var node : Node = entry.Value;
-					var matching = true;
-					for (pair in keyPairs){
-						//check if the "to" value is a match
+				//check if the foreign key maps directly onto the target table's primary key.
+				if (foreignKey.mapsToPrimary()){					
+					//convert the values of the current line to an array key into the other file's nodes.
+					var node_values = new Array();
+					for (pair in keyPairs) {
 						var from_attribute_index = pair[0].column_index;
 						var from_attribute_value = splitLine[from_attribute_index];
+						node_values.Push(from_attribute_value); 
+					}
+					var node_values_string = node_values.toString();
+					if (other_file.nodes.ContainsKey(node_values_string)) {
+						var node : Node = other_file.nodes[node_values_string];
+						these_matches.Add(node); //these_matches should just have the one node.
+					}
+					matches.Add(these_matches);
+				} else {
+					//VERY COMPUTATIONALLY EXPENSIVE
+					//loops over the nodes in the other file. This makes the operation n^2 	
+					for (var entry in other_file.nodes){
+						node = entry.Value;
+						var matching = true;
+						for (pair in keyPairs){
+							//check if the "to" value is a match
+							from_attribute_index = pair[0].column_index;
+							from_attribute_value = splitLine[from_attribute_index];
 
-						var to_attribute_index = pair[1].column_index;	
-						var to_attribute_value = node.data[to_attribute_index];
-						
-						if (from_attribute_value != to_attribute_value){
-							matching = false;
-						} 
+							var to_attribute_index = pair[1].column_index;	
+							var to_attribute_value = node.data[to_attribute_index];
+							
+							if (from_attribute_value != to_attribute_value){
+								matching = false;
+							} 
+						}
+						if (matching){
+							these_matches.Add(node);
+						}
 					}
-					if (matching){
-						these_matches.Add(node);
-					}
+					matches.Add(these_matches);
 				}
-				matches.Add(these_matches);
 			}
 				
 			//TODO: make n-way connections.
@@ -559,28 +565,6 @@ function UpdatePKeyIndices(){
 	}	
 	pkey_indices = output;
 }
-
-/*
-
-function GetFKeyFromIndices(fkey){
-	var output = new Array();
-	for (var entry in fkey[1]){
-		var from : Attribute = entry.Value;
-		output.Push(from.column_index);
-	}
-	return output.sort();	
-}
-
-function GetFKeyToIndices(fkey){
-	var output = new Array();
-	for (var entry in fkey[1]){
-		var to : Attribute = entry.Key;
-		output.Push(to.column_index);
-	}
-	return output.sort();	
-}
-
-*/
 
 function Deactivate() {
 	for (var foreignKey in foreignKeys){
