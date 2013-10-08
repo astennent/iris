@@ -2,7 +2,6 @@
 
 var selectionController : SelectionController;
 var target: Transform;
-var selectionCenter : Vector3;
 function Start () {
 	target = GameObject.FindGameObjectWithTag("GameController").transform;
 	selectionController = GameObject.FindGameObjectWithTag("GameController").GetComponent(SelectionController);
@@ -27,8 +26,8 @@ function Update () {
 	if (freeCamera){ //camera is controlled with arrow keys
 		UpdateFree();
 	} else { //camera is controlled by moving around 
-		CalculateSelectionCenter();
-		UpdateLocked();
+		var selectionCenter : Vector3 = CalculateSelectionCenter();
+		UpdateLocked(selectionCenter);
 	}
 		
 	//spacebar to switch camera type.
@@ -64,7 +63,7 @@ function UpdateFree(){
 
 }
 
-function UpdateLocked(){
+function UpdateLocked(selectionCenter : Vector3){
 	var coordinates = Camera.main.WorldToScreenPoint(selectionCenter);
 	var mouseCoords = Input.mousePosition;
 
@@ -151,6 +150,7 @@ function ToggleLocked(){
 
 function CalculateSelectionCenter() {
 	var selected_nodes = selectionController.nodes;
+	var selectionCenter : Vector3;
 	if (selected_nodes.Count < 2) {
 		selectionCenter = target.position;
 	} else {
@@ -168,4 +168,5 @@ function CalculateSelectionCenter() {
 		}
 		desired_distance = max_distance*2;
 	}
+	return selectionCenter;
 }

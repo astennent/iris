@@ -70,7 +70,7 @@ function LateUpdate(){
 function ProcessDrag(){
 	if(!Input.GetMouseButton(0)  || !networkCamera.freeCamera){
 		dragging = false;
-		return null;
+		return;
 	}
 		
 	if (dragging){
@@ -104,15 +104,14 @@ function ProcessDrag(){
 			if (node != primaryNode){
 				node.transform.position += positionDelta;
 			}
-		}		
-
+		}	
 	}
 }
 
 function ProcessBoxing(){
 	if (dragging || !networkCamera.freeCamera){
 		boxing = false;
-		return null;
+		return;
 	}
 	if (!boxing && Input.GetMouseButtonDown(0)){
 		startBoxing();
@@ -121,7 +120,7 @@ function ProcessBoxing(){
 	}
 }
 
-function startBoxing(){
+function startBoxing() {
 	boxing = true;
 	clearedSelectionSinceBoxStart = false;
 	startCoords = Input.mousePosition;
@@ -194,7 +193,10 @@ function selectBoxedItems(){
 	}
 }
 
-function selectAllInGroup(group_id : int){
+function selectAllInGroup(group_id : int, clear : boolean){
+	if (clear) {
+		clearSelectedNodes();
+	}
 	for (var file : DataFile in fileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);

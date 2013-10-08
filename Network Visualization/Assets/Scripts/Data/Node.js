@@ -30,12 +30,14 @@ private var manual_size : float = 10.0;
 private var size : float = 2.5; //2.5 is the minimum
 
 private var selectionController : SelectionController;
+private var rightClickController : RightClickController;
 
 private var haloColor : Color;
 
 function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	selectionController = networkController.GetComponent(SelectionController);
+	rightClickController = networkController.GetComponent(RightClickController);
 	label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 	label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 	label.transform.parent = this.transform;
@@ -76,7 +78,7 @@ function AddConnection (other : Node, isOutgoing : boolean, foreignKey : Foreign
 
 
 function Update () {	
-	GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0);
+	GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1);
 	
 	var oldRotation = transform.rotation;
 
@@ -172,9 +174,12 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 }
 
 function OnMouseOver() {
-	if(Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
+	if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 		selectionController.NodeClick(this);
     } 
+    if (Input.GetMouseButton(1) || Input.GetMouseButtonUp(1)) { //rightclick
+    	rightClickController.NodeClick(this);
+    }
 }
 
 function LateUpdate () {

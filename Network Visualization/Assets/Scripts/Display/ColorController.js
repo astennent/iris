@@ -209,6 +209,8 @@ function GenRandomColor(scheme_index : int){
 		return NudgeColor(new Color(.25, .75, .1));
 	} else if (scheme_index == 6){ //aqua
 		return NudgeColor(new Color(.1, .4, .75));
+	} else {
+		return Color.white;
 	}
 }
 
