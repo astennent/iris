@@ -230,6 +230,22 @@ function DeactivateConnections(file : DataFile){
 		var connection = connections[x];
 		if (connection.to.source == file){
 			connection.Deactivate();
+			x--;
+			size-=2.5;
+		} else {
+			replacement_connections.Add(connection);
+		}
+	}
+	connections = replacement_connections;
+	UpdateSize();
+}
+function DeactivateConnections(foreignKey : ForeignKey) {
+	var replacement_connections = new List.<Connection>();
+	for (var x = 0 ; x < connections.Count ; x++){
+		var connection = connections[x];
+		if (connection.foreignKey == foreignKey){
+			connection.Deactivate();
+			x--;
 			size-=2.5;
 		} else {
 			replacement_connections.Add(connection);

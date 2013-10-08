@@ -567,11 +567,19 @@ function UpdatePKeyIndices(){
 }
 
 function Deactivate() {
-	for (var foreignKey in foreignKeys){
-		var from_file = foreignKey.from_file;
-		var to_file = foreignKey.to_file;
-		from_file.DeactivateConnections(to_file);
-		to_file.DeactivateConnections(from_file);
+	if (linking_table) {
+		for (var foreignKey in foreignKeys) {
+			for (var node in foreignKey.to_file.nodes){
+				node.Value.DeactivateConnections(foreignKey);
+			}
+		}
+	} else {
+		for (var foreignKey in foreignKeys) {
+			var from_file = foreignKey.from_file;
+			var to_file = foreignKey.to_file;
+			from_file.DeactivateConnections(to_file);
+			to_file.DeactivateConnections(from_file);
+		}
 	}
 	for (var node in nodes) {
 	 	node.Value.Deactivate();
