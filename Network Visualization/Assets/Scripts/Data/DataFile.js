@@ -584,10 +584,10 @@ function Deactivate() {
 	for (var node in nodes) {
 	 	node.Value.Deactivate();
 	}
+	nodes = new Dictionary.<String, Node>();
 	searchController.ReInit();
 	clusterController.ReInit();
 	imported = false;
-	var nodes = new Dictionary.<Array, Node>();
 }
 
 //called by linking table files, executed by non-linking tables.
