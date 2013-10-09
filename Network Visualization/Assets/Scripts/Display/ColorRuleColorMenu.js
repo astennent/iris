@@ -30,20 +30,22 @@ class ColorRuleColorMenu extends BaseMenu {
 		rule = colorController.rules[displayMenu.rule_index];
 
 		if (displaying){
+			var y : int;
 			if (rule.uses_scheme){
 				label_text = "Coloring by scheme";
 				button_text = "Use Custom Color";
-				DrawColorScheme();
+				y = DrawColorScheme();
 			} else {
 				label_text = "Using custom color";
 				button_text = "Color By Scheme";
-				DrawColorCustom();
+				y = DrawColorCustom();
 			}		
 			GUI.Box(Rect(x+5, 35, width-10, 55), "");
 			GUI.Label(Rect(x+10, 35, width, 20), label_text);
 			if (GUI.Button(Rect(x+10, 60, width-20, 25), button_text)){
 				rule.uses_scheme = !rule.uses_scheme;
 			}
+			DrawSizingOptions(y);				
 		}
 	}
 
@@ -71,6 +73,8 @@ class ColorRuleColorMenu extends BaseMenu {
 		if (rule.color != original_color || rule.variation != original_variation || rule.halo != original_halo){
 			colorController.ApplyRule(rule);
 		}
+		cur_y += 30;
+		return cur_y;
 	}
 
 	function DrawColorScheme() {
@@ -100,6 +104,31 @@ class ColorRuleColorMenu extends BaseMenu {
 		}
 
 		GUI.EndScrollView();
+		y+=60;
+		return y;
+	}
+
+	function DrawSizingOptions(cur_y : int){
+		var size_text : String;
+		if (rule.uses_manual_size) {
+			size_text = "Setting node size manually.";
+		} else {
+			size_text = "Not changing node size.";
+		}
+
+		var original_uses_size : boolean = rule.uses_manual_size;
+		var original_manual_size : float = rule.manual_size;
+
+		rule.uses_manual_size = GUI.Toggle(Rect (x+10, cur_y, width-20, 20), rule.uses_manual_size, size_text);
+		cur_y+=20;
+		if (rule.uses_manual_size) {
+			GUI.Label(new Rect(x+10, cur_y, width, 20), "Size: " + rule.manual_size.ToString("f2"));
+			rule.manual_size = GUI.HorizontalSlider(Rect(x+80, cur_y+5, width-100, 20), rule.manual_size, 1.0, 50.0);
+		}
+
+		if (rule.uses_manual_size != original_uses_size || rule.manual_size != original_manual_size){
+			colorController.ApplyRule(rule, false, true);
+		}
 	}
 
 	function DisableDisplay(){

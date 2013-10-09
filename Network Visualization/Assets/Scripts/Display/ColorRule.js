@@ -20,6 +20,10 @@ var colorController : ColorController;
 
 var uses_scheme : boolean = false;
 var scheme_button_color : Color; //used for coloring the scheme button so it doesn't flash.
+
+var uses_manual_size = false;
+var manual_size : float = 2.5;
+
 private var scheme_index : int = 0; //bright
 
 function Init(){
@@ -46,7 +50,7 @@ function setScheme(index : int){
 	scheme_index = index;
 	color = colorController.GenRandomColor(scheme_index);
 	scheme_button_color = color;
-	colorController.ApplyRule(this);
+	colorController.ApplyRule(this, true, false);
 }
 
 function getScheme() {

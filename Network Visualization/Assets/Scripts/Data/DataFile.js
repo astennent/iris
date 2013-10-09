@@ -77,10 +77,7 @@ function ScanForMetadata(){
 		}
 	    while (  sr != null && sr.Peek() != -1  ){
 	    	var line : String = sr.ReadLine();
-	    	
-	    	line = escapeQuotedDelimiters(line);	    
-	    		
-	    	var splitLine : String[]= line.Split(delimiter);
+	    	var splitLine : String[] = splitLine(line);
 
 	    	if (on_first_row){
 	    		first_row_types = new boolean[splitLine.Length];
@@ -137,6 +134,17 @@ function ScanForMetadata(){
     initialized = true;
 }
 
+function splitLine(line : String) {
+	line = escapeQuotedDelimiters(line);
+	var splitLine = line.Split(delimiter);
+    //remove extra quotes
+	for (var entry : String in splitLine) {
+		if (entry.Length > 1 && entry[0] == "\"" && entry[entry.Length-1] == "\"") {
+			entry = entry.Substring(1, entry.Length-2);
+		}
+	}
+	return splitLine;
+}
 function escapeQuotedDelimiters(line : String){
 	var escaped : boolean = false;
 	for (var x :int =0 ; x < line.Length ; x++){
@@ -149,6 +157,8 @@ function escapeQuotedDelimiters(line : String){
 	}
 	return line;
 }
+
+
 
 //determines if the number passed variable is a number.
 function isNumber(n : String) {
@@ -337,9 +347,8 @@ function GenerateNodes(){
 	    	}	
 	    	
 	    	var data = new Array();
-	    	line = escapeQuotedDelimiters(line);	    
-	    		 
-	    	var splitLine : String[] = line.Split(delimiter);
+	    	var splitLine : String[] = splitLine(line);
+
 	    	for (var i : int = 0 ; i < splitLine.length ; i++){
 	    		if (i < attributes.Count){ //in case there are stray commas or whatever
 		    		var attribute = attributes[i];
@@ -432,11 +441,8 @@ function GenerateConnectionsForLinkingTable(){
 	    	}	
 	    	
 	    	var data = new Array();
-	    	line = escapeQuotedDelimiters(line);
-	    	
-			
-	    	//determine data values 
-	    	var splitLine : String[] = line.Split(delimiter);
+	    	var splitLine : String[] = splitLine(line);
+
 	    	for (var i : int = 0 ; i < splitLine.length ; i++){
 	    		if (i < attributes.Count){  //check against attributes count in case there aren't enough commas.
 		    		var attribute = attributes[i];

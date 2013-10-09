@@ -128,6 +128,7 @@ function UpdateSize(){
 function getManualSize(){
 	return manual_size;
 }
+
 function setManualSize(s : float){
 	manual_size = s;
 }
@@ -206,6 +207,16 @@ function isSelected(){
 	return (reticle != null);
 }
 
+function resetColorRules(){
+	resetHaloColor();
+	resetManualSizing();
+}
+
+function resetManualSizing(){
+	//set the sizing type to "by connections"
+	setSizingType(0);
+}
+
 function resetHaloColor(){
 	var c : Color = this.color;
 	c.a = .5;
@@ -220,6 +231,9 @@ function getHaloColor() {
 }
 
 function Deactivate(){
+	if (reticle) {
+		Destroy(reticle.gameObject);
+	}
 	Destroy(gameObject);
 }
 
