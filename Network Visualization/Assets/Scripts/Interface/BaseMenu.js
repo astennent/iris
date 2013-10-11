@@ -17,6 +17,7 @@ class BaseMenu extends MonoBehaviour {
     var fkeyMenu : FkeyMenu;
     var colorController : ColorController;
     var searchController : SearchController;
+    var selectionController : SelectionController;
     var colorRuleMenu : ColorRuleMenu;
     var colorRuleColorMenu : ColorRuleColorMenu;
     var colorPicker : ColorPicker;
@@ -52,6 +53,7 @@ class BaseMenu extends MonoBehaviour {
 		fkeyMenu = GetComponent(FkeyMenu);
 		colorController = GetComponent(ColorController);	
 		searchController = GetComponent(SearchController);
+		selectionController = GetComponent(SelectionController);
 		colorRuleMenu = GetComponent(ColorRuleMenu);
 		colorRuleColorMenu = GetComponent(ColorRuleColorMenu);
 		colorPicker = GetComponent(ColorPicker);

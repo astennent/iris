@@ -71,6 +71,7 @@
      <Compile Include="Assets\Scripts\Search\SearchController.js" />
      <Compile Include="Assets\Scripts\Search\SearchMenu.js" />
      <Compile Include="Assets\Scripts\Selection\SelectionController.js" />
+     <Compile Include="Assets\Scripts\Selection\SelectionMenu.js" />
      <Compile Include="Assets\Scripts\StreamReader\DefaultStreamReader.js" />
      <Compile Include="Assets\Scripts\StreamReader\DemoStreamReader.js" />
      <Compile Include="Assets\Scripts\StreamReader\IrisStreamReader.js" />

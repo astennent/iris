@@ -225,6 +225,10 @@ function clearSelectedNodes(){
 	nodes.Clear();
 }
 
+function getNumSelected() {
+	return nodes.Count;
+}
+
 function deselectNode(node : Node){
 	nodes.Remove(node);
 	node.setSelected(false);

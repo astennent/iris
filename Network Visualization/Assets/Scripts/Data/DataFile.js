@@ -95,7 +95,9 @@ function ScanForMetadata(){
 	    		}
 	    	} else {
 	    		for (x = 0 ; x < expected_column_types.Length ; x++){
-	    			if (expected_column_types[x]){ //if it might still be an integer.
+	    			if (x >= splitLine.Length) {
+	    				expected_column_types[x] = false;
+	    			} else if (expected_column_types[x]){ //if it might still be an integer.
 	    				//if this is a number, it stays a number. Otherwise, the entire column will be interpretted as text.
 	    				expected_column_types[x] = isNumber(splitLine[x]); 
 	    			}
@@ -135,30 +137,33 @@ function ScanForMetadata(){
 }
 
 function splitLine(line : String) {
-	line = escapeQuotedDelimiters(line);
-	var splitLine = line.Split(delimiter);
+	var splitLine = new List.<String>();
+	var escaped : boolean = false;
+
+	for (var x :int =0; x < line.Length ; x++){
+		if (line[x] == "\""[0]){ //match on quotes
+			escaped = !escaped;
+		} else if (!escaped && line[x] == delimiter){
+			var entry = line.Substring(0, x);
+			splitLine.Add(entry);
+			line = line.Substring(x+1);
+			x=-1;
+		}
+		if (x == line.Length-1) {
+			splitLine.Add(line);
+		}
+	}
+	var output : String[] = new String[splitLine.Count];
     //remove extra quotes
-	for (var entry : String in splitLine) {
+	for (x = 0 ; x < splitLine.Count ; x++){
+		entry = splitLine[x];
 		if (entry.Length > 1 && entry[0] == "\"" && entry[entry.Length-1] == "\"") {
 			entry = entry.Substring(1, entry.Length-2);
 		}
+		output[x] = entry;
 	}
-	return splitLine;
+	return output;
 }
-function escapeQuotedDelimiters(line : String){
-	var escaped : boolean = false;
-	for (var x :int =0 ; x < line.Length ; x++){
-		if (line[x] == "\""[0]){ //match on quotes
-			escaped = !escaped;
-		} else if (escaped && line[x] == delimiter){
-			line = line.Substring(0,x) + "\\" + line.Substring(x);
-			x++;
-		}
-	}
-	return line;
-}
-
-
 
 //determines if the number passed variable is a number.
 function isNumber(n : String) {
@@ -414,8 +419,7 @@ function GenerateConnectionsForNodeFile(){
 					
 				}
 			
-			}		
-		
+			}				
 		}
 	}
 }
@@ -523,7 +527,6 @@ function GenerateConnectionsForLinkingTable(){
     } catch (err){
     	print("" + err);
     	if (sr!=null)sr.Close();
-
     }	
 }
 	

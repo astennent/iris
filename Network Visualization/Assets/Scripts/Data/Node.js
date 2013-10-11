@@ -147,6 +147,9 @@ function UpdateName(){
 	label.GetComponent(GUIText).text = gameObject.name;
 }
 
+function getName(){
+	return gameObject.name;
+}
 
 function moveRelativeTo(target : Vector3, other_size: float, second_level : boolean, connectionWeight : float){
 	if (networkController.paused || connectionWeight == 0){
@@ -234,6 +237,13 @@ function Deactivate(){
 	if (reticle) {
 		Destroy(reticle.gameObject);
 	}
+
+	//detach the camera if attached.
+	if (Camera.main.transform.parent == transform) {
+		Camera.main.transform.parent = null;
+	}
+
+	selectionController.deselectNode(this);
 	Destroy(gameObject);
 }
 
