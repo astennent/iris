@@ -96,7 +96,7 @@ class FkeyMenu extends BaseMenu {
 				var from_attr : Attribute = pair[0];
 				var to_attr : Attribute = pair[1];
 				
-				var content = new GUIContent(from_attr.column_name);
+				var content = new GUIContent(from_attr.getColumnName());
 	   			var size = GUI.skin.label.CalcSize(content);
 				var attr_box = new Rect(x+20, cur_y, size.x+20, 20);
 				GUI.Button(attr_box, content);
@@ -105,7 +105,7 @@ class FkeyMenu extends BaseMenu {
 				GUI.Label(attr_box, " > ");
 				
 				attr_box.x += 25;
-				content = new GUIContent(to_attr.column_name);
+				content = new GUIContent(to_attr.getColumnName());
 	   			size = GUI.skin.label.CalcSize(content);
 	   			attr_box.width = size.x+20;
 				GUI.Button(attr_box, content);
@@ -148,7 +148,7 @@ class FkeyMenu extends BaseMenu {
 						tempFileScrollPosition, Rect (0, 0, width-10, 20*file.attributes.Count));			
 					file_box = new Rect(0, 0, width-20, 20);
 					for (var attr : Attribute in file.attributes){
-						if (GUI.Button(file_box, attr.column_name)){
+						if (GUI.Button(file_box, attr.getColumnName())){
 							adding_from_attr = attr;
 						}
 						file_box.y+=20;
@@ -158,7 +158,7 @@ class FkeyMenu extends BaseMenu {
 				} else { //need to add a "to" index		
 					
 					//select a referenced attribute
-					GUI.Box(reference_box, "From " + adding_from_attr.column_name + " to Attribute:");
+					GUI.Box(reference_box, "From " + adding_from_attr.getColumnName() + " to Attribute:");
 					reference_box.height -= 30;
 					reference_box.y+= 30;
 					tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
@@ -167,7 +167,7 @@ class FkeyMenu extends BaseMenu {
 					file_box = new Rect(0, 0, width-20, 20);
 					for (var i = 0 ; i < foreignKey.to_file.attributes.Count ; i++){
 						var attr : Attribute = foreignKey.to_file.attributes[i];
-						if (GUI.Button(file_box, attr.column_name)){
+						if (GUI.Button(file_box, attr.getColumnName())){
 							foreignKey.addKeyPair(adding_from_attr, attr);
 							resetCreation();
 						}

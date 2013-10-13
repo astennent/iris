@@ -7,7 +7,7 @@ class SelectionMenu extends BaseMenu {
 	function Start() {
 		super.Start();
 		displaying = true;
-		width = 200;
+		width = 230;
 		desired_x = Screen.width-width;
 	}
 
@@ -57,28 +57,25 @@ class SelectionMenu extends BaseMenu {
 				var data_height = 20;
 
 				dataScrollPosition = GUI.BeginScrollView (Rect (x,cur_y+20,width,200-20), 
-						dataScrollPosition, Rect (0, 0, width, data_height*(node.data.length+1)));
+						dataScrollPosition, Rect (0, 0, width-16, data_height*(node.data.length+1)));
 					
 					var scroll_y = 0;
-					var node_data = node.data;
 					var source_attrs = node.source.attributes;
 					
 					for (var index : int ; index < node.data.length ; index++) {
 
-
-						var attr_name = source_attrs[index].column_name+": ";
-						var attr_value = node_data[index] + "";
-	    				
-
-	    				var attr_rect = new Rect(0, scroll_y, width/2, data_height);
-						var centeredStyle = GUI.skin.GetStyle("Label");
-
-	    				centeredStyle.alignment = TextAnchor.MiddleRight;
+						var attr_name = source_attrs[index].getRestrictedName(width/2-10);	
+	    				var attr_rect = new Rect(5, scroll_y, width/2, data_height);
 	    				GUI.Label(attr_rect, attr_name);
-	    				
-	    				attr_rect.x = width/2;
-	    				centeredStyle.alignment = TextAnchor.MiddleLeft;
-	    				GUI.Label(attr_rect, attr_value);
+
+	    				attr_rect.x = width/2-10;
+	    				attr_rect.width -=5;
+    				
+	    				var oldValue : String = node.data[index]+"";
+						var newValue : String = GUI.TextField(attr_rect, oldValue, width/2);
+						if (newValue != oldValue) {
+		    				node.data[index] = newValue;
+		    			}
 
 	    				scroll_y += data_height;
 					}

@@ -42,7 +42,12 @@ class AttributeMenu extends BaseMenu {
 			GUI.Label(name_box, "Name:");
 			name_box.width=width - 70;
 			name_box.x += 50;
-			attribute.column_name = GUI.TextField(name_box, attribute.column_name);
+
+			var current_column_name = attribute.getColumnName();
+			var new_column_name = GUI.TextField(name_box, current_column_name);
+			if (new_column_name != current_column_name){
+				attribute.setColumnName(new_column_name);	
+			}
 			
 			cur_y += 25;
 			
@@ -104,7 +109,7 @@ class AttributeMenu extends BaseMenu {
 					var is_simple_fkey = file.getSimpleFkey(attribute, cur_attribute) != null;
 					
 					if (is_simple_fkey){ GUI.color = new Color(1, .5, 0); } else { GUI.color = Color.white; }
-					var match_att = GUI.Toggle(box, is_simple_fkey, " " + cur_attribute.column_name);
+					var match_att = GUI.Toggle(box, is_simple_fkey, " " + cur_attribute.getColumnName());
 					if (match_att != is_simple_fkey){
 						if (match_att){	
 							//generate an fkey	

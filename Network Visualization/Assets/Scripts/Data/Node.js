@@ -288,4 +288,11 @@ function alertConnectionDeactivated(connection : Connection){
 	}
 }
 
+//Used to update displayed information in real time.
+function setData(index : int, value) {
+	data[index] = data;
+	if (index in source.shown_indices) {
+		UpdateName();
+	}
+}
 

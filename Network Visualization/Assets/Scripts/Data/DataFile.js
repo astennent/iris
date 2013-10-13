@@ -115,7 +115,7 @@ function ScanForMetadata(){
 	    		column_name = 'col'+i;
 	    	}
     		var attribute = GameObject.Instantiate(attributePrefab).GetComponent(Attribute);
-    		attribute.column_name = column_name;
+    		attribute.setColumnName(column_name);
     		attribute.is_numeric = expected_column_types[i];
     		attribute.file = GetComponent(DataFile);
     		attribute.column_index = i;
@@ -191,9 +191,9 @@ function ToggleUsingHeaders(){
     for (var i = 0 ; i < attributes.Count ; i++){
     	var attribute : Attribute = attributes[i];
     	if (using_headers){
-    		attribute.column_name = first_row[i];
+    		attribute.setColumnName(first_row[i]);
     	} else {
-    		attribute.column_name = 'col'+i;
+    		attribute.setColumnName('col'+i);
     	}
     } 	
 }
@@ -203,7 +203,7 @@ function ToggleNumeric(index : int){
 	if (expected_column_type){ //You can only switch if each cell in the column is a valid number.
 		attributes[index].is_numeric = !attributes[index].is_numeric;
 	} else {
-		print("Can't change that column type " + index + " " + attributes[index].column_name);
+		print("Can't change that column type " + index + " " + attributes[index].getColumnName());
 	}
 }
 

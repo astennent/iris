@@ -92,14 +92,10 @@ class FileMenu extends BaseMenu {
 		}
 		
 		GUI.color = Color.white;	
-		cur_y += 35;
-		//File Attributes (columns)
-		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,Screen.height-cur_y-50), 
-			attributeScrollPosition, Rect (0, 0, width, 20*file.attributes.Count+20));
-		
 
-		var attribute_y=0;
-		var label_box = new Rect(5, attribute_y, width-10, 20);
+		cur_y += 35;
+
+		var label_box = new Rect(x+10, cur_y, width-10, 20);
 		GUI.Label(label_box, "Shown");
 		label_box.x += 50;
 		GUI.Label(label_box, "Numeric");
@@ -107,8 +103,15 @@ class FileMenu extends BaseMenu {
 		GUI.Label(label_box, "Key");
 		label_box.x += 40;
 		GUI.Label(label_box, "Name");
+
+		cur_y += 25;
+
+		//File Attributes (columns)
+		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,Screen.height-cur_y-50), 
+			attributeScrollPosition, Rect (0, 0, width-30, 20*file.attributes.Count+20));
 		
-		attribute_y += 25;
+		
+		var attribute_y = 0;
 		
 		for (var i = 0 ; i < file.attributes.Count ; i++){
 			var attribute = file.attributes[i];
@@ -144,10 +147,8 @@ class FileMenu extends BaseMenu {
 			if (file.containsFkeyFrom(attribute)){ GUI.color = new Color(1, .5, 0); } 
 			else { GUI.color = Color.white; }
 			
-			var display_string :String = attribute.column_name; //TODO: Cut off and add "..."
-			var content = new GUIContent(display_string);
-	   		var size = GUI.skin.label.CalcSize(content);
-	   		if (GUI.Button(new Rect(150, attribute_y, size.x+22, 20), content)){
+			var display_string :String = attribute.getRestrictedName(140);
+	   		if (GUI.Button(new Rect(150, attribute_y, 140, 20), display_string)){
 	   			fkeyMenu.DisableDisplay();
 	   			attributeMenu.setSelectedIndex(i);
 	   		}

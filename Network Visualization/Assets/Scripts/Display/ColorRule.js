@@ -96,7 +96,7 @@ function getDisplayName() : String{
 		if (attribute == null){
 			return "New Attribute Rule";
 		} else {
-			return attribute.column_name + ": " + attribute_value;
+			return attribute.getColumnName() + ": " + attribute_value;
 		}
 	}
 

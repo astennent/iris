@@ -168,7 +168,7 @@ class ColorRuleMenu extends BaseMenu {
 				temp_y += 20;
 
 				for (var attribute in file.attributes){
-					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.getAttribute()), attribute.column_name)){
+					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.getAttribute()), attribute.getColumnName())){
 						if (attribute != rule.getAttribute()) {
 							updateCachedAttributeValues(attribute);
 						}
