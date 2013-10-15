@@ -2,6 +2,7 @@
 
 class SelectionMenu extends BaseMenu {
 	private var dataScrollPosition : Vector2 = Vector2.zero;
+	private var nodeScrollPosition : Vector2 = Vector2.zero;
 	var more : Texture;
 
 	function Start() {
@@ -28,7 +29,7 @@ class SelectionMenu extends BaseMenu {
 			} else {
 				var enumerator = selectionController.nodes.GetEnumerator();
 				enumerator.MoveNext();
-				title = enumerator.Current.getName() + "";
+				title = enumerator.Current.getDisplayName() + "";
 			}
 			var menuRect = new Rect(x, 0, width, Screen.height);
 			GUI.Box(menuRect, title);
@@ -47,50 +48,90 @@ class SelectionMenu extends BaseMenu {
 	}
 
 	function DrawNodeList(cur_y : int) {
-		for (var node : Node in selectionController.nodes) {
-			GUI.color = node.color;
-			if (selectionController.primaryNode == node) {
-    			var data_rect = new Rect(x, cur_y, width, 200);
-				GUI.Box(data_rect, node.getName());
-				GUI.color = Color.white;
 
-				var data_height = 20;
+		var numNodes = selectionController.getNumSelected();
 
-				dataScrollPosition = GUI.BeginScrollView (Rect (x,cur_y+20,width,200-20), 
-						dataScrollPosition, Rect (0, 0, width-16, data_height*(node.data.length+1)));
-					
-					var scroll_y = 0;
-					var source_attrs = node.source.attributes;
-					
-					for (var index : int ; index < node.data.length ; index++) {
-
-						var attr_name = source_attrs[index].getRestrictedName(width/2-10);	
-	    				var attr_rect = new Rect(5, scroll_y, width/2, data_height);
-	    				GUI.Label(attr_rect, attr_name);
-
-	    				attr_rect.x = width/2-10;
-	    				attr_rect.width -=5;
-    				
-	    				var oldValue : String = node.data[index]+"";
-						var newValue : String = GUI.TextField(attr_rect, oldValue, width/2);
-						if (newValue != oldValue) {
-		    				node.data[index] = newValue;
-		    			}
-
-	    				scroll_y += data_height;
-					}
-
-				GUI.EndScrollView();
-				cur_y += 200;
-			} else {
-				var button_rect = new Rect(x, cur_y, width, 30);
-				if (GUI.Button(button_rect, node.getName())){
-					selectionController.selectPrimaryNode(node);
-				}
-				cur_y += 30;
-			}
-
+		//decide how big the box should be. 
+		var data_rect_height : int;
+		if (numNodes == 1) {
+			data_rect_height = Screen.height-cur_y;
+		} else {
+			data_rect_height = 250;
 		}
 
+		//the width and height of the list of buttons
+		var contentHeight = (selectionController.nodes.Count-1)*30 + data_rect_height;
+		var contentWidth : int;
+		if (contentHeight > Screen.height-cur_y) {
+			contentWidth = width-16; //make space for the scrollbar
+		} else {
+			contentWidth = width;
+		}
+
+		nodeScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,Screen.height-cur_y), 
+				nodeScrollPosition, Rect (0, 0, contentWidth, contentHeight));
+
+			var node_scroll_y = 0;
+
+			for (var node : Node in selectionController.nodes) {
+				GUI.color = node.color;
+
+				if (selectionController.primaryNode == node) {
+					DrawPrimaryNode(node_scroll_y, contentWidth, numNodes, data_rect_height);	    			
+					node_scroll_y += data_rect_height;
+				} else {
+					var button_rect = new Rect(0, node_scroll_y, contentWidth, 30);
+					if (GUI.Button(button_rect, node.getDisplayName())){
+						selectionController.selectPrimaryNode(node);
+					}
+					node_scroll_y += 30;
+				}
+
+			}
+
+			GUI.EndScrollView();
+
+	}
+
+	function DrawPrimaryNode(node_scroll_y : int, contentWidth : int, numNodes : int, data_rect_height : int) {
+		var data_rect = new Rect(0, node_scroll_y, width, data_rect_height);
+		var node = selectionController.primaryNode;
+
+		var extra_vertical_space : int;
+		if (numNodes > 1) {
+			GUI.Box(data_rect, node.getDisplayName());
+			extra_vertical_space = 30; 
+		} else {
+			GUI.Box(data_rect, ""); //Don't display the title again.
+			extra_vertical_space = 0;
+		}
+
+		GUI.color = Color.white;
+
+		var data_height = 20;
+
+		dataScrollPosition = GUI.BeginScrollView (Rect (0,node_scroll_y+extra_vertical_space,contentWidth,data_rect_height-extra_vertical_space), 
+				dataScrollPosition, Rect (0, 0, contentWidth-16, data_height*(node.data.length)));
+			
+			var data_scroll_y = 0;
+			var source_attrs = node.source.attributes;
+			
+			for (var index : int ; index < node.data.length ; index++) {
+
+				var attr_name = source_attrs[index].getRestrictedName(width/2-10);	
+				var attr_rect = new Rect(5, data_scroll_y, contentWidth/2, data_height);
+				GUI.Label(attr_rect, attr_name);
+
+				var attr_value_rect : Rect = attr_rect;
+				attr_value_rect.x = contentWidth/2-10;
+				attr_value_rect.width -=5;
+
+				var attr_value = node.data[index]+"";
+				GUI.TextField(attr_value_rect, attr_value);
+
+				data_scroll_y += data_height;
+			}
+
+		GUI.EndScrollView();
 	}
 }

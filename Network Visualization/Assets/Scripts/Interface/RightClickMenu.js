@@ -63,7 +63,7 @@ class RightClickMenu extends MonoBehaviour {
 			var menuRect = new Rect(x, y, width, height);
 			
 			//GUI.color = node.color;
-			GUI.Box(menuRect, node.gameObject.name/*, "button"*/);
+			GUI.Box(menuRect, node.getDisplayName()/*, "button"*/);
 			//GUI.color = Color.white;
 
 			var cur_y = y+25;

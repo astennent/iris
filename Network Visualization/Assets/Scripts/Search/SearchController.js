@@ -19,7 +19,7 @@ function UpdateMatches(searchString : String){
 	for (var file in fileManager.files){
 		for (var entry in file.nodes){
 			var node = entry.Value;
-			if (searchString != "" && node.gameObject.name.Contains(searchString)){
+			if (searchString != "" && node.getDisplayName().Contains(searchString)){
 				matches.Add(node);
 			}					
 		}		

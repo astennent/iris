@@ -18,6 +18,7 @@ private var reticle : Reticle; //singleton reticle, instantiated on target
 
 var desiredDistance : float;
 
+
 var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
 
 private var activated = true;
@@ -33,6 +34,8 @@ private var selectionController : SelectionController;
 private var rightClickController : RightClickController;
 
 private var haloColor : Color;
+
+private var display_name : String = "";
 
 function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
@@ -140,15 +143,15 @@ function UpdateName(){
 		for (var index in shown_indices){
 			name_string += "\n" + data[index];
 		}
-		gameObject.name = name_string.Substring(1);
+		display_name = name_string.Substring(1);
 	} else {
-		gameObject.name = "";
+		display_name = "";
 	}
-	label.GetComponent(GUIText).text = gameObject.name;
+	label.GetComponent(GUIText).text = display_name;
 }
 
-function getName(){
-	return gameObject.name;
+function getDisplayName(){
+	return display_name;
 }
 
 function moveRelativeTo(target : Vector3, other_size: float, second_level : boolean, connectionWeight : float){
@@ -191,7 +194,7 @@ function LateUpdate () {
 		label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
 		var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*size/10;
 		label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 3.0, 20.0);
-		label.GetComponent(GUIText).text = gameObject.name;
+		label.GetComponent(GUIText).text = display_name;
 	}	else {
 		label.GetComponent(GUIText).text = "";
 	}
@@ -290,9 +293,9 @@ function alertConnectionDeactivated(connection : Connection){
 
 //Used to update displayed information in real time.
 function setData(index : int, value) {
-	data[index] = data;
+	/*data[index] = data;
 	if (index in source.shown_indices) {
 		UpdateName();
-	}
+	}*/
 }
 
