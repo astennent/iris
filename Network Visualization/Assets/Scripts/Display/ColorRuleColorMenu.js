@@ -30,28 +30,40 @@ class ColorRuleColorMenu extends BaseMenu {
 		rule = colorController.rules[displayMenu.rule_index];
 
 		if (displaying){
-			var y : int;
-			if (rule.uses_scheme){
-				label_text = "Coloring by scheme";
-				button_text = "Use Custom Color";
-				y = DrawColorScheme();
+			var y = DrawMethod(35);
+			var method = rule.getMethod();
+			if (method == 0) {
+				y = DrawColorCustom(y);
+			} else if (method == 1) {
+				y = DrawColorScheme(y);
 			} else {
-				label_text = "Using custom color";
-				button_text = "Color By Scheme";
-				y = DrawColorCustom();
-			}		
-			GUI.Box(Rect(x+5, 35, width-10, 55), "");
-			GUI.Label(Rect(x+10, 35, width, 20), label_text);
-			if (GUI.Button(Rect(x+10, 60, width-20, 25), button_text)){
-				rule.uses_scheme = !rule.uses_scheme;
+				y = DrawCentrality(y);
 			}
+
 			DrawSizingOptions(y);				
 		}
 	}
 
-	function DrawColorCustom() {
-		var cur_y = 90;
+	function DrawMethod(cur_y : int) {
+		GUI.Box(Rect(x+5, cur_y, width-10, 80), "");
+		var toggle_rect = new Rect(x+20, cur_y+10, width, 20);
+		var method = rule.getMethod();
+		if (GUI.Toggle(toggle_rect, method==0, "Custom Color") && method != 0){
+			rule.setMethod(0);
+		}
+		toggle_rect.y+=20;
+		if (GUI.Toggle(toggle_rect, method==1, "Scheme") && method != 1){
+			rule.setMethod(1);
+		}
+		toggle_rect.y+=20;
+		if (GUI.Toggle(toggle_rect, method==2, "Centrality") && method != 2){
+			rule.setMethod(2);
+		} 
 
+		return cur_y+80;
+	}
+
+	function DrawColorCustom(cur_y : int) {
 		var original_halo = rule.halo;
 		if (rule.halo){
 			var halo_txt = "Coloring Selection Halo";
@@ -77,19 +89,19 @@ class ColorRuleColorMenu extends BaseMenu {
 		return cur_y;
 	}
 
-	function DrawColorScheme() {
+	function DrawColorScheme(y : int) {
 		GUI.color = Color.white;
 
 		var schemeNames = colorController.getSchemeNames();
 
-		schemeScrollPosition = GUI.BeginScrollView (Rect (x,50,width,Screen.height-33), 
+		schemeScrollPosition = GUI.BeginScrollView (Rect (x,y,width,Screen.height-33), 
 			schemeScrollPosition, Rect (0, 0, width, 30*schemeNames.length+20));
 
-		var y = 45;
-		
+		var cur_y = 0;
+
 		for (var i=0 ; i<schemeNames.length ; i++){
 			var schemeName : String = schemeNames[i];
-			var schemeRect = new Rect(0, y, width, 30);
+			var schemeRect = new Rect(0, cur_y, width, 30);
 
 			if (rule.getScheme() == i) { 
 				GUI.color = rule.scheme_button_color; 
@@ -100,12 +112,32 @@ class ColorRuleColorMenu extends BaseMenu {
 			if (GUI.Button(schemeRect, schemeName)){
 				rule.setScheme(i);
 			}
-			y+=30;
+			cur_y+=30;
 		}
 
 		GUI.EndScrollView();
-		y+=60;
+		y+=cur_y;
 		return y;
+	}
+
+	function DrawCentrality(cur_y : int) {
+		var centrality_types = colorController.centrality_types;
+		for (var index : int = 0 ; index < centrality_types.length ; index++){
+
+			if (rule.getCentralityType() == index) {
+				GUI.color = rule.getColor();
+			} else {
+				GUI.color = Color.white;
+			}
+
+			if (GUI.Button(new Rect(x, cur_y, width, 30), centrality_types[index]) &&
+					rule.getCentralityType() != index){
+				rule.setCentralityType(index);
+			}
+			cur_y += 30;
+		}
+		GUI.color = Color.white;
+		return cur_y;
 	}
 
 	function DrawSizingOptions(cur_y : int){

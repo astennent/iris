@@ -42,6 +42,8 @@ class DisplayMenu extends BaseMenu {
 			}
 			temp_x+=100;
 		}
+
+		
 		
 		y+=25;
 

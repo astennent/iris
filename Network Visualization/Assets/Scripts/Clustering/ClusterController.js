@@ -9,10 +9,12 @@ var leaders : Node[];
 var group_dict =  new Dictionary.<int, List.<Node> >(); //2d dict of keys points to arrays of nodes
 
 private var fileManager : FileManager;
+private var centralityController : CentralityController;
 
 function Start(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	fileManager = networkController.GetComponent(FileManager);
+	centralityController = networkController.GetComponent(CentralityController);
 }
 
 //Identify groups and store them in the group leader array.
@@ -76,6 +78,8 @@ function ReInit(){
 			
 		}
 	}
+
+	centralityController.ReInit();
 }
 
 

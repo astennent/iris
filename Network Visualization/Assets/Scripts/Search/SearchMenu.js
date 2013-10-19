@@ -45,7 +45,7 @@ class SearchMenu extends BaseMenu {
 	    GUI.skin.button.alignment = TextAnchor.MiddleLeft;
 	    for (var match : Node in matches){
 	    	GUI.color = match.color;
-	    	if (GUI.Button(Rect (10,count*30,width,30), match.name)){
+	    	if (GUI.Button(Rect (10,count*30,width,30), match.getDisplayName())){
 	    		Camera.main.GetComponent(NetworkCamera).JumpTo(match.name);
 	    	}
 	    	if (count == match_index){

@@ -20,6 +20,7 @@ var desiredDistance : float;
 
 
 var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
+private var centralities : float[] = new float[4];
 
 private var activated = true;
 
@@ -97,8 +98,6 @@ function Update () {
 				moveRelativeTo(other_other_node.transform.position, other_node.size, true, connectionWeight);
 			}
 		}
-
-
 	}
 
     
@@ -136,6 +135,14 @@ function setManualSize(s : float){
 	manual_size = s;
 }
 
+function getCentrality(index : int) {
+	return centralities[index];
+}
+
+function setCentrality(index : int, value : float) {
+	centralities[index] = value;
+}
+
 function UpdateName(){
 	var shown_indices = source.shown_indices;
 	var name_string = "";
@@ -148,6 +155,7 @@ function UpdateName(){
 		display_name = "";
 	}
 	label.GetComponent(GUIText).text = display_name;
+	gameObject.name = display_name;
 }
 
 function getDisplayName(){
@@ -183,6 +191,7 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 function OnMouseOver() {
 	if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 		selectionController.NodeClick(this);
+		print(group_id + " " +centralities[1]);
     } 
     if (Input.GetMouseButton(1) || Input.GetMouseButtonUp(1)) { //rightclick
     	rightClickController.NodeClick(this);

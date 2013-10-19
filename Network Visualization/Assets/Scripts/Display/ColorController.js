@@ -3,13 +3,17 @@
 private var networkController : NetworkController;
 private var clusterController : ClusterController;
 private var fileManager : FileManager;
+private var centralityController : CentralityController;
 
 var button_color : Color;
 private var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight", "Forest Glade", 
 					"Aqua"];
 
 var rules : List.<ColorRule> = new List.<ColorRule>();
-var rule_types = ["Source", "Cluster", "Node", "Attribute"];
+
+var rule_types : String[]; //Determines which nodes to apply a rule to.
+var centrality_types : String[];
+
 var colorRulePrefab : ColorRule;
 
 function getSchemeNames() {
@@ -20,9 +24,13 @@ function Start(){
 	networkController = this.GetComponent(NetworkController);
 	clusterController = this.GetComponent(ClusterController);
 	fileManager = this.GetComponent(FileManager);
+	centralityController = this.GetComponent(CentralityController);
 
 	createRule();
 	rules[0].is_fallback = true;
+	rules[0].setMethod(1);
+	rule_types = ["Source", "Cluster", "Node", "Attribute"]; 
+	centrality_types = ["Degree", "Closeness", "Betweenness", "Eigenvector"];
 }
 
 function createRule(){
@@ -64,6 +72,7 @@ function ApplyAllRules(){
 
 
 function ApplyRule(rule: ColorRule) {
+	print(centralityController.getMaxCentrality(0, 1));
 	ApplyRule(rule, true, true);
 }
 
@@ -151,12 +160,19 @@ function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRu
 function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean){
 	var halo = rule.halo;
 	var variation : float = rule.variation;
+
+	//Override color in the case of coloring by centrality.
+	var adjusted_variation = variation;
+	if (rule.getMethod() == 2) {
+		color = GenCentralityColor(rule, node);
+		adjusted_variation = 0;
+	}
 	
 	if (change_color) {
 		if (halo){
-			node.setHaloColor(NudgeColor(color, variation));
+			node.setHaloColor(NudgeColor(color, adjusted_variation));
 		} else {
-			node.SetColor(NudgeColor(color, variation), true);
+			node.SetColor(NudgeColor(color, adjusted_variation), true);
 		}
 	}
 	if (change_size && rule.uses_manual_size) {
@@ -194,6 +210,35 @@ function GenRandomColor(scheme_index : int){
 		return NudgeColor(new Color(.1, .4, .75));
 	} else {
 		return Color.white;
+	}
+}
+
+function GenCentralityColor(rule : ColorRule, node : Node) {
+	var centrality_type = rule.getCentralityType();
+
+	centralityController.Init(centrality_type); //this is a no-op if it's already been initialized.
+
+	var node_centrality = node.getCentrality(centrality_type);
+	var max_centrality = centralityController.getMaxCentrality(centrality_type, node.group_id);
+	var min_centrality = centralityController.getMinCentrality(centrality_type, node.group_id);
+
+	//scale centrality from red to cyan.
+	var fraction : float = (node_centrality-min_centrality+1)/(max_centrality-min_centrality-.001);
+	var adjusted_frac : float;
+
+	if (!fraction) {
+		return Color.black;
+	}
+
+	if (fraction > 2.0/3) { //red down to yellow
+		adjusted_frac = (fraction - 2.0/3)*3;
+		return new Color(1, 1-adjusted_frac, 0);
+	} else if (fraction > 1.0/3) { //yellow down to green
+		adjusted_frac = (fraction - 1.0/3)*3;
+		return new Color(adjusted_frac, 1, 0);
+	} else {
+		adjusted_frac = fraction*3;
+		return new Color(0, 1, 1-adjusted_frac);
 	}
 }
 

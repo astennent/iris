@@ -1,6 +1,8 @@
 #pragma strict
 
 private var rule_type : int;
+private var centrality_type : int; //corresponds to ColorController.centrality_types
+
 private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
 private var cluster_id : int; //stores id of cluster
 private var node_pkey : Array;
@@ -18,16 +20,18 @@ var halo_always_on : boolean;
 
 var colorController : ColorController;
 
-var uses_scheme : boolean = false;
 var scheme_button_color : Color; //used for coloring the scheme button so it doesn't flash.
 
 var uses_manual_size = false;
 var manual_size : float = 2.5;
 
+//0:custom, 1:scheme, 2:centrality
+private var method : int = 0;
 private var scheme_index : int = 0; //bright
 
 function Init(){
 	rule_type = 0; //SOURCE
+	centrality_type = 0; //Degree
 
 	node_pkey = null;
 	cluster_id = -1;
@@ -38,11 +42,30 @@ function Init(){
 	variation = 0.3;
 }
 
+function getMethod() {
+	return method;
+}
+
+function setMethod(m : int) {
+	method = m;
+	colorController.ApplyRule(this, true, false);
+}
+
 function getColor(){
-	if (uses_scheme) {
+	if (method == 0) {
+		return color;
+	} else if (method == 1) {
 		return colorController.GenRandomColor(scheme_index);
 	} else {
-		return color;
+		if (centrality_type == 0) {
+			return new Color(1, .5, .5);
+		} else if (centrality_type == 1) {
+			return new Color(1, 1, .5);
+		} else if (centrality_type == 2) {
+			return new Color(.5, 1, .5);
+		} else {
+			return new Color(.5, 1, 1);
+		}
 	}
 }
 
@@ -64,6 +87,15 @@ function setRuleType(index : int) {
 
 function getRuleType() {
 	return rule_type;
+}
+
+function setCentralityType(index : int) {
+	centrality_type = index;
+	colorController.ApplyRule(this);
+}
+
+function getCentralityType() {
+	return centrality_type;
 }
 
 function getDisplayName() : String{
