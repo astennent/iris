@@ -32,7 +32,7 @@ class SelectionMenu extends BaseMenu {
 				title = enumerator.Current.getDisplayName() + "";
 			}
 			var menuRect = new Rect(x, 0, width, Screen.height);
-			GUI.Box(menuRect, title);
+			guiplus.Box(menuRect, title);
 			
 			//"More" button
 			//var button_position : Rect = new Rect(Screen.width, 5, 35, 35);

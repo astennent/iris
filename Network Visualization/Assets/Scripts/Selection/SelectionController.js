@@ -12,15 +12,17 @@ private var startCoords : Vector2; //corner of selection box
 
 var nodes = new HashSet.<Node>(); //list of all selected nodes
 var primaryNode : Node; //the focused selected node
-var networkCamera : NetworkCamera;
-var cameraTransform : Transform;
 
+private var networkCamera : NetworkCamera;
+private var cameraTransform : Transform;
+private var guiplus : GuiPlus;
 private var fileManager : FileManager;
 
 function Start(){
 	networkCamera = Camera.main.GetComponent(NetworkCamera);
 	cameraTransform = networkCamera.transform;
 	fileManager = GetComponent(FileManager);
+	guiplus = GetComponent(GuiPlus);
 }
 
 var last_click_time = 0.0;
@@ -113,7 +115,7 @@ function ProcessBoxing(){
 		boxing = false;
 		return;
 	}
-	if (!boxing && Input.GetMouseButtonDown(0)){
+	if (!boxing && Input.GetMouseButtonDown(0)  && !guiplus.isBlocked()){
 		startBoxing();
 	} else if (boxing && Input.GetMouseButtonUp(0)){
 		stopBoxing();

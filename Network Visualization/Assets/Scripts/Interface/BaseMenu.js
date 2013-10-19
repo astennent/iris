@@ -10,21 +10,22 @@ class BaseMenu extends MonoBehaviour {
 
 	/* List of all classes attached to the NetworkController,
 		used for easy referencing between menus*/
-	var clusterController : ClusterController;
-	var fileManager : FileManager;
-	var fileMenu : FileMenu;
-    var attributeMenu : AttributeMenu;
-    var fkeyMenu : FkeyMenu;
-    var colorController : ColorController;
-    var searchController : SearchController;
-    var selectionController : SelectionController;
-    var colorRuleMenu : ColorRuleMenu;
-    var colorRuleColorMenu : ColorRuleColorMenu;
-    var colorPicker : ColorPicker;
-    var searchMenu : SearchMenu;
-    var displayMenu : DisplayMenu;
-    var networkController : NetworkController;
-    var mainMenu : MainMenu;
+	protected var clusterController : ClusterController;
+	protected var fileManager : FileManager;
+	protected var fileMenu : FileMenu;
+    protected var attributeMenu : AttributeMenu;
+    protected var fkeyMenu : FkeyMenu;
+    protected var colorController : ColorController;
+    protected var searchController : SearchController;
+    protected var selectionController : SelectionController;
+    protected var colorRuleMenu : ColorRuleMenu;
+    protected var colorRuleColorMenu : ColorRuleColorMenu;
+    protected var colorPicker : ColorPicker;
+    protected var searchMenu : SearchMenu;
+    protected var displayMenu : DisplayMenu;
+    protected var networkController : NetworkController;
+    protected var mainMenu : MainMenu;
+    protected var guiplus : GuiPlus;
 
 
     /* The text displayed at the top of the menu */
@@ -61,6 +62,7 @@ class BaseMenu extends MonoBehaviour {
 		displayMenu = GetComponent(DisplayMenu);
 		networkController = GetComponent(NetworkController);
 		mainMenu = GetComponent(MainMenu);
+		guiplus = GetComponent(GuiPlus);
 	}
 
 	function Update () {	
@@ -74,7 +76,7 @@ class BaseMenu extends MonoBehaviour {
 
 	function OnGUI() {
 		var menuRect = new Rect(x, 0, width, Screen.height);
-		GUI.Box(menuRect, title);
+		guiplus.Box(menuRect, title);
 
 		var box = new Rect(x+width-30, 4, 26, 26);
 		if (GUI.Button(box, "X")){
