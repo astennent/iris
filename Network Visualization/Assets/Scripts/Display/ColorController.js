@@ -235,7 +235,7 @@ function GenCentralityColor(rule : ColorRule, node : Node) {
 	var min_centrality = centralityController.getMinCentrality(centrality_type, node.group_id);
 
 	//scale centrality from red to cyan.
-	var fraction : float = (node_centrality-min_centrality+1)/(max_centrality-min_centrality-.001);
+	var fraction : float = (node_centrality-min_centrality+.1)/(max_centrality-min_centrality-.001);
 	var adjusted_frac : float;
 
 	if (!fraction) {
