@@ -74,7 +74,7 @@ class SelectionMenu extends BaseMenu {
 			var node_scroll_y = 0;
 
 			for (var node : Node in selectionController.nodes) {
-				GUI.color = node.color;
+				GUI.color = node.getMenuColor();
 
 				if (selectionController.primaryNode == node) {
 					DrawPrimaryNode(node_scroll_y, contentWidth, numNodes, data_rect_height);	    			

@@ -58,12 +58,12 @@ function Init(){
 	resetHaloColor();	
 }
 
-function SetColor(c : Color, colorConnections : boolean){
+function setColor(c : Color, colorConnections : boolean){
 	color = c;
 	renderer.material.color = color;
 	if (colorConnections){
 		for (connection in connections){
-			connection.SetColor(c);
+			connection.setColor(c);
 		}
 	}
 }
@@ -162,6 +162,11 @@ function getDisplayName(){
 	return display_name;
 }
 
+//ignore alpha
+function getMenuColor(){
+	return new Color(color.r, color.g, color.b);
+}
+
 function moveRelativeTo(target : Vector3, other_size: float, second_level : boolean, connectionWeight : float){
 	if (networkController.paused || connectionWeight == 0){
 		return;
@@ -191,7 +196,6 @@ function moveRelativeTo(target : Vector3, other_size: float, second_level : bool
 function OnMouseOver() {
 	if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 		selectionController.NodeClick(this);
-		print(group_id + " " +centralities[1]);
     } 
     if (Input.GetMouseButton(1) || Input.GetMouseButtonUp(1)) { //rightclick
     	rightClickController.NodeClick(this);
@@ -234,7 +238,7 @@ function resetManualSizing(){
 
 function resetHaloColor(){
 	var c : Color = this.color;
-	c.a = .5;
+	c.a = .75;
 	setHaloColor(c);
 }
 function setHaloColor(c : Color){

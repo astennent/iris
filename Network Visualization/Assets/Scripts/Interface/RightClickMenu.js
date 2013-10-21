@@ -14,11 +14,13 @@ class RightClickMenu extends MonoBehaviour {
 	var networkController : NetworkController;
 	var rightClickController : RightClickController;
 	var selectionController : SelectionController;
+	var guiplus : GuiPlus;
 
 	function Start() {
 		networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 		rightClickController = networkController.GetComponent(RightClickController);
 		selectionController = networkController.GetComponent(SelectionController);
+		guiplus = GetComponent(GuiPlus);
 	}
 
 	function ProcessClick(){
@@ -63,7 +65,7 @@ class RightClickMenu extends MonoBehaviour {
 			var menuRect = new Rect(x, y, width, height);
 			
 			//GUI.color = node.color;
-			GUI.Box(menuRect, node.getDisplayName()/*, "button"*/);
+			guiplus.Box(menuRect, node.getDisplayName()/*, "button"*/);
 			//GUI.color = Color.white;
 
 			var cur_y = y+25;

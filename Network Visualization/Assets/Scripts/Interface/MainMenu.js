@@ -30,7 +30,7 @@ class MainMenu extends BaseMenu {
 
 	function OnGUI(){
 		var menuRect = new Rect(x, 0, width, Screen.height);
-		GUI.Box(menuRect, title);
+		guiplus.Box(menuRect, title);
 		
 		var centeredStyle = GUI.skin.GetStyle("Label");
 		centeredStyle.alignment = TextAnchor.MiddleLeft;

@@ -72,7 +72,8 @@ class DisplayMenu extends BaseMenu {
 		for (i = 1 ; i < rules.Count ; i++){
 
 			rule = colorController.rules[i];
-			GUI.color = rule.color;
+			var rule_color = rule.color; rule_color.a = 1;
+			GUI.color = rule_color;
 
 
 			var buttonRect = new Rect(35, temp_y, width-85, 30);

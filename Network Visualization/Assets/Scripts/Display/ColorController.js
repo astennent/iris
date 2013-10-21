@@ -30,7 +30,7 @@ function Start(){
 	rules[0].is_fallback = true;
 	rules[0].setMethod(1);
 	rule_types = ["Source", "Cluster", "Node", "Attribute"]; 
-	centrality_types = ["Degree", "Closeness", "Betweenness", "Eigenvector"];
+	centrality_types = ["Degree", "Closeness", "Betweenness (NA)", "Eigenvector (NA)"];
 }
 
 function createRule(){
@@ -73,6 +73,8 @@ function ApplyAllRules(){
 
 function ApplyRule(rule: ColorRule) {
 	print(centralityController.getMaxCentrality(0, 1));
+
+	//Note that change_color and change_size are for 
 	ApplyRule(rule, true, true);
 }
 
@@ -158,8 +160,10 @@ function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRu
 }
 
 function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean){
-	var halo = rule.halo;
-	var variation : float = rule.variation;
+	var coloring_halo = rule.coloring_halo;
+	var coloring_node = rule.coloring_node;
+
+	var variation : float = getAdjustedVariation(rule);
 
 	//Override color in the case of coloring by centrality.
 	var adjusted_variation = variation;
@@ -169,10 +173,11 @@ function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_c
 	}
 	
 	if (change_color) {
-		if (halo){
+		if (coloring_halo){
 			node.setHaloColor(NudgeColor(color, adjusted_variation));
-		} else {
-			node.SetColor(NudgeColor(color, adjusted_variation), true);
+		} 
+		if (coloring_node) {
+			node.setColor(NudgeColor(color, adjusted_variation), true);
 		}
 	}
 	if (change_size && rule.uses_manual_size) {
@@ -181,16 +186,23 @@ function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_c
 	}
 }
 
+function getAdjustedVariation(rule : ColorRule){
+	if (rule.getMethod() == 2 || rule.getMethod() == 1  && rule.getScheme() == 2){
+		return 0;
+	}
+	return rule.variation;
+}
+
 //Alters the color a small amount for variety.
 function NudgeColor(c : Color){
 	return NudgeColor(c, 0.3);
 }
 
 function NudgeColor(c : Color, dist : float){
-	var red : float = c.r + Random.Range(-dist, dist);
-	var green : float = c.g + Random.Range(-dist, dist);
-	var blue : float = c.b + Random.Range(-dist, dist);
-	return new Color(red, green, blue);	
+	c.r += Random.Range(-dist, dist);
+	c.g += Random.Range(-dist, dist);
+	c.b += Random.Range(-dist, dist);
+	return c;	
 }
 
 function GenRandomColor(scheme_index : int){
@@ -201,13 +213,13 @@ function GenRandomColor(scheme_index : int){
 	} else if (scheme_index == 2) { //grayscale
 		return GenGrayscale();
 	} else if (scheme_index == 3) { //rust
-		return NudgeColor(new Color(.72, .26, .05));
+		return NudgeColor(new Color(.72, .26, .05, .75));
 	} else if (scheme_index == 4) { //sunlight
-		return NudgeColor(new Color(1, .7, 0));
+		return NudgeColor(new Color(1, .7, 0, .75));
 	} else if (scheme_index == 5) { //forest glade
-		return NudgeColor(new Color(.25, .75, .1));
+		return NudgeColor(new Color(.25, .75, .1, .75));
 	} else if (scheme_index == 6){ //aqua
-		return NudgeColor(new Color(.1, .4, .75));
+		return NudgeColor(new Color(.1, .4, .75, .75));
 	} else {
 		return Color.white;
 	}
@@ -232,20 +244,20 @@ function GenCentralityColor(rule : ColorRule, node : Node) {
 
 	if (fraction > 2.0/3) { //red down to yellow
 		adjusted_frac = (fraction - 2.0/3)*3;
-		return new Color(1, 1-adjusted_frac, 0);
+		return new Color(1, 1-adjusted_frac, 0, .75);
 	} else if (fraction > 1.0/3) { //yellow down to green
 		adjusted_frac = (fraction - 1.0/3)*3;
-		return new Color(adjusted_frac, 1, 0);
-	} else {
+		return new Color(adjusted_frac, 1, 0, .75);
+	} else { //green to blue
 		adjusted_frac = fraction*3;
-		return new Color(0, 1, 1-adjusted_frac);
+		return new Color(0, 1, 1-adjusted_frac, .75);
 	}
 }
 
 
 function GenGrayscale(){
 	var scale_number = Random.Range(0.0,1.0);
-	return new Color(scale_number, scale_number, scale_number);
+	return new Color(scale_number, scale_number, scale_number, .75);
 }
 
 function GenScaledColor(pastel: boolean){
@@ -283,7 +295,7 @@ function GenScaledColor(pastel: boolean){
 			g = 1.0; r = base;
 		}
 	}
-	return new Color(r, g, b);
+	return new Color(r, g, b, .5);
 }
 
 function randBinary(){ //true or false

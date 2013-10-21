@@ -15,9 +15,8 @@ var is_fallback : boolean; //is this the "default" rule?
 var color : Color;
 var variation : float;
 
-var halo : boolean;
-var halo_always_on : boolean;
-
+var coloring_halo : boolean; //Should it color the halo?
+var coloring_node : boolean;  //Should it color the body of the node?
 var colorController : ColorController;
 
 var scheme_button_color : Color; //used for coloring the scheme button so it doesn't flash.
@@ -27,18 +26,20 @@ var manual_size : float = 2.5;
 
 //0:custom, 1:scheme, 2:centrality
 private var method : int = 0;
-private var scheme_index : int = 0; //bright
+private var scheme_index : int;
 
 function Init(){
 	rule_type = 0; //SOURCE
 	centrality_type = 0; //Degree
+
+	coloring_node = coloring_halo = true;
 
 	node_pkey = null;
 	cluster_id = -1;
 
 	colorController = GameObject.FindGameObjectWithTag("GameController").GetComponent(ColorController);
 	color = colorController.GenRandomColor(scheme_index); //BRIGHT
-	scheme_button_color = color;
+	setScheme(0);  //bright
 	variation = 0.3;
 }
 
@@ -73,6 +74,7 @@ function setScheme(index : int){
 	scheme_index = index;
 	color = colorController.GenRandomColor(scheme_index);
 	scheme_button_color = color;
+	scheme_button_color.a = 1;
 	colorController.ApplyRule(this, true, false);
 }
 
@@ -98,11 +100,7 @@ function getCentralityType() {
 	return centrality_type;
 }
 
-function getDisplayName() : String{
-	if (is_fallback){
-		return "Fallback Scheme -- X";
-	}
-
+function getDisplayName() : String {
 	if (rule_type == 0){ //SOURCE
 		var count = sources.Count;
 		if (count == 0){

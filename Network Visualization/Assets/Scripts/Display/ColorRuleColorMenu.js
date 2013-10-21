@@ -39,7 +39,7 @@ class ColorRuleColorMenu extends BaseMenu {
 			} else {
 				y = DrawCentrality(y);
 			}
-
+			y = DrawHaloOptions(y);
 			DrawSizingOptions(y);				
 		}
 	}
@@ -64,15 +64,6 @@ class ColorRuleColorMenu extends BaseMenu {
 	}
 
 	function DrawColorCustom(cur_y : int) {
-		var original_halo = rule.halo;
-		if (rule.halo){
-			var halo_txt = "Coloring Selection Halo";
-		} else {
-			halo_txt = "Coloring Node Body";
-		}
-		rule.halo = GUI.Toggle (Rect (x+10, cur_y, width-20, 20), rule.halo, halo_txt);
-
-		cur_y += 20;		
 		colorPicker.Init(x, cur_y, false);
 		var original_color = rule.color;
 		rule.color = colorPicker.getColor();
@@ -82,7 +73,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		GUI.Label(new Rect(x+10, cur_y, width, 20), "Randomness: " + rule.variation.ToString("f2"));
 		rule.variation = GUI.HorizontalSlider(Rect(x+130, cur_y+5, width-140, 20), rule.variation, 0.0, 1.0);
 
-		if (rule.color != original_color || rule.variation != original_variation || rule.halo != original_halo){
+		if (rule.color != original_color || rule.variation != original_variation){
 			colorController.ApplyRule(rule);
 		}
 		cur_y += 30;
@@ -114,7 +105,7 @@ class ColorRuleColorMenu extends BaseMenu {
 			}
 			cur_y+=30;
 		}
-
+		GUI.color = Color.white;
 		GUI.EndScrollView();
 		y+=cur_y;
 		return y;
@@ -125,7 +116,8 @@ class ColorRuleColorMenu extends BaseMenu {
 		for (var index : int = 0 ; index < centrality_types.length ; index++){
 
 			if (rule.getCentralityType() == index) {
-				GUI.color = rule.getColor();
+				var rule_color = rule.getColor();
+				GUI.color = rule_color;
 			} else {
 				GUI.color = Color.white;
 			}
@@ -138,6 +130,20 @@ class ColorRuleColorMenu extends BaseMenu {
 		}
 		GUI.color = Color.white;
 		return cur_y;
+	}
+
+	function DrawHaloOptions (cur_y : int) {
+		var original_node = rule.coloring_node;
+		var original_halo = rule.coloring_halo;
+
+		rule.coloring_node = GUI.Toggle (Rect (x+width/2+10, cur_y, width/2-10, 20), rule.coloring_node, "Color Node");
+		rule.coloring_halo = GUI.Toggle (Rect (x+10, cur_y, width/2-10, 20), rule.coloring_halo, " Color Halo");
+		
+		if (rule.coloring_halo != original_halo || rule.coloring_node != original_node){
+			colorController.ApplyRule(rule);
+		}
+
+		return cur_y + 40;	
 	}
 
 	function DrawSizingOptions(cur_y : int){
