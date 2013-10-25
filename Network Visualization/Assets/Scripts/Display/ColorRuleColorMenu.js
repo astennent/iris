@@ -112,21 +112,41 @@ class ColorRuleColorMenu extends BaseMenu {
 	}
 
 	function DrawCentrality(cur_y : int) {
-		var centrality_types = colorController.centrality_types;
+		var centrality_types = centralityController.centrality_types;
 		for (var index : int = 0 ; index < centrality_types.length ; index++){
 
-			if (rule.getCentralityType() == index) {
-				var rule_color = rule.getColor();
-				GUI.color = rule_color;
+			if (rule.getCentralityType() == index){
+				GUI.color = rule.getColor();
 			} else {
 				GUI.color = Color.white;
 			}
+		
 
-			if (GUI.Button(new Rect(x, cur_y, width, 30), centrality_types[index]) &&
-					rule.getCentralityType() != index){
-				rule.setCentralityType(index);
-			}
-			cur_y += 30;
+			var sub_types = centralityController.centrality_subtypes[index];
+
+			var box_height = 30+20*sub_types.length;
+			GUI.Box(new Rect(x, cur_y, width, box_height), centrality_types[index]);
+			cur_y+=25;
+
+			for (var sub_index : int = 0 ; sub_index < sub_types.length ; sub_index++){
+
+				if (rule.getCentralitySubtype() == sub_index && rule.getCentralityType() == index) {
+					GUI.color = rule.getColor();
+				} else {
+					GUI.color = Color.white;
+				}
+
+				var selected = (rule.getCentralityType() == index && rule.getCentralitySubtype() == sub_index);
+
+				if (GUI.Toggle(new Rect(x, cur_y, width, 20), selected, sub_types[sub_index]) && !selected ) {
+					rule.setCentralityType(index);
+					rule.setCentralitySubtype(sub_index);
+				}
+				cur_y +=20;
+				
+			} 
+			cur_y+=5;
+
 		}
 		GUI.color = Color.white;
 		return cur_y;

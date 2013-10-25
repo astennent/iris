@@ -1,17 +1,31 @@
 #pragma strict
 import System.Collections.Generic;
 
+var centrality_types : String[];
+var centrality_subtypes = [["Dummy"]]; //since unity js doesn't allow String[][] typing declation.
 //maps group ids to max centrality measures for easy coloring.
 private var clusterController : ClusterController;
 private var initialized : boolean[]; //tracks whether each of the centrality measures has been calculated.
 
+//degree centrality variables
+var degreeCentralities : Dictionary.<Node, float>; //key node to value degree centrality. (# nodes)
+
+//closeness centrality variables
+private var distanceSums : Dictionary.<Node, float>;
+private var invertedDistanceSums : Dictionary.<Node, float>;
 
 function Start(){
 	clusterController = this.GetComponent(ClusterController);
+	centrality_types = ["Degree", "Closeness", "Betweenness (NA)", "Eigenvector (NA)"];
+    centrality_subtypes = [	["Intra-Cluster", "Inter-Cluster"],
+							["Intra-Cluster Distances", "Intra-Cluster Inverted Distances", "Inter-Cluster Inverted Distances"],
+							["Not Implemented"],
+							["Not Implemented"]
+						  ];
 }
 
 function ReInit() {
-		//In case init doesn't happen in the correct order.
+	//In case init doesn't happen in the correct order.
 	if (clusterController == null) {
 		Start();
 	}
@@ -33,32 +47,35 @@ function Init(measure : int) {
 	}
 }
 
-
 function CalculateDegreeCentrality(){
+	degreeCentralities = new Dictionary.<Node, float>();
+
 	for (var entry in clusterController.group_dict) {
 		var nodes = entry.Value;
 		for (var node in nodes) {			
 			//Degree centrality is simply a count of connected nodes.
 			var node_centrality = node.connections.Count;
-			node.setCentrality(0, node_centrality);
+			degreeCentralities[node] = node_centrality;
 		}
 	}
 }
 
 
-private var closenessCache = new Dictionary.<HashSet.<Node>, int>();		
 function CalculateClosenessCentrality(){
-	closenessCache = new Dictionary.<HashSet.<Node>, int>();	
+	distanceSums = new Dictionary.<Node, float>();
+	invertedDistanceSums = new Dictionary.<Node, float>();
+
 	for (var entry in clusterController.group_dict) {
 		var nodes = entry.Value;
-		for (var from_node in nodes) {
-			from_node.setCentrality(1, calculateCloseness(from_node));			
+		for (var from_node in nodes) {			
+			//update the distance and inverted distance sums
+			CalculateDistanceSums(from_node);	
 		}
 	}
 }
 
-function calculateCloseness(from_node : Node) : int{
 
+function CalculateDistanceSums(from_node : Node) {
 	var alreadySeen = new HashSet.<Node>();
 
 	var node_queue = new Queue.<Node>();
@@ -66,24 +83,25 @@ function calculateCloseness(from_node : Node) : int{
 	node_queue.Enqueue(from_node);
 	count_queue.Enqueue(0);
 
-	var total = 0;
+	var total_distance = 0;
+	var total_inverted_distance = 0;
 	while(node_queue.Count > 0) {
 		var cur_node = node_queue.Dequeue();
 		var cur_count = count_queue.Dequeue();
-		total += cur_count;
+		total_distance += cur_count;
+		total_inverted_distance += (1.0/cur_count);
 		for (var connection : Connection in cur_node.connections) {
 			var connection_node = connection.to;
 			if (! (alreadySeen.Contains(connection_node))){
 				alreadySeen.Add(connection_node);
 				node_queue.Enqueue(connection_node);
 				count_queue.Enqueue(cur_count+1);
-
 			}
 		}
 	}
-	return total;
+	distanceSums[from_node] = total_distance;
+	invertedDistanceSums[from_node] = total_distance;
 }
-
 
 function CalculateBetweennessCentrality(){
 
@@ -93,25 +111,63 @@ function CalculateEigenvectorCentrality(){
 
 }
 
-//TODO: cache this
-function getMaxCentrality(centrality_type : int, group_id : int) : int {
-	var max :float = 0;
-	for (var node in clusterController.group_dict[group_id]){
-		var node_centrality = node.getCentrality(centrality_type);
-		if (node_centrality > max){
-			max = node_centrality;
+function getCentralityFraction(node: Node, rule : ColorRule) {
+	var centrality_type = rule.getCentralityType();
+	var sub_centrality = rule.getCentralitySubtype();
+	Init(centrality_type); //this is a no-op if it's already initialized.
+
+	var inter_cluster : boolean;
+	var relevant_dictionary : Dictionary.<Node, float>; //chosen depending on centrality type and subtype.
+
+	if (centrality_type == 0) {
+
+		inter_cluster = (sub_centrality == 1);
+		relevant_dictionary = degreeCentralities;
+	
+	} else if (centrality_type == 1) {
+
+		inter_cluster = (sub_centrality == 2);
+		if (sub_centrality == 0) {
+			relevant_dictionary = distanceSums;
+		} else {
+			relevant_dictionary = invertedDistanceSums;
+		}
+
+	} else if (centrality_type == 2) {
+		return 0;
+	} else {
+		return 0;
+	}
+
+	var node_centrality : float = relevant_dictionary[node];
+	var max_centrality : float = 0;
+	var min_centrality : float = int.MaxValue;
+	for (var entry in relevant_dictionary) {		
+		var cur_node = entry.Key;
+		if (inter_cluster || cur_node.group_id == node.group_id) {
+			var centrality = entry.Value;
+			if (centrality > max_centrality){
+				max_centrality = centrality;
+			} 
+			if (centrality < min_centrality) {
+				min_centrality = centrality;
+			}
 		}
 	}
-	return max;
+
+	return makeFraction(node_centrality, min_centrality, max_centrality);
 }
 
-function getMinCentrality(centrality_type : int, group_id : int) : int {
-	var min : float = int.MaxValue;
-	for (var node in clusterController.group_dict[group_id]){
-		var node_centrality = node.getCentrality(centrality_type);
-		if (node_centrality < min){
-			min = node_centrality;
-		}
-	}
-	return min;
+
+
+function getBetweennessFraction(node : Node, rule : ColorRule) {
+	return 0;
+}
+
+function getEigenvectorFraction(node : Node, rule : ColorRule) {
+	return 0;
+}
+
+function makeFraction(node_centrality : float, min_centrality : float, max_centrality : float) {
+	return (node_centrality - min_centrality + .1) / (max_centrality - min_centrality - .001);
 }

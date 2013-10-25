@@ -20,8 +20,6 @@ var desiredDistance : float;
 
 
 var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
-private var centralities : float[] = new float[4];
-
 private var activated = true;
 
 private var networkController : NetworkController;
@@ -33,6 +31,7 @@ private var size : float = 2.5; //2.5 is the minimum
 
 private var selectionController : SelectionController;
 private var rightClickController : RightClickController;
+private var centralityController : CentralityController;
 
 private var haloColor : Color;
 
@@ -42,6 +41,7 @@ function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	selectionController = networkController.GetComponent(SelectionController);
 	rightClickController = networkController.GetComponent(RightClickController);
+	centralityController = GetComponent(CentralityController);
 	label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 	label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 	label.transform.parent = this.transform;
@@ -133,14 +133,6 @@ function getManualSize(){
 
 function setManualSize(s : float){
 	manual_size = s;
-}
-
-function getCentrality(index : int) {
-	return centralities[index];
-}
-
-function setCentrality(index : int, value : float) {
-	centralities[index] = value;
 }
 
 function UpdateName(){

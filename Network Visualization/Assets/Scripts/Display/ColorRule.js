@@ -1,7 +1,10 @@
 #pragma strict
 
 private var rule_type : int;
+
 private var centrality_type : int; //corresponds to ColorController.centrality_types
+private var sub_centralities : int[]; //used for specifying whether the centrality should be relative to everything or just the group.
+private var invert_centrality : boolean; //swap colors?
 
 private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
 private var cluster_id : int; //stores id of cluster
@@ -30,7 +33,9 @@ private var scheme_index : int;
 
 function Init(){
 	rule_type = 0; //SOURCE
-	centrality_type = 0; //Degree
+	centrality_type = 0; //DEGREE
+	sub_centralities = new int[4]; 
+	invert_centrality = false;
 
 	coloring_node = coloring_halo = true;
 
@@ -95,10 +100,18 @@ function setCentralityType(index : int) {
 	centrality_type = index;
 	colorController.ApplyRule(this);
 }
-
 function getCentralityType() {
 	return centrality_type;
 }
+
+function setCentralitySubtype(index : int) {
+	sub_centralities[getCentralityType()] = index;
+	colorController.ApplyRule(this);
+}
+function getCentralitySubtype() {
+	return sub_centralities[getCentralityType()];
+}
+
 
 function getDisplayName() : String {
 	if (rule_type == 0){ //SOURCE

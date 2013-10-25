@@ -12,7 +12,6 @@ private var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight", "For
 var rules : List.<ColorRule> = new List.<ColorRule>();
 
 var rule_types : String[]; //Determines which nodes to apply a rule to.
-var centrality_types : String[];
 
 var colorRulePrefab : ColorRule;
 
@@ -30,7 +29,6 @@ function Start(){
 	rules[0].is_fallback = true;
 	rules[0].setMethod(1);
 	rule_types = ["Source", "Cluster", "Node", "Attribute"]; 
-	centrality_types = ["Degree", "Closeness", "Betweenness (NA)", "Eigenvector (NA)"];
 }
 
 function createRule(){
@@ -72,9 +70,7 @@ function ApplyAllRules(){
 
 
 function ApplyRule(rule: ColorRule) {
-	print(centralityController.getMaxCentrality(0, 1));
-
-	//Note that change_color and change_size are for 
+	//Note that change_color and change_size are for small changes in the menu.
 	ApplyRule(rule, true, true);
 }
 
@@ -228,18 +224,17 @@ function GenRandomColor(scheme_index : int){
 function GenCentralityColor(rule : ColorRule, node : Node) {
 	var centrality_type = rule.getCentralityType();
 
-	centralityController.Init(centrality_type); //this is a no-op if it's already been initialized.
-
-	var node_centrality = node.getCentrality(centrality_type);
-	var max_centrality = centralityController.getMaxCentrality(centrality_type, node.group_id);
-	var min_centrality = centralityController.getMinCentrality(centrality_type, node.group_id);
-
-	//scale centrality from red to cyan.
-	var fraction : float = (node_centrality-min_centrality+.1)/(max_centrality-min_centrality-.001);
+	//scale centrality from red to cyan.	
+	var fraction : float = centralityController.getCentralityFraction(node, rule);
 	var adjusted_frac : float;
 
 	if (!fraction) {
 		return Color.black;
+	}
+
+	//For consistency, auto-invert closeness so red is central.
+	if (centrality_type == 1){
+		fraction = 1-fraction;
 	}
 
 	if (fraction > 2.0/3) { //red down to yellow
