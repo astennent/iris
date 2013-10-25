@@ -7,12 +7,17 @@ private var clusterController : ClusterController;
 private var initialized : boolean[]; //tracks whether each of the centrality measures has been calculated.
 
 //degree centrality variables
-var degreeCentralities : Dictionary.<Node, float>; //key node to value degree centrality. (# nodes)
+private var degreeCentralities : Dictionary.<Node, float>; //key node to value degree centrality. (# nodes)
+private var minMaxDegreeCache : Dictionary.<int, Dictionary.<int, float> >; 
 
 //closeness centrality variables
 private var distanceSums : Dictionary.<Node, float>;
 private var invertedDistanceSums : Dictionary.<Node, float>;
+private var minMaxDistanceCache : Dictionary.<int, Dictionary.<int, float> >;
+private var minMaxInvertedDistanceCache : Dictionary.<int, Dictionary.<int, float> >;
 
+private static var GLOBAL_CLUSTER_ID = int.MaxValue;
+ 
 function Start(){
 	clusterController = this.GetComponent(ClusterController);
 	centrality_types = ["Degree", "Closeness", "Betweenness (NA)", "Eigenvector (NA)"];
@@ -42,28 +47,99 @@ function Init(measure : int) {
 }
 
 function CalculateDegreeCentrality(){
+
+	//initialize the cache
+	minMaxDegreeCache = new Dictionary.<int, Dictionary.<int, float> >();
+	minMaxDegreeCache[0] = new Dictionary.<int, float>();
+	minMaxDegreeCache[1] = new Dictionary.<int, float>();
+
 	degreeCentralities = new Dictionary.<Node, float>();
 
 	for (var entry in clusterController.group_dict) {
 		var nodes = entry.Value;
 		for (var node in nodes) {			
 			//Degree centrality is simply a count of connected nodes.
-			var node_centrality = node.connections.Count;
+			var node_centrality : float = node.connections.Count;
 			degreeCentralities[node] = node_centrality;
+
+			var group_id = node.group_id;
+
+			//update cluster's min and max
+			if (!(group_id in minMaxDegreeCache[0]) || minMaxDegreeCache[0][group_id] > node_centrality) {
+				minMaxDegreeCache[0][group_id] = node_centrality;
+			}
+			if (!(group_id in minMaxDegreeCache[1]) || minMaxDegreeCache[1][group_id] < node_centrality) {
+				minMaxDegreeCache[1][group_id] = node_centrality;
+			}			
+
+			//update the global min and max
+			if ( !(GLOBAL_CLUSTER_ID in minMaxDegreeCache[0]) || minMaxDegreeCache[0][GLOBAL_CLUSTER_ID] > node_centrality) {
+				minMaxDegreeCache[0][GLOBAL_CLUSTER_ID] = node_centrality;
+			}
+			if ( !(GLOBAL_CLUSTER_ID in minMaxDegreeCache[1]) || minMaxDegreeCache[1][GLOBAL_CLUSTER_ID] < node_centrality) {
+				minMaxDegreeCache[1][GLOBAL_CLUSTER_ID] = node_centrality;
+			}			
+
 		}
 	}
 }
 
 
 function CalculateClosenessCentrality(){
+	//initialize the caches
+	minMaxDistanceCache = new Dictionary.<int, Dictionary.<int, float> >();
+	minMaxDistanceCache[0] = new Dictionary.<int, float>();
+	minMaxDistanceCache[1] = new Dictionary.<int, float>();
+	minMaxInvertedDistanceCache = new Dictionary.<int, Dictionary.<int, float> >();
+	minMaxInvertedDistanceCache[0] = new Dictionary.<int, float>();
+	minMaxInvertedDistanceCache[1] = new Dictionary.<int, float>();
+
 	distanceSums = new Dictionary.<Node, float>();
 	invertedDistanceSums = new Dictionary.<Node, float>();
 
 	for (var entry in clusterController.group_dict) {
 		var nodes = entry.Value;
-		for (var from_node in nodes) {			
+		for (var node in nodes) {			
 			//update the distance and inverted distance sums
-			CalculateDistanceSums(from_node);	
+			CalculateDistanceSums(node);	
+
+			var group_id = node.group_id;
+			var node_distance = distanceSums[node];
+			var node_inverted_distance = invertedDistanceSums[node];
+
+			//update cluster's min and max distance
+			if (!(group_id in minMaxDistanceCache[0]) || minMaxDistanceCache[0][group_id] > node_distance) {
+				minMaxDistanceCache[0][group_id] = node_distance;
+			}
+			if (!(group_id in minMaxDistanceCache[1]) || minMaxDistanceCache[1][group_id] < node_distance) {
+				minMaxDistanceCache[1][group_id] = node_distance;
+			}			
+
+			//update the global min and max distance
+			if ( !(GLOBAL_CLUSTER_ID in minMaxDistanceCache[0]) || minMaxDistanceCache[0][GLOBAL_CLUSTER_ID] > node_distance) {
+				minMaxDistanceCache[0][GLOBAL_CLUSTER_ID] = node_distance;
+			}
+			if ( !(GLOBAL_CLUSTER_ID in minMaxDistanceCache[1]) || minMaxDistanceCache[1][GLOBAL_CLUSTER_ID] < node_distance) {
+				minMaxDistanceCache[1][GLOBAL_CLUSTER_ID] = node_distance;
+			}	
+
+			//update cluster's min and max inverted distance
+			if (!(group_id in minMaxInvertedDistanceCache[0]) || minMaxInvertedDistanceCache[0][group_id] > node_inverted_distance) {
+				minMaxInvertedDistanceCache[0][group_id] = node_inverted_distance;
+			}
+			if (!(group_id in minMaxInvertedDistanceCache[1]) || minMaxInvertedDistanceCache[1][group_id] < node_inverted_distance) {
+				minMaxInvertedDistanceCache[1][group_id] = node_inverted_distance;
+			}			
+
+			//update the global min and max inverted distance
+			if ( !(GLOBAL_CLUSTER_ID in minMaxInvertedDistanceCache[0]) || minMaxInvertedDistanceCache[0][GLOBAL_CLUSTER_ID] > node_inverted_distance) {
+				minMaxInvertedDistanceCache[0][GLOBAL_CLUSTER_ID] = node_inverted_distance;
+			}
+			if ( !(GLOBAL_CLUSTER_ID in minMaxInvertedDistanceCache[1]) || minMaxInvertedDistanceCache[1][GLOBAL_CLUSTER_ID] < node_inverted_distance) {
+				minMaxInvertedDistanceCache[1][GLOBAL_CLUSTER_ID] = node_inverted_distance;
+			}	
+
+
 		}
 	}
 }
@@ -111,14 +187,18 @@ function getCentralityFraction(node: Node, rule : ColorRule) {
 
 	var inter_cluster = rule.getInterCluster();
 	var relevant_dictionary : Dictionary.<Node, float>; //chosen depending on centrality type and subtype.
+	var relevant_cache : Dictionary.<int, Dictionary.<int, float> >;
 
 	if (centrality_type == 0) {
 		relevant_dictionary = degreeCentralities;
+		relevant_cache = minMaxDegreeCache;
 	} else if (centrality_type == 1) {
 		if (inter_cluster) {
 			relevant_dictionary = invertedDistanceSums;
+			relevant_cache = minMaxDistanceCache;
 		} else {
 			relevant_dictionary = distanceSums;
+			relevant_cache = minMaxInvertedDistanceCache;
 		}
 	} else if (centrality_type == 2) {
 		return 0;
@@ -126,21 +206,16 @@ function getCentralityFraction(node: Node, rule : ColorRule) {
 		return 0;
 	}
 
-	var node_centrality : float = relevant_dictionary[node];
-	var max_centrality : float = 0;
-	var min_centrality : float = int.MaxValue;
-	for (var entry in relevant_dictionary) {		
-		var cur_node = entry.Key;
-		if (inter_cluster || cur_node.group_id == node.group_id) {
-			var centrality = entry.Value;
-			if (centrality > max_centrality){
-				max_centrality = centrality;
-			} 
-			if (centrality < min_centrality) {
-				min_centrality = centrality;
-			}
-		}
+	var group_id : int;
+	if (inter_cluster) {
+		group_id = GLOBAL_CLUSTER_ID;
+	} else {
+		group_id = node.group_id;
 	}
+
+	var node_centrality : float = relevant_dictionary[node];
+	var min_centrality : float = relevant_cache[0][group_id];
+	var max_centrality : float = relevant_cache[1][group_id];
 
 	return makeFraction(node_centrality, min_centrality, max_centrality);
 }

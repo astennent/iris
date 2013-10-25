@@ -7,7 +7,8 @@ class RightClickController extends MonoBehaviour {
 	var selectionController : SelectionController;
 	var rightClickMenu : RightClickMenu;
 
-
+	var lastClickedNode : Node;
+	var startClickTime : float;
 
 	private var node : Node;
 
@@ -19,9 +20,14 @@ class RightClickController extends MonoBehaviour {
 	}
 
 	function NodeClick(node : Node) {
-		this.node = node;
-		selectionController.selectPrimaryNode(node);
-		rightClickMenu.ProcessClick();
+		if (lastClickedNode != node) {
+			lastClickedNode = node;
+			startClickTime = Time.time;
+		} else if (Time.time - startClickTime > 0.1) {
+			this.node = node;
+			selectionController.selectPrimaryNode(node);
+			rightClickMenu.ProcessClick();
+		}
 	}
 
 	function setNode(node : Node) {
