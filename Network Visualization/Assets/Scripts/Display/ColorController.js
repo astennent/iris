@@ -233,7 +233,7 @@ function GenCentralityColor(rule : ColorRule, node : Node) {
 	}
 
 	var inverted = rule.getInvertCentrality();
-	if (centrality_type == 1) {	//For consistency, auto-invert closeness so red is central.
+	if (centrality_type == 1 && !rule.getInterCluster()) {	//For consistency, auto-invert closeness so red is central.
 		inverted = !inverted;
 	}
 

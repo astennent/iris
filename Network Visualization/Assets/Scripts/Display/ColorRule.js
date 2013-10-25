@@ -33,7 +33,7 @@ private var scheme_index : int;
 
 function Init(){
 	rule_type = 0; //SOURCE
-	centrality_type = 0; //DEGREE
+	centrality_type = 1; //CLOSENESS
 
 	coloring_node = coloring_halo = true;
 

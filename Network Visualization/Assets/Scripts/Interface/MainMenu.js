@@ -16,7 +16,7 @@ class MainMenu extends BaseMenu {
 	function Start() {
 		super.Start();
 		width = 45;
-		Time.timeScale = 1;
+		Time.timeScale = 4;
 		displaying = true;
 	}
 
@@ -109,7 +109,7 @@ class MainMenu extends BaseMenu {
 			GUI.color = new Color(0, 1, 0);
 			var next_speed : int; 
 			tooltip = "Fast Forward (x" + networkController.gameSpeed + ")";		
-			if (networkController.gameSpeed == 8){
+			if (networkController.gameSpeed >= 16){
 				next_speed = 1;
 			} else {
 				next_speed = networkController.gameSpeed*2;

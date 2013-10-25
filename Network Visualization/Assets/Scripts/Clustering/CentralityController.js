@@ -12,7 +12,7 @@ private var minMaxDegreeCache : Dictionary.<int, Dictionary.<int, float> >;
 
 //closeness centrality variables
 private var distanceSums : Dictionary.<Node, float>;
-private var invertedDistanceSums : Dictionary.<Node, float>;
+var invertedDistanceSums : Dictionary.<Node, float>;
 private var minMaxDistanceCache : Dictionary.<int, Dictionary.<int, float> >;
 private var minMaxInvertedDistanceCache : Dictionary.<int, Dictionary.<int, float> >;
 
@@ -134,9 +134,11 @@ function CalculateClosenessCentrality(){
 			//update the global min and max inverted distance
 			if ( !(GLOBAL_CLUSTER_ID in minMaxInvertedDistanceCache[0]) || minMaxInvertedDistanceCache[0][GLOBAL_CLUSTER_ID] > node_inverted_distance) {
 				minMaxInvertedDistanceCache[0][GLOBAL_CLUSTER_ID] = node_inverted_distance;
+				print("Uupdated to " + node_inverted_distance);
 			}
 			if ( !(GLOBAL_CLUSTER_ID in minMaxInvertedDistanceCache[1]) || minMaxInvertedDistanceCache[1][GLOBAL_CLUSTER_ID] < node_inverted_distance) {
 				minMaxInvertedDistanceCache[1][GLOBAL_CLUSTER_ID] = node_inverted_distance;
+				print("Updated to " + node_inverted_distance);
 			}	
 
 
@@ -153,13 +155,17 @@ function CalculateDistanceSums(from_node : Node) {
 	node_queue.Enqueue(from_node);
 	count_queue.Enqueue(0);
 
-	var total_distance = 0;
-	var total_inverted_distance = 0;
+	var total_distance : float = 0;
+	var total_inverted_distance : float = 0;
 	while(node_queue.Count > 0) {
 		var cur_node = node_queue.Dequeue();
 		var cur_count = count_queue.Dequeue();
+		
 		total_distance += cur_count;
-		total_inverted_distance += (1.0/cur_count);
+		if (cur_count != 0) { //don't count the first node.
+			total_inverted_distance += (1.0/cur_count);
+		}
+
 		for (var connection : Connection in cur_node.connections) {
 			var connection_node = connection.to;
 			if (! (alreadySeen.Contains(connection_node))){
@@ -170,7 +176,7 @@ function CalculateDistanceSums(from_node : Node) {
 		}
 	}
 	distanceSums[from_node] = total_distance;
-	invertedDistanceSums[from_node] = total_distance;
+	invertedDistanceSums[from_node] = total_inverted_distance;
 }
 
 function CalculateBetweennessCentrality(){
@@ -195,10 +201,10 @@ function getCentralityFraction(node: Node, rule : ColorRule) {
 	} else if (centrality_type == 1) {
 		if (inter_cluster) {
 			relevant_dictionary = invertedDistanceSums;
-			relevant_cache = minMaxDistanceCache;
+			relevant_cache = minMaxInvertedDistanceCache;
 		} else {
 			relevant_dictionary = distanceSums;
-			relevant_cache = minMaxInvertedDistanceCache;
+			relevant_cache = minMaxDistanceCache;
 		}
 	} else if (centrality_type == 2) {
 		return 0;

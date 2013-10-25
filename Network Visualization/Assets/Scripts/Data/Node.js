@@ -31,7 +31,6 @@ private var size : float = 2.5; //2.5 is the minimum
 
 private var selectionController : SelectionController;
 private var rightClickController : RightClickController;
-private var centralityController : CentralityController;
 
 private var haloColor : Color;
 
@@ -41,7 +40,6 @@ function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	selectionController = networkController.GetComponent(SelectionController);
 	rightClickController = networkController.GetComponent(RightClickController);
-	centralityController = GetComponent(CentralityController);
 	label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 	label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 	label.transform.parent = this.transform;
