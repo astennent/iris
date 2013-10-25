@@ -232,11 +232,15 @@ function GenCentralityColor(rule : ColorRule, node : Node) {
 		return Color.black;
 	}
 
-	//For consistency, auto-invert closeness so red is central.
-	if (centrality_type == 1){
-		fraction = 1-fraction;
+	var inverted = rule.getInvertCentrality();
+	if (centrality_type == 1) {	//For consistency, auto-invert closeness so red is central.
+		inverted = !inverted;
 	}
 
+	if (inverted) {
+		fraction = 1-fraction;
+	}
+	
 	if (fraction > 2.0/3) { //red down to yellow
 		adjusted_frac = (fraction - 2.0/3)*3;
 		return new Color(1, 1-adjusted_frac, 0, .75);

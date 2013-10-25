@@ -2,8 +2,7 @@
 import System.Collections.Generic;
 
 var centrality_types : String[];
-var centrality_subtypes = [["Dummy"]]; //since unity js doesn't allow String[][] typing declation.
-//maps group ids to max centrality measures for easy coloring.
+
 private var clusterController : ClusterController;
 private var initialized : boolean[]; //tracks whether each of the centrality measures has been calculated.
 
@@ -17,11 +16,6 @@ private var invertedDistanceSums : Dictionary.<Node, float>;
 function Start(){
 	clusterController = this.GetComponent(ClusterController);
 	centrality_types = ["Degree", "Closeness", "Betweenness (NA)", "Eigenvector (NA)"];
-    centrality_subtypes = [	["Intra-Cluster", "Inter-Cluster"],
-							["Intra-Cluster Distances", "Intra-Cluster Inverted Distances", "Inter-Cluster Inverted Distances"],
-							["Not Implemented"],
-							["Not Implemented"]
-						  ];
 }
 
 function ReInit() {
@@ -113,26 +107,19 @@ function CalculateEigenvectorCentrality(){
 
 function getCentralityFraction(node: Node, rule : ColorRule) {
 	var centrality_type = rule.getCentralityType();
-	var sub_centrality = rule.getCentralitySubtype();
 	Init(centrality_type); //this is a no-op if it's already initialized.
 
-	var inter_cluster : boolean;
+	var inter_cluster = rule.getInterCluster();
 	var relevant_dictionary : Dictionary.<Node, float>; //chosen depending on centrality type and subtype.
 
 	if (centrality_type == 0) {
-
-		inter_cluster = (sub_centrality == 1);
 		relevant_dictionary = degreeCentralities;
-	
 	} else if (centrality_type == 1) {
-
-		inter_cluster = (sub_centrality == 2);
-		if (sub_centrality == 0) {
-			relevant_dictionary = distanceSums;
-		} else {
+		if (inter_cluster) {
 			relevant_dictionary = invertedDistanceSums;
+		} else {
+			relevant_dictionary = distanceSums;
 		}
-
 	} else if (centrality_type == 2) {
 		return 0;
 	} else {

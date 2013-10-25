@@ -6,7 +6,7 @@ class ColorRuleColorMenu extends BaseMenu {
 	function Start(){
 		parent = GetComponent(DisplayMenu);
 		super.Start();
-		width = 200;
+		width = 220;
 		title = "Rule Options";
 	}
 
@@ -112,47 +112,60 @@ class ColorRuleColorMenu extends BaseMenu {
 	}
 
 	function DrawCentrality(cur_y : int) {
-		var centrality_types = centralityController.centrality_types;
-		for (var index : int = 0 ; index < centrality_types.length ; index++){
+		cur_y += 5;
 
-			if (rule.getCentralityType() == index){
+		GUI.Box(Rect(x+5, cur_y, width-10, 155), "");
+		var centrality_types = centralityController.centrality_types;
+
+		var wasInverted = rule.getInvertCentrality();
+		if (wasInverted) {
+			var inversion_text = " On";
+		} else {
+			inversion_text = " Off";
+		}
+
+		cur_y+=5;
+		GUI.Label(new Rect(x+10, cur_y, width, 20), "Invert Colors: ");
+		if (GUI.Toggle(new Rect(x+95, cur_y, width, 20), wasInverted, inversion_text) != wasInverted){
+			rule.toggleInvertCentrality();
+		}
+		cur_y += 20;
+		var inter_cluster = rule.getInterCluster();
+		if (GUI.Toggle(new Rect(x+10, cur_y, width/2-20, 20), inter_cluster, " Inter-Cluster")  && !inter_cluster) {
+			rule.toggleInterCluster();
+		} 
+		if (GUI.Toggle(new Rect(x+width/2, cur_y, width/2, 20), !inter_cluster, " Intra-Cluster") && inter_cluster) {
+			rule.toggleInterCluster();
+		}
+
+		cur_y += 25;
+
+		GUI.Label(new Rect(x+10, cur_y, width, 20), "Centrality Method: ");
+		cur_y += 20;
+
+		for (var index : int = 0 ; index < centrality_types.length ; index++){
+			var selected = (rule.getCentralityType() == index);
+
+			if (selected){
 				GUI.color = rule.getColor();
 			} else {
 				GUI.color = Color.white;
+			}		
+
+			if (GUI.Toggle(new Rect(x+15, cur_y, width, 20), selected, centrality_types[index]) && !selected ) {
+				rule.setCentralityType(index);
 			}
-		
-
-			var sub_types = centralityController.centrality_subtypes[index];
-
-			var box_height = 30+20*sub_types.length;
-			GUI.Box(new Rect(x, cur_y, width, box_height), centrality_types[index]);
-			cur_y+=25;
-
-			for (var sub_index : int = 0 ; sub_index < sub_types.length ; sub_index++){
-
-				if (rule.getCentralitySubtype() == sub_index && rule.getCentralityType() == index) {
-					GUI.color = rule.getColor();
-				} else {
-					GUI.color = Color.white;
-				}
-
-				var selected = (rule.getCentralityType() == index && rule.getCentralitySubtype() == sub_index);
-
-				if (GUI.Toggle(new Rect(x, cur_y, width, 20), selected, sub_types[sub_index]) && !selected ) {
-					rule.setCentralityType(index);
-					rule.setCentralitySubtype(sub_index);
-				}
-				cur_y +=20;
-				
-			} 
-			cur_y+=5;
-
+			cur_y +=20;
 		}
 		GUI.color = Color.white;
+		cur_y += 5;
 		return cur_y;
 	}
 
 	function DrawHaloOptions (cur_y : int) {
+		cur_y += 5;
+		GUI.Box(Rect(x+5, cur_y, width-10, 30), "");
+		cur_y+=5;
 		var original_node = rule.coloring_node;
 		var original_halo = rule.coloring_halo;
 
@@ -163,7 +176,7 @@ class ColorRuleColorMenu extends BaseMenu {
 			colorController.ApplyRule(rule);
 		}
 
-		return cur_y + 40;	
+		return cur_y + 35;	
 	}
 
 	function DrawSizingOptions(cur_y : int){
