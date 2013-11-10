@@ -1,6 +1,6 @@
 #pragma strict
 
-var data = new Array(); //all information contained in a node file
+var data : Array; //all information contained in a node file
 var source : DataFile;
 
 var labelObject : GameObject;
@@ -37,7 +37,10 @@ private var haloColor : Color;
 
 private var display_name : String = "";
 
-function Init(){
+function Init(data : Array, color : Color, source : DataFile){
+	this.data = data;
+	this.color = color;
+	this.source = source;
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	selectionController = networkController.GetComponent(SelectionController);
 	rightClickController = networkController.GetComponent(RightClickController);

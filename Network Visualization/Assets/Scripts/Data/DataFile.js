@@ -535,11 +535,7 @@ function CreateNode(data : Array){
 	var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
 	var randColor : Color = colorController.GenRandomColor(0); //random bright color
 	var node : Node = GameObject.Instantiate(nodePrefab, randPos, transform.rotation).GetComponent(Node);
-	node.data = data;
-	node.color = randColor;
-	node.transform.position = randPos;
-	node.source = GetComponent(DataFile);
-	node.Init();
+	node.Init(data, randColor, this);
 	return node;
 }
 

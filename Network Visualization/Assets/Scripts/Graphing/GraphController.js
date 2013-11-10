@@ -1,19 +1,25 @@
 #pragma strict
 
-private var graphing : boolean;
+private var graphing = false;
 private var file : DataFile;
 
 private var axes : Attribute[];
 private var fileManager : FileManager;
 
+private var minMaxCache = new List.<List.<int> >();
+
+private var scale : float = 200;
+
 function Start(){
 	fileManager = GetComponent(FileManager);
-	graphing = false;
 	resetAxes();
 }
 
 function resetAxes(){
 	axes = new Attribute[3];
+	for (var i = 0 ; i < 3 ; i++) {
+		minMaxCache.Add(new List.<int>());
+	}
 }
 
 function isGraphing(){
@@ -54,6 +60,30 @@ function setAxis(axis_index : int, attribute : Attribute) {
 		}
 	}
 	axes[axis_index] = attribute;
+
+	var minMax = new List.<int>();
+	//update the min/max cache
+	if (attribute != null) {
+		minMax.Add(int.MaxValue);
+		minMax.Add(int.MinValue);
+		var nodes = file.nodes;
+		for (var entry in nodes) {
+			if (attribute.is_numeric){
+				var value : float = entry.Value.getData(attribute);
+			} else {
+				value = getStringValue(entry.Value.getData(attribute));
+			}
+
+			//update the cache.
+			if (value < minMax[0]) {
+				minMax[0] = value;
+			} 
+			if (value > minMax[1]) {
+				minMax[1] = value;
+			}
+		}
+	}
+	minMaxCache[axis_index] = minMax;
 }
 
 function Update(){
@@ -61,35 +91,52 @@ function Update(){
 		var nodes = file.nodes;
 		for (var entry in nodes) {
 			var node = entry.Value;
+			var desired_position : Vector3 = Vector3.zero;
 			for (var i = 0 ; i < 3 ; i++) {
 				var attribute = axes[i];
-				var coordinate : float;
+				var value : float;
 
-				// //determine the "value" of the node's attribute
-				// if (attribute.is_numeric) {
-				// 	coordinate = getNumericCoordinate(attribute, )
-				// } else {
+				//determine the "value" of the node's attribute
+				if (attribute == null) {
+					value = scale/2;
+				} else if (attribute.is_numeric) {
+					value = node.getData(attribute);
+				} else { //attribute is string.
+					value = getStringValue(node.getData(attribute));
+				}
 
-				// }
-				coordinate = 0.0;
+				var coordinate = makeFraction(value, i);
 
-				//actually move the node
+				//adjust the desired position
 				if (i == 0) {
-					node.transform.position.x = coordinate;
+					desired_position.x = coordinate;
 				} else if (i == 1){
-					node.transform.position.y = coordinate;
+					desired_position.y = coordinate;
 				} else {
-					node.transform.position.z = coordinate;
+					desired_position.z = coordinate;
 				}
 			}
+			node.transform.position = Vector3.Lerp(node.transform.position, desired_position, .3);
 		}
 	}
 }
 
-function getNumericCoordinate(attribute : Attribute, value : float) : float{
-	return 0;
+//converts the string to a float
+function getStringValue(input : String) : float {
+	return scale/2;
 }
 
-function getStringCoordinate(attribute : Attribute, value) : float{
-	return 0;
+function makeFraction(val : float, i : int) {
+	if (minMaxCache[i].Count > 0) {
+		var min = minMaxCache[i][0];
+		var max = minMaxCache[i][1];
+		var frac = scale*(val - min + .0001) / (max - min - .0001);
+		if (frac < 0) {
+			frac = 0;
+		} else if (frac > scale) {
+			frac = scale;
+		}
+		return frac;
+	} 
+	return scale/2;
 }

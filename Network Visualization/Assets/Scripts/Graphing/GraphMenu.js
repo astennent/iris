@@ -101,8 +101,15 @@ class GraphMenu extends BaseMenu {
 
 		cur_y+=20;
 		var axis_spacing = 25; //horizontal space between radio buttons
+		var axes = graphController.getAxes();
+
+		if (axes[0] != null) {GUI.color = Color.red;} else {GUI.color = Color.white;}
 		GUI.Label(new Rect(x+width/2+18, cur_y, axis_spacing, 20), "X");
+
+		if (axes[1] != null) {GUI.color = Color.green;} else {GUI.color = Color.white;}
 		GUI.Label(new Rect(x+width/2+axis_spacing+18, cur_y, axis_spacing, 20), "Y");
+
+		if (axes[2] != null) {GUI.color = Color.blue;} else {GUI.color = Color.white;}
 		GUI.Label(new Rect(x+width/2+axis_spacing*2+18, cur_y, axis_spacing, 20), "Z");
 		
 
@@ -111,7 +118,6 @@ class GraphMenu extends BaseMenu {
 				axesScrollPosition, Rect (0, 0, width-26, 20*attrs.Count));
 
 		var scroll_y = 0;
-		var axes = graphController.getAxes();
 
 		for (var attribute : Attribute in attrs) {
 			var attrRect = new Rect(10, scroll_y, width-25, 20);
