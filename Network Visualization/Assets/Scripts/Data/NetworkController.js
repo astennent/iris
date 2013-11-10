@@ -11,7 +11,7 @@ private var fkeyColumnIndex : int = 0;
 var flatten = true;
 
 var gameSpeed : float = 1;
-var paused : boolean = false;
+private var paused : boolean = false;
 
 var seeding = true;
 var seeds : String[];
@@ -22,7 +22,8 @@ var nodeTexture : Material;
 var lineTexture : Material;
 var reticleTexture : Material;
 
-var fileManager : FileManager;
+private var fileManager : FileManager;
+private var graphController : GraphController;
 
 
 function SetSpeed(speed : float){
@@ -32,9 +33,13 @@ function SetSpeed(speed : float){
 function TogglePause(){
 	paused = !paused;
 }
+function isPaused() {
+	return (paused || graphController.isGraphing());
+}
 
 function Start(){
 	fileManager = GetComponent(FileManager);
+	graphController = GetComponent(GraphController);
 }
 
 function escapeQuotedDelimiters(line : String){

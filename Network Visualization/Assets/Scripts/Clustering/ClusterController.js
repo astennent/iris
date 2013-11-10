@@ -12,9 +12,9 @@ private var fileManager : FileManager;
 private var centralityController : CentralityController;
 
 function Start(){
-	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
-	fileManager = networkController.GetComponent(FileManager);
-	centralityController = networkController.GetComponent(CentralityController);
+	networkController = GetComponent(NetworkController);
+	fileManager = GetComponent(FileManager);
+	centralityController = GetComponent(CentralityController);
 }
 
 //Identify groups and store them in the group leader array.
@@ -82,9 +82,9 @@ function ReInit(){
 	centralityController.ReInit();
 }
 
-
+//Disabled until a faster algorithm can be found.
 function Update() {
-	if (false && !networkController.paused){
+	if (false && !networkController.isPaused){
 		
 		var index = 0; 
 		for (var leader in leaders){

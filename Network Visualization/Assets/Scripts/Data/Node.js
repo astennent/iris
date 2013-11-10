@@ -31,6 +31,7 @@ private var size : float = 2.5; //2.5 is the minimum
 
 private var selectionController : SelectionController;
 private var rightClickController : RightClickController;
+private var graphController : GraphController;
 
 private var haloColor : Color;
 
@@ -40,6 +41,7 @@ function Init(){
 	networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 	selectionController = networkController.GetComponent(SelectionController);
 	rightClickController = networkController.GetComponent(RightClickController);
+	graphController = networkController.GetComponent(GraphController);
 	label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 	label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 	label.transform.parent = this.transform;
@@ -79,31 +81,43 @@ function AddConnection (other : Node, isOutgoing : boolean, foreignKey : Foreign
 }
 
 
-function Update () {	
+function Update () {
 	GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1);
 	
-	var oldRotation = transform.rotation;
+	if (graphController.isGraphing() && graphController.getFile() != source) {
+		setRender(false);
+	} else {
+		setRender(true);
+		var oldRotation = transform.rotation;
+		
+		for (var i = 0 ; i < connections.Count ; i++){
+			var other_node : Node = connections[i].to;
+			var connectionWeight : float = connections[i].foreignKey.connectionWeight;
+			moveRelativeTo(other_node.transform.position, other_node.size, false, connectionWeight);
 
-	for (var i = 0 ; i < connections.Count ; i++){
-		var other_node : Node = connections[i].to;
-		var connectionWeight : float = connections[i].foreignKey.connectionWeight;
-		moveRelativeTo(other_node.transform.position, other_node.size, false, connectionWeight);
-
-		if (selectionController.dragging){
-			var other_connections = other_node.connections;
-			for (var other_connection : Connection in other_connections){
-				var other_other_node = other_connection.to;
-				moveRelativeTo(other_other_node.transform.position, other_node.size, true, connectionWeight);
+			if (selectionController.dragging){
+				var other_connections = other_node.connections;
+				for (var other_connection : Connection in other_connections){
+					var other_other_node = other_connection.to;
+					moveRelativeTo(other_other_node.transform.position, other_node.size, true, connectionWeight);
+				}
 			}
 		}
+	    
+	    transform.rotation = oldRotation;
+	    
+	    if (networkController.flatten){
+	    	transform.position.z/=1.1;
+	    } 
 	}
+}
 
-    
-    transform.rotation = oldRotation;
-    
-    if (networkController.flatten){
-    	transform.position.z/=1.1;
-    }  
+//called every frame, based on graphing.
+function setRender(enable : boolean){
+	renderer.enabled = enable;
+	if (reticle != null) {
+		reticle.renderer.enabled = enable;
+	}
 }
 
 function setSizingType(type_index : int){
@@ -158,7 +172,7 @@ function getMenuColor(){
 }
 
 function moveRelativeTo(target : Vector3, other_size: float, second_level : boolean, connectionWeight : float){
-	if (networkController.paused || connectionWeight == 0){
+	if (networkController.isPaused() || connectionWeight == 0){
 		return;
 	}
 	transform.LookAt(target);
@@ -300,5 +314,13 @@ function setData(index : int, value) {
 	if (index in source.shown_indices) {
 		UpdateName();
 	}*/
+}
+
+function getData(attribute : Attribute) {
+	if (attribute.file == source) {
+		return data[attribute.column_index];
+	} else {
+		return null;
+	}
 }
 

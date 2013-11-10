@@ -8,6 +8,7 @@ var to : Node;
 var foreignKey : ForeignKey; //the foreign key that gave rise to this connection.
 private var lineRenderer : LineRenderer;
 private var networkController : NetworkController;
+private var graphController : GraphController;
 
 function Init (m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
 	mat = m;
@@ -15,11 +16,12 @@ function Init (m : Material, c : Color, o : boolean, f : Node, t :Node, nC : Net
 	isOutgoing = o;
 	from = f;
 	to = t;
+	foreignKey = fkey;
 	lineRenderer = GetComponent(LineRenderer);
 	lineRenderer.material = mat;
 	lineRenderer.material.color = color;
 	networkController = nC;
-	foreignKey = fkey;
+	graphController = networkController.GetComponent(GraphController);
 }
 
 function LateUpdate () {
@@ -27,8 +29,16 @@ function LateUpdate () {
 		Destroy(gameObject);
 		return;
 	}
+
+	//Logic for hiding the lines. Currently only responds to graphing,
+	//TODO: more options for hiding based on rules or one-way connections
+	if (graphController.isGraphing()) {
+		lineRenderer.enabled = false;
+	} else {
+		lineRenderer.enabled = true;
+	}
+
 	//Adjust the line to match the from and to nodes.
-	lineRenderer.enabled = true;
 	var incomingAdjust : Vector3;
 	if (isOutgoing){
 		incomingAdjust = Vector3.zero;

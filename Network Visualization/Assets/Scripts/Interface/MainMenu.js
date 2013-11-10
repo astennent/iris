@@ -12,6 +12,7 @@ class MainMenu extends BaseMenu {
 	var display : Texture;
 	var upload : Texture;
 	var zoom_to_fit : Texture;
+	var graph : Texture;
 
 	function Start() {
 		super.Start();
@@ -47,35 +48,42 @@ class MainMenu extends BaseMenu {
 		}	
 			
 		if (displaying) {
-			button_position = new Rect(x+5, 60, 35, 35);
+			var cur_y = 60;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){
-				this.GetComponent(SearchMenu).ToggleDisplay();
-				this.GetComponent(DisplayMenu).DisableDisplay();
-				this.GetComponent(FileMenu).DisableDisplay();
-
+				chooseMenu(SearchMenu);
 			}
 			if (button_position.Contains(mousePosition)){} //TODO: tooltips
 			
-			button_position = new Rect(x+5, 100, 35, 35);
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.magenta;
 			if (GUI.Button(button_position, display)){
-				this.GetComponent(SearchMenu).DisableDisplay();
-				this.GetComponent(DisplayMenu).ToggleDisplay();
-				this.GetComponent(FileMenu).DisableDisplay();
+				chooseMenu(DisplayMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
 			
-				
-			button_position = new Rect(x+5, 140, 35, 35);
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.yellow;
 			if (GUI.Button(button_position, gear)){
 				print("clicked");
 			}
 			if (button_position.Contains(mousePosition)){}
 
+
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
+			GUI.color = new Color(1, .7, 0);
+			if (GUI.Button(button_position, graph)){
+				chooseMenu(GraphMenu);
+			}
+			if (button_position.Contains(mousePosition)){}
+
 			
-			button_position = new Rect(x+5, 190, 35, 35);
+			cur_y += 80;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(1, 0, 0);
 			if (Camera.main.GetComponent(NetworkCamera).freeCamera){
 				var lock_pic = unlocked;
@@ -91,9 +99,10 @@ class MainMenu extends BaseMenu {
 			
 
 			
-			button_position = new Rect(x+5, 230, 35, 35);
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(0, 1, 1);
-			if (networkController.paused){
+			if (networkController.isPaused()){
 				var playpause = play;
 				tooltip = "Play";
 			}	else {
@@ -105,7 +114,8 @@ class MainMenu extends BaseMenu {
 			}
 
 			
-			button_position = new Rect(x+5, 270, 35, 35);
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(0, 1, 0);
 			var next_speed : int; 
 			tooltip = "Fast Forward (x" + networkController.gameSpeed + ")";		
@@ -117,27 +127,29 @@ class MainMenu extends BaseMenu {
 			if (GUI.Button(button_position, ff)){
 				networkController.gameSpeed=next_speed;
 			}
-
-			/*
-			button_position = new Rect(x+5, 310, 35, 35);
-			GUI.color = new Color(1, .8, .3);
-			if (GUI.Button(button_position, zoom_to_fit)){
-				print("clicked");
-			}
-			if (button_position.Contains(mousePosition)){}
-			*/
-			
-						
-			button_position = new Rect(x+5, 360, 35, 35);
+				
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, upload)){
-				this.GetComponent(SearchMenu).DisableDisplay();
-				this.GetComponent(DisplayMenu).DisableDisplay();
-				this.GetComponent(FileMenu).ToggleDisplay();
+				chooseMenu(FileMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
 
 		}
 		
+	}
+
+	function chooseMenu(chosenMenu : System.Type){
+		var menus : BaseMenu[] = [GetComponent(SearchMenu), 
+				GetComponent(DisplayMenu), GetComponent(FileMenu), GetComponent(GraphMenu)];
+
+		for (var menu : BaseMenu in menus) {
+			if (typeof(menu) == chosenMenu) {
+				menu.ToggleDisplay();
+			} else {
+				menu.DisableDisplay();
+			}
+		}
 	}
 }

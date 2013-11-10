@@ -25,6 +25,8 @@ class BaseMenu extends MonoBehaviour {
     protected var displayMenu : DisplayMenu;
     protected var networkController : NetworkController;
     protected var centralityController : CentralityController;
+    protected var graphController : GraphController;
+    protected var graphMenu : GraphMenu;
     protected var mainMenu : MainMenu;
     protected var guiplus : GuiPlus;
 
@@ -63,6 +65,8 @@ class BaseMenu extends MonoBehaviour {
 		displayMenu = GetComponent(DisplayMenu);
 		networkController = GetComponent(NetworkController);
 		centralityController = GetComponent(CentralityController);
+		graphMenu = GetComponent(GraphMenu);
+		graphController = GetComponent(GraphController);
 		mainMenu = GetComponent(MainMenu);
 		guiplus = GetComponent(GuiPlus);
 	}
