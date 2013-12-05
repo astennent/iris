@@ -210,7 +210,7 @@ function OnMouseOver() {
 }
 
 function LateUpdate () {
-	if (renderer.isVisible){
+	if (renderer.isVisible && !graphController.isGraphing()){
 		label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
 		var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*size/10;
 		label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 3.0, 20.0);

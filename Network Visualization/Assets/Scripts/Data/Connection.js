@@ -25,7 +25,7 @@ function Init (m : Material, c : Color, o : boolean, f : Node, t :Node, nC : Net
 }
 
 function LateUpdate () {
-	if (from == null || to == null){
+	if (from == null || to == null) {
 		Destroy(gameObject);
 		return;
 	}
@@ -50,7 +50,7 @@ function LateUpdate () {
 	lineRenderer.SetPosition(1, to.transform.position + incomingAdjust);	
 }
 
-function setColor(c : Color){
+function setColor(c : Color) {
 	color = c;
 	GetComponent(LineRenderer).material.color = c;
 }

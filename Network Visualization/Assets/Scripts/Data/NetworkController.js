@@ -21,6 +21,8 @@ var currentSeedIndex : int = 0;
 var nodeTexture : Material;
 var lineTexture : Material;
 var reticleTexture : Material;
+var axisTexture : Material;
+var gridTexture : Material;
 
 private var fileManager : FileManager;
 private var graphController : GraphController;

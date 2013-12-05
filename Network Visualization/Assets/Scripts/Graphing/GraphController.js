@@ -5,20 +5,27 @@ private var file : DataFile;
 
 private var axes : Attribute[];
 private var fileManager : FileManager;
+private var axisController : AxisController;
 
-private var minMaxCache = new List.<List.<int> >();
+private var minMaxCache = new List.<List.<float> >();
+private var uniqueValueCounts = new List.<int>();
 
 private var scale : float = 200;
 
 function Start(){
 	fileManager = GetComponent(FileManager);
+	axisController = GetComponent(AxisController);
 	resetAxes();
 }
 
 function resetAxes(){
 	axes = new Attribute[3];
 	for (var i = 0 ; i < 3 ; i++) {
-		minMaxCache.Add(new List.<int>());
+		minMaxCache.Add(new List.<float>());
+		uniqueValueCounts.Add(0);
+	}
+	if (axisController.initialized) {
+		axisController.Redraw();
 	}
 }
 
@@ -38,6 +45,10 @@ function setGraphing(graphing : boolean) {
 			file = fileManager.files[0];
 		}
 	}
+
+	if (graphing){
+		axisController.Redraw();
+	}
 }
 
 function setFile(file : DataFile){
@@ -53,15 +64,28 @@ function getAxes() {
 	return axes;
 }
 
+function getUniqueValueCount(index : int) {
+	return uniqueValueCounts[index];
+}
+
+function getScale(){
+	return scale;
+}
+
+function setScale(scale : float){
+	this.scale = scale;
+}
+
 function setAxis(axis_index : int, attribute : Attribute) {
 	for (var i = 0 ; i < 3 ; i++){
-		if (axes[i] == attribute) {
-			axes[i] = null;
+		if (attribute != null && axes[i] == attribute) {
+			setAxis(i, null);
 		}
 	}
 	axes[axis_index] = attribute;
 
-	var minMax = new List.<int>();
+	var minMax = new List.<float>();
+	var uniqueValues = new HashSet.<float>();
 	//update the min/max cache
 	if (attribute != null) {
 		minMax.Add(int.MaxValue);
@@ -81,9 +105,16 @@ function setAxis(axis_index : int, attribute : Attribute) {
 			if (value > minMax[1]) {
 				minMax[1] = value;
 			}
+
+			uniqueValues.Add(value);
 		}
 	}
+
+	uniqueValueCounts[axis_index] = uniqueValues.Count;	
 	minMaxCache[axis_index] = minMax;
+
+	//Send a message to the axis controller to update the number of ticks.
+	axisController.updateAxis(axis_index);
 }
 
 function Update(){
@@ -98,7 +129,7 @@ function Update(){
 
 				//determine the "value" of the node's attribute
 				if (attribute == null) {
-					value = scale/2;
+					value = 0;
 				} else if (attribute.is_numeric) {
 					value = node.getData(attribute);
 				} else { //attribute is string.
@@ -126,6 +157,7 @@ function getStringValue(input : String) : float {
 	return scale/2;
 }
 
+//Given a val between min and max, returns the position for positioning
 function makeFraction(val : float, i : int) {
 	if (minMaxCache[i].Count > 0) {
 		var min = minMaxCache[i][0];
@@ -138,5 +170,23 @@ function makeFraction(val : float, i : int) {
 		}
 		return frac;
 	} 
-	return scale/2;
+	return 0;
+}
+
+//Given a val between 0 and 1, returns the fraction between min and max
+function getFractionalValue(val : float, i : int) {
+	if (minMaxCache[i].Count > 0) {
+		var min = minMaxCache[i][0];
+		var max = minMaxCache[i][1];
+
+		if (val < 0) {
+			return min;
+		} else if (val > 1) {
+			return max;
+		}
+
+		var frac = min + val*(max - min);
+		return frac;
+	} 
+	return 0;
 }

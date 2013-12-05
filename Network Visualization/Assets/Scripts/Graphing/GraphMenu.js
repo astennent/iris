@@ -42,7 +42,7 @@ class GraphMenu extends BaseMenu {
 		cur_y += 5;
 		var files = fileManager.files;
 
-		var fileRect = new Rect(x+5, cur_y, width-10, 75);
+		var fileRect = new Rect(x+5, cur_y, width-10, 90);
 		GUI.Box(fileRect, "Select File");
 		fileRect.height -= 20; fileRect.y+=20;
 
@@ -73,11 +73,20 @@ class GraphMenu extends BaseMenu {
 		GUI.EndScrollView();
 
 		GUI.color = Color.white;
-		return cur_y+75;
+		return cur_y+90;
 	}
 
 	function DrawOptions(cur_y : int) {
-		//TODO: custom options: hide axes, show connections, hide other nodes, etc.
+		//TODO:
+		//Options Section:
+			//toggle connections
+			//toggle labels (show on mouseover?)
+			//toggle auto-size
+		//Axes Menu:
+			//custom scale
+			//tick marks options (disable, frequency)
+			//color?
+
 		return cur_y;
 	}
 
@@ -112,6 +121,7 @@ class GraphMenu extends BaseMenu {
 		if (axes[2] != null) {GUI.color = Color.blue;} else {GUI.color = Color.white;}
 		GUI.Label(new Rect(x+width/2+axis_spacing*2+18, cur_y, axis_spacing, 20), "Z");
 		
+		GUI.color = Color.white;
 
 		axesRect.height -= 40; axesRect.y+=40;
 		axesScrollPosition = GUI.BeginScrollView (axesRect, 
