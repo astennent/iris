@@ -16,18 +16,42 @@ private var tickCounts : int[];
 private var tickLabels : List.<List.<GUIText> >;
 private var TICK_HEIGHT_SCALE : float = .05;
 
-private var axisColors = [new Color(1, 0, 0, .5), Color.green, Color.blue];
 private var directions = [Vector3.right, Vector3.up, Vector3.forward];
 
-var draw_axes : boolean;
-var draw_tick_lines : boolean;
-var draw_gridlines : boolean;
-var draw_tick_labels : boolean;
+private var draw_axes : boolean = true;
+private var draw_gridlines : boolean = true;
+private var draw_tick_labels : boolean = true;
 
 var redAxis : Material;
 var blueAxis : Material;
 var greenAxis : Material;
 
+function isDrawingAxes(){
+	return draw_axes;
+}
+
+function setDrawingAxes(draw_axes : boolean) {
+	this.draw_axes = draw_axes;
+	Redraw();
+}
+
+function isDrawingGrid(){
+	return draw_gridlines;
+}
+
+function setDrawingGrid(draw_gridlines : boolean) {
+	this.draw_gridlines = draw_gridlines;
+	Redraw();
+}
+
+function isDrawingLabels(){
+	return draw_tick_labels;
+}
+
+function setDrawingLabels(draw_tick_labels : boolean) {
+	this.draw_tick_labels = draw_tick_labels;
+	Redraw();
+}
 
 function Start () {
 	networkController = GetComponent(NetworkController);
@@ -74,7 +98,6 @@ function Start () {
 	ticks[2].material = blueAxis;
 
 	draw_tick_labels = true;
-	draw_tick_lines = true;
 	draw_axes = true;
 	draw_gridlines = true;
 
@@ -82,16 +105,18 @@ function Start () {
 }
 
 function DrawAxes() {
-	var graphing = graphController.isGraphing();
+
+	var should_draw = graphController.isGraphing() && draw_axes;
+
 	for (var i = 0 ; i < 3 ; i++) {
 		var	lineRenderer = axes[i];
 		var tickRenderer = ticks[i];
 		
 		//enable or disable depending on selected options.
-		lineRenderer.enabled = graphing && draw_axes;
-		tickRenderer.enabled = graphing && draw_axes && draw_tick_lines;
-		
-		if (graphing) {
+		lineRenderer.enabled = should_draw;
+		tickRenderer.enabled = should_draw;
+
+		if (should_draw) {
 
 			var scale : float = graphController.getScale();
 			var direction = directions[i];
@@ -106,35 +131,31 @@ function DrawAxes() {
 			tickRenderer.SetVertexCount(1+5*tickCount);
 			tickRenderer.SetPosition(0, lastPosition);	
 
-			//Loop to draw ticks and gridlines.
-			if (draw_tick_lines) {
-				for (var tickIndex = 0 ; tickIndex < tickCount ; tickIndex++) {
-					var pivot = lastPosition+direction*scale/tickCount;
-				
-					var tickPositionIndex = 1 + tickIndex*5;
-					tickRenderer.SetPosition(tickPositionIndex, pivot);
-
-					//go off in one direction
-					var off_direction = directions[(i+1)%3];
-					var off_position = pivot + scale*TICK_HEIGHT_SCALE * off_direction;
-					tickRenderer.SetPosition(tickPositionIndex+1, off_position);
-
-					//return to pivot
-					tickRenderer.SetPosition(tickPositionIndex+2, pivot);
-
-					//go off in the second direction
-					off_direction = directions[(i+2)%3];
-					off_position = pivot + scale*TICK_HEIGHT_SCALE * off_direction;
-					tickRenderer.SetPosition(tickPositionIndex+3, off_position);
-
-					//return again to pivot
-					tickRenderer.SetPosition(tickPositionIndex+4, pivot);	
-
-					lastPosition = pivot;
-				}
-
-			}
+			//Loop to draw ticks and gridlines.		
+			for (var tickIndex = 0 ; tickIndex < tickCount ; tickIndex++) {
+				var pivot = lastPosition+direction*scale/tickCount;
 			
+				var tickPositionIndex = 1 + tickIndex*5;
+				tickRenderer.SetPosition(tickPositionIndex, pivot);
+
+				//go off in one direction
+				var off_direction = directions[(i+1)%3];
+				var off_position = pivot + scale*TICK_HEIGHT_SCALE * off_direction;
+				tickRenderer.SetPosition(tickPositionIndex+1, off_position);
+
+				//return to pivot
+				tickRenderer.SetPosition(tickPositionIndex+2, pivot);
+
+				//go off in the second direction
+				off_direction = directions[(i+2)%3];
+				off_position = pivot + scale*TICK_HEIGHT_SCALE * off_direction;
+				tickRenderer.SetPosition(tickPositionIndex+3, off_position);
+
+				//return again to pivot
+				tickRenderer.SetPosition(tickPositionIndex+4, pivot);	
+
+				lastPosition = pivot;
+			}			
 
 		} 
 	}

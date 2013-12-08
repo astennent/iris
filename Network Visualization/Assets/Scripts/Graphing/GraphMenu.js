@@ -7,7 +7,7 @@ class GraphMenu extends BaseMenu {
 	function Start(){
 		parent = GetComponent(MainMenu);
 		super.Start();
-		title = "Graph Options";
+		title = "Graphing";
 		width = 260;
 	}	
 
@@ -77,17 +77,55 @@ class GraphMenu extends BaseMenu {
 	}
 
 	function DrawOptions(cur_y : int) {
-		//TODO:
-		//Options Section:
-			//toggle connections
-			//toggle labels (show on mouseover?)
-			//toggle auto-size
-		//Axes Menu:
-			//custom scale
-			//tick marks options (disable, frequency)
-			//color?
+		cur_y += 5;
 
-		return cur_y;
+		var optionsRect = new Rect(x+5, cur_y, width-10, 70);
+		GUI.Box(optionsRect, "");
+
+		var sizeRect = new Rect(x+10, cur_y+5, width/2-10, 20);
+		var isForcingNodeSize = graphController.isForcingNodeSize();
+		if (GUI.Toggle(sizeRect, isForcingNodeSize, "Fix Node Size") != isForcingNodeSize) {
+			graphController.setForcingNodeSize(!isForcingNodeSize);
+		}
+
+		if (!isForcingNodeSize) {
+			GUI.color = Color.gray;
+		} 
+
+		var original_size = graphController.getForcedNodeSize();
+		var new_size = GUI.HorizontalSlider(Rect(x+20, cur_y+25, width/2-50, 20), original_size, 1.0, 15.0);
+		if (original_size != new_size) {
+			graphController.setForcedNodeSize(new_size);
+		}
+
+		GUI.color = Color.white;
+
+		var axesRect = new Rect(x+width/2, cur_y+5, width/2, 20);
+		var isDrawingAxes = axisController.isDrawingAxes();
+		if (GUI.Toggle(axesRect, isDrawingAxes, "Draw Axes") != isDrawingAxes) {
+			axisController.setDrawingAxes(!isDrawingAxes);
+		}
+
+		if (!isDrawingAxes) {
+			GUI.color = Color.gray;
+		} else {
+			GUI.color = Color.white;
+		}
+
+		var gridRect = new Rect(x+width/2+30, cur_y+25, width/2-30, 20);
+		var isDrawingGrid = axisController.isDrawingGrid();
+		if (GUI.Toggle(gridRect, isDrawingGrid, "Draw Grid") != isDrawingGrid && isDrawingAxes) {
+			axisController.setDrawingGrid(!isDrawingGrid);
+		}
+
+		var labelsRect = new Rect(x+width/2+30, cur_y+45, width/2-30, 20);
+		var isDrawingLabels = axisController.isDrawingLabels();
+		if (GUI.Toggle(labelsRect, isDrawingLabels, "Draw Labels") != isDrawingLabels && isDrawingAxes) {
+			axisController.setDrawingLabels(!isDrawingLabels);
+		}
+
+		GUI.color = Color.white;
+		return cur_y + 70;
 	}
 
 	function DrawAxesSelection(cur_y : int) {

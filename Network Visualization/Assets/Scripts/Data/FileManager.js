@@ -132,3 +132,13 @@ function determineDependencies(file : DataFile) {
 	output.Add(file);
 	return output;
 }
+
+function UpdateNodeSizes(){
+	for (var file in files){
+		var nodes = file.nodes;
+		for (var entry in nodes){
+			var node : Node = entry.Value;
+			node.UpdateSize();
+		}
+	}
+}

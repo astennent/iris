@@ -6,16 +6,41 @@ private var file : DataFile;
 private var axes : Attribute[];
 private var fileManager : FileManager;
 private var axisController : AxisController;
+private var networkController : NetworkController;
 
 private var minMaxCache = new List.<List.<float> >();
 private var uniqueValueCounts = new List.<int>();
 
 private var scale : float = 200;
 
-function Start(){
+private var forcingNodeSize : boolean = true;
+private var forcedNodeSize : float = 2.5;
+
+function Start() {
 	fileManager = GetComponent(FileManager);
 	axisController = GetComponent(AxisController);
+	networkController = GetComponent(NetworkController);
 	resetAxes();
+	forcingNodeSize = true;
+}
+
+//called by Node to decide if it should ignore its rules.
+function isForcingNodeSize() {
+	return forcingNodeSize;
+}
+
+function setForcingNodeSize(forcingNodeSize : boolean){
+	this.forcingNodeSize = forcingNodeSize;
+	fileManager.UpdateNodeSizes();
+}
+
+function getForcedNodeSize() {
+	return forcedNodeSize;
+}
+
+function setForcedNodeSize(forcedNodeSize : float) {
+	this.forcedNodeSize = forcedNodeSize;
+	fileManager.UpdateNodeSizes();
 }
 
 function resetAxes(){
@@ -46,9 +71,9 @@ function setGraphing(graphing : boolean) {
 		}
 	}
 
-	if (graphing){
-		axisController.Redraw();
-	}
+	fileManager.UpdateNodeSizes();
+	axisController.Redraw();
+
 }
 
 function setFile(file : DataFile){

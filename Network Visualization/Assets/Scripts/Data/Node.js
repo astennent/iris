@@ -129,12 +129,18 @@ function setSizingType(type_index : int){
 }
 
 function UpdateSize(){
-	if (sizing_type == 0){ //by # connections
-		size = (3 + connections.Count * 2.5)/2;
-	} else if (sizing_type == 1) { //manual
-		size = manual_size;
-	} else if (sizing_type == 2) { //by attribute
-		//TODO
+
+	//override other rules when graphing.
+	if (graphController.isGraphing() && graphController.isForcingNodeSize()) {
+		size = graphController.getForcedNodeSize();
+	} else {
+		if (sizing_type == 0){ //by # connections
+			size = (3 + connections.Count * 2.5)/2;
+		} else if (sizing_type == 1) { //manual
+			size = manual_size;
+		} else if (sizing_type == 2) { //by attribute
+			//TODO
+		}
 	}
 
 	size = Mathf.Max(2.5, size);
@@ -286,6 +292,7 @@ function DeactivateConnections(file : DataFile){
 	connections = replacement_connections;
 	UpdateSize();
 }
+
 function DeactivateConnections(foreignKey : ForeignKey) {
 	var replacement_connections = new List.<Connection>();
 	for (var x = 0 ; x < connections.Count ; x++){

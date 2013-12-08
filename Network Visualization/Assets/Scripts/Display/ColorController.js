@@ -54,6 +54,7 @@ function moveRuleDown(i : int){
 	}
 }
 
+
 function ApplyAllRules(){
 	//reset all halos.
 	for (var file : DataFile in fileManager.files){
