@@ -150,7 +150,7 @@ function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRu
 	var attr_index : int = file.attributes.IndexOf(attribute);
 
 	for (var node in file.nodes){
-		if (""+node.Value.data[attr_index] == value) { 
+		if (node.Value.data.Get(attr_index) == value) { 
 			ColorNodeForRule(node.Value, rule, color, change_color, change_size);
 		}
 	}

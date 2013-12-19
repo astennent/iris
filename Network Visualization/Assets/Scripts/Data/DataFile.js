@@ -291,17 +291,13 @@ class DataFile {
 		var fileContents = getFileContents();
 	    for (var row in fileContents) {
 	    	
-	    	var data = new Array();
+	    	var data = new Data();
 
 	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){ //in case there are stray commas or whatever
 		    		var attribute = attributes[i];
 		    		var val : String = row[i];
-		    		if (attribute.is_numeric){
-		    			data.Push(float.Parse(val));
-		    		} else {
-		    			data.Push(val);
-		    		}
+		    		data.Set(attribute, val);
 	    		}
 	    	}
 	    	
@@ -309,7 +305,7 @@ class DataFile {
 	    	var node : Node = CreateNode(data);
 	    	var key = new Array();
 	    	for (var pkey_index in pkey_indices){
-	    		key.Push(data[pkey_index]);
+	    		key.Push(data.Get(pkey_index));
 	    	}
 	    	nodes[key.toString()] = node;
 	    }
@@ -342,10 +338,10 @@ class DataFile {
 					for (var pair in fkeyPairs){					
 
 						var from_attribute_index = pair[0].column_index;	
-						var from_attribute_value = from_node.data[from_attribute_index];					
+						var from_attribute_value = from_node.data.Get(from_attribute_index);					
 						
 						var to_attribute_index = pair[1].column_index;
-						var to_attribute_value = to_node.data[to_attribute_index];							
+						var to_attribute_value = to_node.data.Get(to_attribute_index);							
 						
 						//You found a match. Generate a connection.
 						if (from_attribute_value == to_attribute_value){
@@ -364,17 +360,13 @@ class DataFile {
 		var fileContents = getFileContents();
 		for (var row in fileContents) {
 
-			var data = new Array();
+			var data = new Data();
 
 	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){  //check against attributes count in case there aren't enough commas.
 		    		var attribute = attributes[i];
 		    		var val : String = row[i];
-		    		if (attribute.is_numeric){
-		    			data.Push(float.Parse(val));
-		    		} else {
-		    			data.Push(val);
-		    		}
+		    		data.Set(attribute, val);
 	    		}
 	    	}
 	    	
@@ -413,7 +405,7 @@ class DataFile {
 							from_attribute_value = row[from_attribute_index];
 
 							var to_attribute_index = pair[1].column_index;	
-							var to_attribute_value = node.data[to_attribute_index];
+							var to_attribute_value = node.data.Get(to_attribute_index);
 							
 							if (from_attribute_value != to_attribute_value){
 								matching = false;
@@ -439,10 +431,9 @@ class DataFile {
 			}
 	    }
 		   
-	}
+	}		
 		
-		
-	function CreateNode(data : Array){
+	function CreateNode(data : Data){
 		var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
 		var randColor : Color = colorController.GenRandomColor(0); //random bright color
 		var node : Node = GameObject.Instantiate(networkController.nodePrefab, randPos, networkController.transform.rotation).GetComponent(Node);

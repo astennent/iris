@@ -169,12 +169,7 @@ class GraphMenu extends BaseMenu {
 
 		for (var attribute : Attribute in attrs) {
 			var attrRect = new Rect(10, scroll_y, width-25, 20);
-			
-			if (attribute.is_numeric) {
-				GUI.color = new Color(.5, .5 , 1);
-			} else {
-				GUI.color = Color.white;
-			}
+				
 			GUI.Label(attrRect, attribute.getRestrictedName(width/2-10));
 			
 			if (attribute == axes[0]) {

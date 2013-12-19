@@ -2,39 +2,41 @@
 //Owned by Nodes and Connections. 
 class Data {
 
-	private var dict = new Dictionary.<Attribute, Datum>();
+	private var attr_dict = new Dictionary.<Attribute, Datum>();
+	private var index_dict = new Dictionary.<int, Datum>();
+
+	//Constructor
+	public function Data() { }
 
 	//set an attribute 
-	function setValue(attribute : Attribute, value : String) {
-		dict[attribute] = new Datum(attribute, value);
+	function Set(attribute : Attribute, value : String) {
+		var datum = new Datum(attribute, value);
+		attr_dict[attribute] = datum;
+		index_dict[attribute.column_index] = datum;
 	}
 
-	function setValue(attribute : Attribute, value : float) {
-		dict[attribute] = new Datum(attribute, value);
+	function Get(attribute : Attribute) {
+		return attr_dict[attribute].getValue();
 	}
 
-	function getValue(attribute : Attribute) {
-		if (dict.ContainsKey(attribute)) {
-			return dict[attribute].getValue();
-		} else {
-			return null;
-		}
+	function GetNumeric(attribute : Attribute) {
+		return attr_dict[attribute].getNumericValue();
 	}
 
-	function getNumericValue(attribute : Attribute) {
-		if (dict.ContainsKey(attribute)) {
-			return dict[attribute].getNumericValue();
-		} else {
-			return null;
-		}
+	function Get(index : int) {
+		return index_dict[index].getValue();
 	}
 
-	//Loop over elements and make sure that they are the same as the other key.
-	function compareTo(other : Data) {
-		
+	function GetNumeric(index : int) {
+		return index_dict[index].getNumericValue();
 	}
 
+	//Used for enumerating over the dict.
+	function getDict(){
+		return attr_dict;
+	}
 
-
-
+	function Count(){
+		return attr_dict.Count;
+	}
 }

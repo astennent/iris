@@ -16,12 +16,6 @@ public class Datum {
 		setValue(value);
 	}
 
-	//Numeric Constructor
-	public function Datum(attribute : Attribute, value : float) {
-		this.attribute = attribute;
-		setValue(value);
-	}
-
 	//Update the value stored, along with all data types.
 	function setValue(value : String) {
 		this.value = value;

@@ -117,11 +117,7 @@ function setAxis(axis_index : int, attribute : Attribute) {
 		minMax.Add(int.MinValue);
 		var nodes = file.nodes;
 		for (var entry in nodes) {
-			if (attribute.is_numeric){
-				var value : float = entry.Value.getData(attribute);
-			} else {
-				value = getStringValue(entry.Value.getData(attribute));
-			}
+			var value = entry.Value.data.GetNumeric(attribute);
 
 			//update the cache.
 			if (value < minMax[0]) {
@@ -150,16 +146,8 @@ function Update(){
 			var desired_position : Vector3 = Vector3.zero;
 			for (var i = 0 ; i < 3 ; i++) {
 				var attribute = axes[i];
-				var value : float;
+				var value = node.data.GetNumeric(attribute);
 
-				//determine the "value" of the node's attribute
-				if (attribute == null) {
-					value = 0;
-				} else if (attribute.is_numeric) {
-					value = node.getData(attribute);
-				} else { //attribute is string.
-					value = getStringValue(node.getData(attribute));
-				}
 
 				var coordinate = makeFraction(value, i);
 
@@ -177,10 +165,6 @@ function Update(){
 	}
 }
 
-//converts the string to a float
-function getStringValue(input : String) : float {
-	return scale/2;
-}
 
 //Given a val between min and max, returns the position for positioning
 function makeFraction(val : float, i : int) {

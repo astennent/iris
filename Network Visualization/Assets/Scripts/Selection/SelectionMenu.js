@@ -111,23 +111,30 @@ class SelectionMenu extends BaseMenu {
 		var data_height = 20;
 
 		dataScrollPosition = GUI.BeginScrollView (Rect (0,node_scroll_y+extra_vertical_space,contentWidth,data_rect_height-extra_vertical_space), 
-				dataScrollPosition, Rect (0, 0, contentWidth-16, data_height*(node.data.length)));
+				dataScrollPosition, Rect (0, 0, contentWidth-16, data_height*(node.data.Count())));
 			
 			var data_scroll_y = 0;
 			var source_attrs = node.source.attributes;
 			
-			for (var index : int ; index < node.data.length ; index++) {
+			for (var index : int ; index < source_attrs.Count ; index++) {
 
-				var attr_name = source_attrs[index].getRestrictedName(width/2-10);	
+				var attribute = source_attrs[index];
+
+				var attr_name = attribute.getRestrictedName(width/2-10);	
 				var attr_rect = new Rect(5, data_scroll_y, contentWidth/2, data_height);
 				GUI.Label(attr_rect, attr_name);
 
 				var attr_value_rect : Rect = attr_rect;
 				attr_value_rect.x = contentWidth/2-10;
-				attr_value_rect.width -=5;
+				attr_value_rect.width -= 5;
 
-				var attr_value = node.data[index]+"";
-				GUI.TextField(attr_value_rect, attr_value);
+				var attr_value = node.data.Get(index)+"";
+				var new_value = GUI.TextField(attr_value_rect, attr_value);
+
+				//Update the data point.
+				if (attr_value != new_value) {
+					node.setData(attribute, new_value);
+				}
 
 				data_scroll_y += data_height;
 			}

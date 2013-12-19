@@ -1,6 +1,6 @@
 #pragma strict
 
-var data : Array; //all information contained in a node file
+var data : Data; //all information contained in a node file
 var source : DataFile;
 
 var labelObject : GameObject;
@@ -37,7 +37,7 @@ private var haloColor : Color;
 
 private var display_name : String = "";
 
-function Init(data : Array, color : Color, source : DataFile){
+function Init(data : Data, color : Color, source : DataFile){
 	this.data = data;
 	this.color = color;
 	this.source = source;
@@ -161,7 +161,7 @@ function UpdateName(){
 	var name_string = "";
 	if (shown_indices.length > 0){
 		for (var index in shown_indices){
-			name_string += "\n" + data[index];
+			name_string += "\n" + data.Get(index);
 		}
 		display_name = name_string.Substring(1);
 	} else {
@@ -318,19 +318,9 @@ function alertConnectionDeactivated(connection : Connection){
 	}
 }
 
-//Used to update displayed information in real time.
-function setData(index : int, value) {
-	/*data[index] = data;
-	if (index in source.shown_indices) {
-		UpdateName();
-	}*/
+function setData(attribute : Attribute, value : String) {
+	//Actually change the value
+	data.Set(attribute, value);
+	//Update visible values in case that changed. 
+	UpdateName();
 }
-
-function getData(attribute : Attribute) {
-	if (attribute.file == source) {
-		return data[attribute.column_index];
-	} else {
-		return null;
-	}
-}
-

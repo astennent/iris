@@ -14,8 +14,6 @@ var restrictedNameCache = new Dictionary.<int, String>();
 
 class Attribute {
 
-	var is_numeric = false;
-
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
 		this.file = file;

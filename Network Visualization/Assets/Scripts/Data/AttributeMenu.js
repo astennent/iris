@@ -1,4 +1,4 @@
-#pragma downcast
+#pragma strict
 
 class AttributeMenu extends BaseMenu {
 
@@ -60,15 +60,6 @@ class AttributeMenu extends BaseMenu {
 				file.ToggleShown(selected_index);
 			}
 
-
-			box.y += 20;
-			if (attribute.is_numeric){ GUI.color = new Color(.5, .5, 1); } 
-			else { GUI.color = Color.white; }
-			var numeric_toggle = GUI.Toggle (box, attribute.is_numeric, " Uses numeric values");		
-			if (numeric_toggle != attribute.is_numeric){
-				file.ToggleNumeric(selected_index);
-			}
-			
 			box.y += 20;
 			if (attribute.is_pkey){ GUI.color = new Color(1, .5, .5);} 
 			else { GUI.color = Color.white; }
