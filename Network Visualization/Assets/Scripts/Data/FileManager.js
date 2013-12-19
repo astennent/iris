@@ -3,7 +3,6 @@ import System.IO;
 #pragma strict
 
 var files = new List.<DataFile>(); //holds File objects.
-var filePrefab : GameObject;		
 
 var dest_directories = new List.<DirectoryInfo>();
 var dest_files = new List.<FileInfo>();
@@ -36,8 +35,6 @@ function Start(){
 		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_alter, fga_name);
 		alliance_edge_list.linking_table = true;
 		alliance_edge_list.Activate();	
-		//Load("C:\\Users\\Alan\\Desktop\\Dictionaries\\AllianceData\\Alliance Edge List - Names.csv");	
-		//Load("C:\\Users\\Alan\\Desktop\\Dictionaries\\AllianceData\\Full Group Attributes.csv");	
 	}
 }
 
@@ -97,17 +94,20 @@ function Load(fname : String, isDemo : boolean){
 				return -2;
 			}
 		}
-		//Create the File and attempt to do interpret its contents
-		var newfile = GameObject.Instantiate(filePrefab).GetComponent(DataFile);
-		newfile.Init();
-		newfile.fname = fname;
-		newfile.isDemoFile = isDemo;
-		newfile.gameObject.name = fname;
-		files.Add(newfile);	
+		// //Create the File and attempt to do interpret its contents
+		// var newfile = GameObject.Instantiate(filePrefab).GetComponent(DataFile);
+		// newfile.Init();
+		// newfile.fname = fname;
+		// newfile.isDemoFile = isDemo;
+		// newfile.gameObject.name = fname;
+		// files.Add(newfile);	
 		
-		newfile.ScanForMetadata();
-	
+		// newfile.ScanForMetadata();
+
+		var new_file = new DataFile(fname, isDemo);
+		files.Add(new_file);	
 		return files.Count-1;
+
 	} else if (Directory.Exists(fname)){
 		fileMenu.error_message = "That's a directory. Select a file.";
 		return -2;
@@ -123,14 +123,6 @@ function DeactivateFile(index : int){
 
 function ActivateFile(index : int){
 	files[index].Activate();
-}
-
-
-//TODO
-function determineDependencies(file : DataFile) {
-	var output = new List.<DataFile>();
-	output.Add(file);
-	return output;
 }
 
 function UpdateNodeSizes(){

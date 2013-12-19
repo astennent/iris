@@ -1,7 +1,7 @@
 #pragma strict
 import System.IO;
 
-var nodeObject : GameObject;
+var nodePrefab : GameObject;
 
 private var edgeFile : String = "C:\\Users\\Alan\\Desktop\\Dictionaries\\AllianceData\\Alliance Edge List - Names.csv";
 private var delimiter : char = ','[0];

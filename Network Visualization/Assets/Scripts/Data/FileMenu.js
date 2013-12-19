@@ -124,16 +124,7 @@ class FileMenu extends BaseMenu {
 			if (is_shown_value != attribute.is_shown){
 				attribute.ToggleShown();
 			}		
-
-			//numeric toggles
-			if (attribute.is_numeric){ GUI.color = new Color(.5, .5, 1); } 
-			else { GUI.color = Color.white; }
-			var numeric_box = new Rect(72, attribute_y, 20, 20);
-			var numeric_toggle = GUI.Toggle (numeric_box, attribute.is_numeric, "");		
-			if (numeric_toggle != attribute.is_numeric){
-				file.ToggleNumeric(i);
-			}
-			
+	
 			//pkey toggles
 			if (attribute.is_pkey){ GUI.color = new Color(1, .5, .5); } 
 			else { GUI.color = Color.white; }		

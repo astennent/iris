@@ -5,9 +5,6 @@
 import System.IO;
 import System.Collections.Generic;
 
-var attributePrefab : GameObject;
-var nodePrefab : GameObject;
-
 var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
 
 //What the computer thinks the types should be.
@@ -45,68 +42,42 @@ private var inactiveKeys = new List.<ForeignKey>();
 		continuous coloring by attribute (vs. discrete colors)
 */	
 
-//called initially on load to guess information about data types and header usage.
-
 private var fileManager : FileManager;
 private var colorController : ColorController;
-private var gameController : GameObject;
+private var networkController : NetworkController;
 private var searchController : SearchController;
 private var clusterController : ClusterController;
-function Init(){
-	gameController = GameObject.FindGameObjectWithTag("GameController");
-	colorController = gameController.GetComponent(ColorController);
-	fileManager = gameController.GetComponent(FileManager);
-	searchController = gameController.GetComponent(SearchController);
-	clusterController = gameController.GetComponent(ClusterController);
-}
 
-function ScanForMetadata(){
-	var on_first_row : boolean= true;
-	var first_row_types : boolean[]; //true = number, false = text
+class DataFile {
 
-	attributes = new List.<Attribute>();
-	
-	try {
-		var sr : IrisStreamReader = null; //StreamReader interface.
-		if (isDemoFile){
-			sr = new DemoStreamReader();
-			sr.setCurrentFile(fname);
-		} else {
-			sr = new DefaultStreamReader();
-			sr.setCurrentFile(fname);
+	//Constructor
+	public function DataFile(fname : String, isDemo : boolean){
+		networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
+		colorController = networkController.GetComponent(ColorController);
+		fileManager = networkController.GetComponent(FileManager);
+		searchController = networkController.GetComponent(SearchController);
+		clusterController = networkController.GetComponent(ClusterController);
+		this.fname = fname; 
+		this.isDemoFile = isDemo;
+		ScanForMetadata();
+	    initialized = true;
+	}
+
+	//Computes header names and creates attributes
+	function ScanForMetadata(){
+		
+		first_row = getFirstRow();
+
+		//If there is a number, it probably doesn't use headers, otherwise it probably does.  
+		using_headers = true;
+		var first_row = getFirstRow();
+		for (var cell in first_row) {
+			if (isNumber(cell)) {
+				using_headers = false;
+			}
 		}
-	    while (  sr != null && sr.Peek() != -1  ){
-	    	var line : String = sr.ReadLine();
-	    	var splitLine : String[] = splitLine(line);
 
-	    	if (on_first_row){
-	    		first_row_types = new boolean[splitLine.Length];
-	    		first_row = splitLine;
-	    		expected_column_types = new boolean[splitLine.Length];
-	    		for (var x : int = 0 ; x < splitLine.Length ; x++){
-	    			first_row_types[x] = isNumber(splitLine[x]);
-	    			
-	    			//found a number in the header row, guessing it's not a header.
-	    			if (first_row_types[x] == true){
-	    				using_headers = false;
-	    			}
-	    			
-	    			expected_column_types[x] = true;
-	    		}
-	    	} else {
-	    		for (x = 0 ; x < expected_column_types.Length ; x++){
-	    			if (x >= splitLine.Length) {
-	    				expected_column_types[x] = false;
-	    			} else if (expected_column_types[x]){ //if it might still be an integer.
-	    				//if this is a number, it stays a number. Otherwise, the entire column will be interpretted as text.
-	    				expected_column_types[x] = isNumber(splitLine[x]); 
-	    			}
-	    		}
-	    	}
-
-    		on_first_row = false;
-	    }
-	    
+		attributes = new List.<Attribute>(); 
 	    for (var i = 0 ; i < first_row.Length ; i++){
 	    	var column_name : String;
 	    	if (using_headers){
@@ -114,250 +85,218 @@ function ScanForMetadata(){
 	    	} else {
 	    		column_name = 'col'+i;
 	    	}
-    		var attribute = GameObject.Instantiate(attributePrefab).GetComponent(Attribute);
-    		attribute.setColumnName(column_name);
-    		attribute.is_numeric = expected_column_types[i];
-    		attribute.file = GetComponent(DataFile);
-    		attribute.column_index = i;
-    		if (i == 0 || column_name.ToLower().Contains("name") || column_name.ToLower().Contains("title")){
-    			attribute.is_shown = true;
-    		} 
-    		if (i == 0 || column_name.ToLower() == "id"){
-    			attribute.is_pkey = true;
-    		}
-    		attributes.Add(attribute);
-	    } 	   
-	    
-	    if (sr != null) sr.Close();
-    } catch (err){
-    	print("" + err);
-    	if (sr != null) sr.Close();
-    }
-    initialized = true;
-}
 
-function splitLine(line : String) {
-	var splitLine = new List.<String>();
-	var escaped : boolean = false;
-
-	for (var x :int =0; x < line.Length ; x++){
-		if (line[x] == "\""[0]){ //match on quotes
-			escaped = !escaped;
-		} else if (!escaped && line[x] == delimiter){
-			var entry = line.Substring(0, x);
-			splitLine.Add(entry);
-			line = line.Substring(x+1);
-			x=-1;
-		}
-		if (x == line.Length-1) {
-			splitLine.Add(line);
-		}
+			var attribute = new Attribute(this, column_name, i);
+			if (i == 0 || column_name.ToLower().Contains("name") || column_name.ToLower().Contains("title")){
+				attribute.is_shown = true;
+			} 
+			if (i == 0 || column_name.ToLower() == "id"){
+				attribute.is_pkey = true;
+			}
+			attributes.Add(attribute);
+	    } 	
 	}
-	var output : String[] = new String[splitLine.Count];
-    //remove extra quotes
-	for (x = 0 ; x < splitLine.Count ; x++){
-		entry = splitLine[x];
-		if (entry.Length > 1 && entry[0] == "\"" && entry[entry.Length-1] == "\"") {
-			entry = entry.Substring(1, entry.Length-2);
-		}
-		output[x] = entry;
-	}
-	return output;
-}
 
-//determines if the number passed variable is a number.
-function isNumber(n : String) {
-	try { 
-		var num = float.Parse(n);
-		return true;
-	} catch (err){
-		return false;
-	}
-}
+	function splitLine(line : String) {
+		var splitLine = new List.<String>();
+		var escaped : boolean = false;
 
-//gets everything in the file name after the trailing /
-function shortName(){
-	if (fname.Contains("\\")){
-		return fname.Substring(fname.LastIndexOf("\\")+1);
-	} else if (fname.Contains("/")){
-		return fname.Substring(fname.LastIndexOf("/")+1);
-	} else {
-		return fname;
-	}
-}
-
-function ToggleUsingHeaders(){
-	using_headers = !using_headers;	
-    for (var i = 0 ; i < attributes.Count ; i++){
-    	var attribute : Attribute = attributes[i];
-    	if (using_headers){
-    		attribute.setColumnName(first_row[i]);
-    	} else {
-    		attribute.setColumnName('col'+i);
-    	}
-    } 	
-}
-
-function ToggleNumeric(index : int){
-	var expected_column_type = expected_column_types[index];
-	if (expected_column_type){ //You can only switch if each cell in the column is a valid number.
-		attributes[index].is_numeric = !attributes[index].is_numeric;
-	} else {
-		print("Can't change that column type " + index + " " + attributes[index].getColumnName());
-	}
-}
-
-function ToggleShown(index : int){
-	attributes[index].ToggleShown();
-}
-
-
-function removeFkey(fkey : ForeignKey){
-	for (var i = 0 ; i < foreignKeys.Count ; i++){
-		var foreignKey = foreignKeys[i];
-		if (fkey == foreignKey){
-			foreignKeys.RemoveAt(i);
-			return;
-		}
-	}
-	for (var j = 0 ; j < inactiveKeys.Count ; j++){
-		var inactiveKey = inactiveKeys[j];
-		if (fkey == inactiveKey){
-			inactiveKeys.RemoveAt(j);
-			return;
-		}
-	}
-}
-
-//promote or demote a foreign key based on it's number of attributes.
-//called by ForeignKey
-function promoteFkey(fkey : ForeignKey){
-	for (var i = 0 ; i < inactiveKeys.Count ; i++){
-		var inactiveKey = inactiveKeys[i];
-		if (fkey == inactiveKey){
-			foreignKeys.Insert(0, fkey);
-			inactiveKeys.RemoveAt(i);
-			return;
-		}
-	}
-}
-function demoteFkey(fkey : ForeignKey){
-	for (var i = 0 ; i < foreignKeys.Count ; i++){
-		var foreignKey = foreignKeys[i];
-		if (fkey == foreignKey){
-			foreignKeys.RemoveAt(i);
-			inactiveKeys.Insert(0, fkey);
-			return;
-		}
-	}
-}
-
-//creates an empty foreign key and marks it as inactive.
-function createEmptyFkey(other_file : DataFile){
-	var foreignKey = GameObject.Instantiate(foreignKeyPrefab).GetComponent(ForeignKey);
-	foreignKey.to_file = other_file;
-	inactiveKeys.Add(foreignKey);
-}
-
-function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
-	var foreignKey = GameObject.Instantiate(foreignKeyPrefab).GetComponent(ForeignKey);
-	foreignKey.from_file = this;
-	foreignKey.to_file = other_file;
-	foreignKey.addKeyPair(from, to);
-	foreignKeys.Add(foreignKey);
-}
-
-function destroySimpleFkey(from : Attribute, to : Attribute){
-	var doomed_key : ForeignKey = getSimpleFkey(from, to);
-	removeFkey(doomed_key);
-}
-
-//only returns true if attribute is found AND the size of that dictionary is 1.
-function getSimpleFkey(from : Attribute, to : Attribute){
-	for (var foreignKey in foreignKeys){
-		if (foreignKey.isSimpleFkey(from, to)){
-			return foreignKey;
-		}
-	}
-	return null;	
-}
-
-//returns true if this object can be found anywhere as a referencing foreign key
-function containsFkeyFrom(attribute : Attribute){
-	for (var foreignKey in foreignKeys){
-		var keyPairs = foreignKey.getKeyPairs();
-		for (var keyPair in keyPairs){
-			if (keyPair[0] == attribute){
-				return true;
+		for (var x :int =0; x < line.Length ; x++){
+			if (line[x] == "\""[0]){ //match on quotes
+				escaped = !escaped;
+			} else if (!escaped && line[x] == delimiter){
+				var entry = line.Substring(0, x);
+				splitLine.Add(entry);
+				line = line.Substring(x+1);
+				x=-1;
+			}
+			if (x == line.Length-1) {
+				splitLine.Add(line);
 			}
 		}
-	}
-	return false;
-}
-
-function getForeignKeys(includeInactive : boolean){
-	if (includeInactive){
-		var output = new List.<ForeignKey>();
-		for (var ikey in inactiveKeys){
-			output.Add(ikey);
-		}
-		for (var key in foreignKeys){
-			output.Add(key);
+		var output : String[] = new String[splitLine.Count];
+	    //remove extra quotes
+		for (x = 0 ; x < splitLine.Count ; x++){
+			entry = splitLine[x];
+			if (entry.Length > 1 && entry[0] == "\"" && entry[entry.Length-1] == "\"") {
+				entry = entry.Substring(1, entry.Length-2);
+			}
+			output[x] = entry;
 		}
 		return output;
 	}
-	return foreignKeys;
-}
 
-function Activate(){
-	var required_files : List.<DataFile> = fileManager.determineDependencies(GetComponent(DataFile)); //not implemented.
-	for (var required_file in required_files){
-		if (!required_file.linking_table){
-			required_file.GenerateNodes();
+	//determines if the number passed variable is a number.
+	function isNumber(n : String) {
+		try { 
+			var num = float.Parse(n);
+			return true;
+		} catch (err){
+			return false;
 		}
 	}
-	for (var required_file in required_files){
-		required_file.GenerateConnections();
-	}
-	
-	searchController.ReInit();
-	clusterController.ReInit();
 
-	imported = true;
-	
-}
-
-function GenerateNodes(){
-	//TODO: destroy nodes and connections.
-	nodes = new Dictionary.<String, Node>();
-	UpdatePKeyIndices();
-	UpdateShownIndices();
-	try {
-		var line_index = -1;
-		var sr : IrisStreamReader = null; //StreamReader interface.
-		if (isDemoFile){
-			sr = new DemoStreamReader();
-			sr.setCurrentFile(fname);
+	//gets everything in the file name after the trailing /
+	function shortName(){
+		if (fname.Contains("\\")){
+			return fname.Substring(fname.LastIndexOf("\\")+1);
+		} else if (fname.Contains("/")){
+			return fname.Substring(fname.LastIndexOf("/")+1);
 		} else {
-			sr = new DefaultStreamReader();
-			sr.setCurrentFile(fname);
+			return fname;
 		}
-	    while (  sr != null && sr.Peek() != -1  ){
-	    	var line : String = sr.ReadLine();
-    		
-    		line_index++;
-	    	//skip the first line if using headers.
-	    	if (line_index == 0 && using_headers){
-	    		continue;
-	    	}	
+	}
+
+	function ToggleUsingHeaders() {
+		using_headers = !using_headers;	
+	    for (var i = 0 ; i < attributes.Count ; i++){
+	    	var attribute : Attribute = attributes[i];
+	    	if (using_headers){
+	    		attribute.setColumnName(first_row[i]);
+	    	} else {
+	    		attribute.setColumnName('col'+i);
+	    	}
+	    } 	
+	}
+
+	function ToggleShown(index : int){
+		attributes[index].ToggleShown();
+	}
+
+
+	function removeFkey(fkey : ForeignKey){
+		for (var i = 0 ; i < foreignKeys.Count ; i++){
+			var foreignKey = foreignKeys[i];
+			if (fkey == foreignKey){
+				foreignKeys.RemoveAt(i);
+				return;
+			}
+		}
+		for (var j = 0 ; j < inactiveKeys.Count ; j++){
+			var inactiveKey = inactiveKeys[j];
+			if (fkey == inactiveKey){
+				inactiveKeys.RemoveAt(j);
+				return;
+			}
+		}
+	}
+
+	//promote or demote a foreign key based on it's number of attributes.
+	//called by ForeignKey
+	function promoteFkey(fkey : ForeignKey){
+		for (var i = 0 ; i < inactiveKeys.Count ; i++){
+			var inactiveKey = inactiveKeys[i];
+			if (fkey == inactiveKey){
+				foreignKeys.Insert(0, fkey);
+				inactiveKeys.RemoveAt(i);
+				return;
+			}
+		}
+	}
+	function demoteFkey(fkey : ForeignKey){
+		for (var i = 0 ; i < foreignKeys.Count ; i++){
+			var foreignKey = foreignKeys[i];
+			if (fkey == foreignKey){
+				foreignKeys.RemoveAt(i);
+				inactiveKeys.Insert(0, fkey);
+				return;
+			}
+		}
+	}
+
+	//creates an empty foreign key and marks it as inactive.
+	function createEmptyFkey(other_file : DataFile){
+		var foreignKey = new ForeignKey(this, other_file);
+		inactiveKeys.Add(foreignKey);
+	}
+
+	function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
+		var foreignKey = new ForeignKey(this, other_file);
+		foreignKey.addKeyPair(from, to);
+		foreignKeys.Add(foreignKey);
+	}
+
+	function destroySimpleFkey(from : Attribute, to : Attribute){
+		var doomed_key : ForeignKey = getSimpleFkey(from, to);
+		removeFkey(doomed_key);
+	}
+
+	//only returns true if attribute is found AND the size of that dictionary is 1.
+	function getSimpleFkey(from : Attribute, to : Attribute){
+		for (var foreignKey in foreignKeys){
+			if (foreignKey.isSimpleFkey(from, to)){
+				return foreignKey;
+			}
+		}
+		return null;	
+	}
+
+	//returns true if this object can be found anywhere as a referencing foreign key
+	function containsFkeyFrom(attribute : Attribute){
+		for (var foreignKey in foreignKeys){
+			var keyPairs = foreignKey.getKeyPairs();
+			for (var keyPair in keyPairs){
+				if (keyPair[0] == attribute){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	function getForeignKeys(includeInactive : boolean){
+		if (includeInactive){
+			var output = new List.<ForeignKey>();
+			for (var ikey in inactiveKeys){
+				output.Add(ikey);
+			}
+			for (var key in foreignKeys){
+				output.Add(key);
+			}
+			return output;
+		}
+		return foreignKeys;
+	}
+
+	function Activate(){
+		var required_files = determineDependencies(); //not implemented.
+		for (var required_file in required_files){
+			if (!required_file.linking_table){
+				required_file.GenerateNodes();
+			}
+		}
+		for (var required_file in required_files){
+			required_file.GenerateConnections();
+		}
+		
+		searchController.ReInit();
+		clusterController.ReInit();
+
+		imported = true;
+	}
+
+	//TODO
+	function determineDependencies() {
+		var output = new List.<DataFile>();
+		output.Add(this);
+		return output;
+	}
+
+	function GenerateNodes(){
+		//TODO: destroy nodes and connections.
+		nodes = new Dictionary.<String, Node>();
+		UpdatePKeyIndices();
+		UpdateShownIndices();
+
+		var fileContents = getFileContents();
+	    for (var row in fileContents) {
 	    	
 	    	var data = new Array();
-	    	var splitLine : String[] = splitLine(line);
 
-	    	for (var i : int = 0 ; i < splitLine.length ; i++){
+	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){ //in case there are stray commas or whatever
 		    		var attribute = attributes[i];
-		    		var val : String = splitLine[i];
+		    		var val : String = row[i];
 		    		if (attribute.is_numeric){
 		    			data.Push(float.Parse(val));
 		    		} else {
@@ -366,91 +305,71 @@ function GenerateNodes(){
 	    		}
 	    	}
 	    	
-
-	    	
 	    	//Add the node to the dict as a key/value pair of pkeys/node.
 	    	var node : Node = CreateNode(data);
 	    	var key = new Array();
 	    	for (var pkey_index in pkey_indices){
 	    		key.Push(data[pkey_index]);
 	    	}
-	    	nodes[key.toString()] = node;	    	
+	    	nodes[key.toString()] = node;
 	    }
-	   
-	   if (sr != null) sr.Close();
-    } catch (err){
-    	if (sr != null) sr.Close();
-    }	
-}
 
-
-function GenerateConnections(){
-	if (linking_table){
-		GenerateConnectionsForLinkingTable();
-	} else {
-		GenerateConnectionsForNodeFile();
+		   
+		  
 	}
-}
-	
-function GenerateConnectionsForNodeFile(){
-	for (var entry in nodes){
-		var from_node : Node = entry.Value;
-		for (var foreignKey in foreignKeys){
-			var other_file : DataFile = foreignKey.to_file;
-			var fkeyPairs = foreignKey.getKeyPairs();
-			//TODO: special case when the foreign key points exactly to the other file's primary keys.
-			
-			//loop over other file's nodes. This is n^2 argh
-			for (var other_entry in other_file.nodes){
-				var to_node : Node = other_entry.Value;	
-	
-				for (var pair in fkeyPairs){					
 
-					var from_attribute_index = pair[0].column_index;	
-					var from_attribute_value = from_node.data[from_attribute_index];					
-					
-					var to_attribute_index = pair[1].column_index;
-					var to_attribute_value = to_node.data[to_attribute_index];							
-					
-					//You found a match. Generate a connection.
-					if (from_attribute_value == to_attribute_value){
-						from_node.AddConnection(to_node, true, foreignKey); 
-					}
-					
-				}
-			
-			}				
-		}
-	}
-}
-	
-function GenerateConnectionsForLinkingTable(){
-	try {
-	    var line_index = -1;	
-		var sr : IrisStreamReader = null; //StreamReader interface.
-		if (isDemoFile){
-			sr = new DemoStreamReader();
-			sr.setCurrentFile(fname);
+
+	function GenerateConnections(){
+		if (linking_table){
+			GenerateConnectionsForLinkingTable();
 		} else {
-			sr = new DefaultStreamReader();
-			sr.setCurrentFile(fname);
+			GenerateConnectionsForNodeFile();
 		}
-	    while (  sr != null && sr.Peek() != -1  ){
-	    	var line : String = sr.ReadLine();    		    		
-    		
-    		line_index++;	    		
-	    	//skip the first line if using headers.
-	    	if (line_index == 0 && using_headers){
-	    		continue;
-	    	}	
-	    	
-	    	var data = new Array();
-	    	var splitLine : String[] = splitLine(line);
+	}
+		
+	function GenerateConnectionsForNodeFile(){
+		for (var entry in nodes){
+			var from_node : Node = entry.Value;
+			for (var foreignKey in foreignKeys){
+				var other_file : DataFile = foreignKey.to_file;
+				var fkeyPairs = foreignKey.getKeyPairs();
+				//TODO: special case when the foreign key points exactly to the other file's primary keys.
+				
+				//loop over other file's nodes. This is n^2 argh
+				for (var other_entry in other_file.nodes){
+					var to_node : Node = other_entry.Value;	
+		
+					for (var pair in fkeyPairs){					
 
-	    	for (var i : int = 0 ; i < splitLine.length ; i++){
+						var from_attribute_index = pair[0].column_index;	
+						var from_attribute_value = from_node.data[from_attribute_index];					
+						
+						var to_attribute_index = pair[1].column_index;
+						var to_attribute_value = to_node.data[to_attribute_index];							
+						
+						//You found a match. Generate a connection.
+						if (from_attribute_value == to_attribute_value){
+							from_node.AddConnection(to_node, true, foreignKey); 
+						}
+						
+					}
+				
+				}				
+			}
+		}
+	}
+		
+	function GenerateConnectionsForLinkingTable(){
+
+		var fileContents = getFileContents();
+		for (var row in fileContents) {
+
+			var data = new Array();
+
+	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){  //check against attributes count in case there aren't enough commas.
 		    		var attribute = attributes[i];
-		    		var val : String = splitLine[i];
+		    		var val : String = row[i];
 		    		if (attribute.is_numeric){
 		    			data.Push(float.Parse(val));
 		    		} else {
@@ -473,7 +392,7 @@ function GenerateConnectionsForLinkingTable(){
 					var node_values = new Array();
 					for (pair in keyPairs) {
 						var from_attribute_index = pair[0].column_index;
-						var from_attribute_value = splitLine[from_attribute_index];
+						var from_attribute_value = row[from_attribute_index];
 						node_values.Push(from_attribute_value); 
 					}
 					var node_values_string = node_values.toString();
@@ -491,7 +410,7 @@ function GenerateConnectionsForLinkingTable(){
 						for (pair in keyPairs){
 							//check if the "to" value is a match
 							from_attribute_index = pair[0].column_index;
-							from_attribute_value = splitLine[from_attribute_index];
+							from_attribute_value = row[from_attribute_index];
 
 							var to_attribute_index = pair[1].column_index;	
 							var to_attribute_value = node.data[to_attribute_index];
@@ -519,81 +438,141 @@ function GenerateConnectionsForLinkingTable(){
 				}
 			}
 	    }
-	   
-	   if (sr!=null)sr.Close();
-    } catch (err){
-    	print("" + err);
-    	if (sr!=null)sr.Close();
-    }	
-}
-	
-	
-function CreateNode(data : Array){
-	var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-	var randColor : Color = colorController.GenRandomColor(0); //random bright color
-	var node : Node = GameObject.Instantiate(nodePrefab, randPos, transform.rotation).GetComponent(Node);
-	node.Init(data, randColor, this);
-	return node;
-}
-
-function UpdateShownIndices(){
-	var output = new Array();
-	for (var i = 0 ; i < attributes.Count ; i++){
-		if (attributes[i].is_shown){
-			output.Push(i);
-		}
+		   
 	}
-	shown_indices = output;
 		
-	for (var node in nodes){
-		node.Value.UpdateName();
+		
+	function CreateNode(data : Array){
+		var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
+		var randColor : Color = colorController.GenRandomColor(0); //random bright color
+		var node : Node = GameObject.Instantiate(networkController.nodePrefab, randPos, networkController.transform.rotation).GetComponent(Node);
+		node.Init(data, randColor, this);
+		return node;
 	}
-}
 
-function UpdatePKeyIndices(){
-	var output = new Array();
-	for (var i = 0 ; i < attributes.Count ; i++){
-		if (attributes[i].is_pkey){
-			output.Push(i);
-		}
-	}
-	
-	//use all attributes if none are selected.
-	if (output.length == 0){
-		for (i = 0 ; i < attributes.Count ; i++){
-			output.Push(i);
-		}
-	}	
-	pkey_indices = output;
-}
-
-function Deactivate() {
-	if (linking_table) {
-		for (var foreignKey in foreignKeys) {
-			for (var node in foreignKey.to_file.nodes){
-				node.Value.DeactivateConnections(foreignKey);
+	function UpdateShownIndices(){
+		var output = new Array();
+		for (var i = 0 ; i < attributes.Count ; i++){
+			if (attributes[i].is_shown){
+				output.Push(i);
 			}
 		}
-	} else {
-		for (var foreignKey in foreignKeys) {
-			var from_file = foreignKey.from_file;
-			var to_file = foreignKey.to_file;
-			from_file.DeactivateConnections(to_file);
-			to_file.DeactivateConnections(from_file);
+		shown_indices = output;
+			
+		for (var node in nodes){
+			node.Value.UpdateName();
 		}
 	}
-	for (var node in nodes) {
-	 	node.Value.Deactivate();
-	}
-	nodes = new Dictionary.<String, Node>();
-	searchController.ReInit();
-	clusterController.ReInit();
-	imported = false;
-}
 
-//called by linking table files, executed by non-linking tables.
-function DeactivateConnections(file : DataFile){
-	for (var node in nodes){
-		node.Value.DeactivateConnections(file);
+	function UpdatePKeyIndices(){
+		var output = new Array();
+		for (var i = 0 ; i < attributes.Count ; i++){
+			if (attributes[i].is_pkey){
+				output.Push(i);
+			}
+		}
+		
+		//use all attributes if none are selected.
+		if (output.length == 0){
+			for (i = 0 ; i < attributes.Count ; i++){
+				output.Push(i);
+			}
+		}	
+		pkey_indices = output;
 	}
-} 
+
+	function Deactivate() {
+		if (linking_table) {
+			for (var foreignKey in foreignKeys) {
+				for (var node in foreignKey.to_file.nodes){
+					node.Value.DeactivateConnections(foreignKey);
+				}
+			}
+		} else {
+			for (var foreignKey in foreignKeys) {
+				var from_file = foreignKey.from_file;
+				var to_file = foreignKey.to_file;
+				from_file.DeactivateConnections(to_file);
+				to_file.DeactivateConnections(from_file);
+			}
+		}
+		for (var node in nodes) {
+		 	node.Value.Deactivate();
+		}
+		nodes = new Dictionary.<String, Node>();
+		searchController.ReInit();
+		clusterController.ReInit();
+		imported = false;
+	}
+
+	//called by linking table files, executed by non-linking tables.
+	function DeactivateConnections(file : DataFile){
+		for (var node in nodes){
+			node.Value.DeactivateConnections(file);
+		}
+	} 
+
+
+
+	function getFirstRow() : String[] {
+		try {
+			var sr = getStreamReader();
+
+			if (  sr != null && sr.Peek() != -1  ) {
+				var line : String = sr.ReadLine();
+				return splitLine(line);
+			}
+
+			if (sr != null) sr.Close();
+		} catch (err){
+			print("" + err);
+			if (sr != null) sr.Close();
+		}
+
+		return null;
+	}
+
+	function getFileContents() : List.<List.<String> > {
+		var output = new List.<List.<String> >();
+		try {		
+			var sr = getStreamReader();
+
+			//If you use headers, skip first row.
+			var on_first_row = using_headers;
+
+			while (  sr != null && sr.Peek() != -1  ) {
+				if (on_first_row) {
+					on_first_row = false;
+					continue;
+				}
+				var row = new List.<String>();
+				var line : String = sr.ReadLine();
+				var splitLine : String[] = splitLine(line);
+				for (var cell in splitLine) {
+					row.Add(cell);
+				}
+				output.Add(row);
+			}
+
+			if (sr != null) sr.Close();
+		} catch (err){
+			Debug.Log("" + err);
+
+			if (sr != null) sr.Close();
+		}
+		return output;
+	}
+
+	function getStreamReader() : IrisStreamReader{
+		var sr : IrisStreamReader = null; //StreamReader interface.
+		if (isDemoFile) {
+			sr = new DemoStreamReader();
+			sr.setCurrentFile(fname);
+		} else {
+			sr = new DefaultStreamReader();
+			sr.setCurrentFile(fname);
+		}
+		return sr;
+	}
+
+}
