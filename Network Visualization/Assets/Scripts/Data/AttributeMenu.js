@@ -6,7 +6,7 @@ class AttributeMenu extends BaseMenu {
 
 	private var fkeyScrollPosition : Vector2 = Vector2.zero;
 
-	function Start(){
+	function Start() {
 		parent = GetComponent(FileMenu);
 		super.Start();
 		title = "Attribute Manager";

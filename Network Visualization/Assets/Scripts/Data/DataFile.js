@@ -485,7 +485,7 @@ function GenerateConnectionsForLinkingTable(){
 				} else {
 					//VERY COMPUTATIONALLY EXPENSIVE
 					//loops over the nodes in the other file. This makes the operation n^2 	
-					for (var entry in other_file.nodes){
+					for (var entry in other_file.nodes) {
 						node = entry.Value;
 						var matching = true;
 						for (pair in keyPairs){
@@ -518,9 +518,6 @@ function GenerateConnectionsForLinkingTable(){
 					}
 				}
 			}
-
-	    	
-	    	
 	    }
 	   
 	   if (sr!=null)sr.Close();

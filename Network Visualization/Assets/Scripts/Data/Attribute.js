@@ -1,6 +1,8 @@
 #pragma strict
 
 private var column_name :String;
+private var defaultNumeric : float = 0;
+
 var column_index : int;
 var is_numeric : boolean; //true for number, false otherwise.
 var is_shown : boolean = false; //for display on the screen.
@@ -56,4 +58,12 @@ function setColumnName(new_name : String) {
 		column_name = new_name;
 		restrictedNameCache = new Dictionary.<int, String>();
 	}
+}
+
+function setDefaultNumeric(defaultNumeric : float) {
+	this.defaultNumeric = defaultNumeric;
+}
+
+function getDefaultNumeric() {
+	return defaultNumeric;
 }

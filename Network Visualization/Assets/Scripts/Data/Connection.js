@@ -6,6 +6,7 @@ var isOutgoing : boolean; //is the connection an outgoing one? Determines offset
 var from : Node;
 var to : Node;
 var foreignKey : ForeignKey; //the foreign key that gave rise to this connection.
+
 private var lineRenderer : LineRenderer;
 private var networkController : NetworkController;
 private var graphController : GraphController;
