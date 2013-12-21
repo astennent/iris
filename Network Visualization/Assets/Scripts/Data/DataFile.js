@@ -48,6 +48,8 @@ private var networkController : NetworkController;
 private var searchController : SearchController;
 private var clusterController : ClusterController;
 
+private var cachedFileContents : List.<List.<String> >; //Contents are stored after load.
+
 class DataFile {
 
 	//Constructor
@@ -524,6 +526,12 @@ class DataFile {
 	}
 
 	function getFileContents() : List.<List.<String> > {
+		
+		//If you've already loaded it, use that instead.
+		if (cachedFileContents != null) {
+			return cachedFileContents;
+		}
+
 		var output = new List.<List.<String> >();
 		try {		
 			var sr = getStreamReader();
@@ -551,6 +559,10 @@ class DataFile {
 
 			if (sr != null) sr.Close();
 		}
+
+		//cache for later use.
+		cachedFileContents = output;
+		
 		return output;
 	}
 
