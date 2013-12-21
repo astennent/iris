@@ -146,7 +146,9 @@ function Update(){
 			var desired_position : Vector3 = Vector3.zero;
 			for (var i = 0 ; i < 3 ; i++) {
 				var attribute = axes[i];
-				var value = node.data.GetNumeric(attribute);
+
+				if (attribute != null) {
+					var value = node.data.GetNumeric(attribute);
 
 
 				var coordinate = makeFraction(value, i);
@@ -158,6 +160,7 @@ function Update(){
 					desired_position.y = coordinate;
 				} else {
 					desired_position.z = coordinate;
+				}
 				}
 			}
 			node.transform.position = Vector3.Lerp(node.transform.position, desired_position, .3);
