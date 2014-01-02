@@ -12,6 +12,20 @@ var file : DataFile; //the file to which this attribute belongs
 
 var restrictedNameCache = new Dictionary.<int, String>();
 
+static var NORMAL = 0;
+static var FOREIGN_KEY = 1;
+static var TIMESERIES = 2;
+static var GIS = 3;
+
+private var aspect = 0;
+static var aspectColors = [Color.white, //Normal
+						new Color(1, .5, 0), //FKey
+						new Color(.2, 1, .5), // Time Series
+						new Color(1, 0, .5) //GIS
+						];
+static var shownColor = new Color(1, 1, .5);
+static var pkeyColor = new Color(1, .5, .5);
+
 class Attribute {
 
 	//Constructor
@@ -73,6 +87,37 @@ class Attribute {
 
 	function getDefaultNumeric() {
 		return defaultNumeric;
+	}
+
+	function getAspect() {
+		return aspect;
+	}
+
+	function getAspectColor() {
+		if (aspect == 0) {
+			if (is_shown && is_pkey) {
+				return mergeColors(shownColor, pkeyColor);
+			} else if (is_shown) {
+				return shownColor;
+			} else if (is_pkey) {
+				return pkeyColor;
+			}
+			return aspectColors[0];
+		} else {
+			return aspectColors[aspect];
+		}
+	}
+
+	function mergeColors(one : Color, two : Color) {
+		var r = (one.r + two.r)/2;
+		var g = (one.g + two.g)/2;
+		var b = (one.b + two.b)/2;
+		return new Color(r, g, b);
+	}
+
+	function setAspect(aspect : int) {
+		//TOOD: Validate.
+		this.aspect = aspect;
 	}
 
 }

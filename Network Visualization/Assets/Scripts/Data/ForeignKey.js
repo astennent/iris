@@ -5,7 +5,7 @@ var from_file : DataFile; //
 var to_file : DataFile;
 var isBidirectional : boolean = true;
 var activated : boolean = false;
-var connectionWeight : float = 1.0;
+var weightModifier : float = 1.0;
 
 class ForeignKey {
 
@@ -19,6 +19,10 @@ class ForeignKey {
 		var tuple = new List.<Attribute>();
 		tuple.Add(from);
 		tuple.Add(to);
+
+		//Update aspect
+		from.setAspect(Attribute.FOREIGN_KEY);
+
 		keyPairs.Add(tuple);
 		activated = true;
 	}

@@ -95,14 +95,14 @@ function Update () {
 		
 		for (var i = 0 ; i < connections.Count ; i++){
 			var other_node : Node = connections[i].to;
-			var connectionWeight : float = connections[i].foreignKey.connectionWeight;
-			moveRelativeTo(other_node.transform.position, other_node.size, false, connectionWeight);
+			var weightModifier : float = connections[i].foreignKey.weightModifier;
+			moveRelativeTo(other_node.transform.position, other_node.size, false, weightModifier);
 
 			if (selectionController.dragging){
 				var other_connections = other_node.connections;
 				for (var other_connection : Connection in other_connections){
 					var other_other_node = other_connection.to;
-					moveRelativeTo(other_other_node.transform.position, other_node.size, true, connectionWeight);
+					moveRelativeTo(other_other_node.transform.position, other_node.size, true, weightModifier);
 				}
 			}
 		}

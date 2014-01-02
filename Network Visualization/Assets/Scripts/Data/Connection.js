@@ -11,6 +11,10 @@ private var lineRenderer : LineRenderer;
 private var networkController : NetworkController;
 private var graphController : GraphController;
 
+//If connection is derived from a normal table, data references the data of the "from" Node.
+//If connection is from a linking table, data is unique to the connection.
+var data : Data;
+
 function Init (m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
 	mat = m;
 	color = c;

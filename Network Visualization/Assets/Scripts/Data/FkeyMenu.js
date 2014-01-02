@@ -22,13 +22,11 @@ class FkeyMenu extends BaseMenu {
 	function OnGUI(){
 		super.OnGUI();
 		GUI.color = Color.white;
-		
-		var file_index = fileMenu.selected_file_index;
-		if (file_index < 0){
-			return;
-		}	
-		var file = fileManager.files[file_index];			
 
+		var file = fileMenu.getSelectedFile();
+		if (file == null) {
+			return;
+		}		
 		
 		var cur_y = 40;
 		//display menu for choosing a file for the new fkey
@@ -88,8 +86,8 @@ class FkeyMenu extends BaseMenu {
 						
 			cur_y += 20;
 
-			GUI.Label(new Rect(x+10, cur_y, width, 20), "Connection Weight: " + foreignKey.connectionWeight.ToString("f1"));
-			foreignKey.connectionWeight = GUI.HorizontalSlider(Rect(x+155, cur_y+5, width-180, 20), foreignKey.connectionWeight, 0.0, 10.0);
+			GUI.Label(new Rect(x+10, cur_y, width, 20), "Weight Modifier: " + foreignKey.weightModifier.ToString("f1"));
+			foreignKey.weightModifier = GUI.HorizontalSlider(Rect(x+155, cur_y+5, width-180, 20), foreignKey.weightModifier, 0.0, 10.0);
 			cur_y += 30;
 			
 			for (var pair in keyPairs){
@@ -199,7 +197,6 @@ class FkeyMenu extends BaseMenu {
 
 	function EnableDisplay(){
 		super.EnableDisplay();
-		attributeMenu.DisableDisplay();
 		resetCreation();
 	}
 

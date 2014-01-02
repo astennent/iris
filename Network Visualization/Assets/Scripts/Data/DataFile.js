@@ -29,6 +29,8 @@ var nodes = new Dictionary.<String, Node>();
 
 var isDemoFile : boolean = false;
 
+var timeFrame : TimeFrame;
+
 var foreignKeyPrefab : ForeignKey;
 private var foreignKeys = new List.<ForeignKey>();
 private var inactiveKeys = new List.<ForeignKey>();
@@ -63,6 +65,7 @@ class DataFile {
 		this.isDemoFile = isDemo;
 		ScanForMetadata();
 	    initialized = true;
+	    timeFrame = new TimeFrame(this);
 	}
 
 	//Computes header names and creates attributes
@@ -170,6 +173,7 @@ class DataFile {
 		for (var i = 0 ; i < foreignKeys.Count ; i++){
 			var foreignKey = foreignKeys[i];
 			if (fkey == foreignKey){
+				checkAspectReset(fkey);
 				foreignKeys.RemoveAt(i);
 				return;
 			}
@@ -177,10 +181,40 @@ class DataFile {
 		for (var j = 0 ; j < inactiveKeys.Count ; j++){
 			var inactiveKey = inactiveKeys[j];
 			if (fkey == inactiveKey){
+				checkAspectReset(fkey);
 				inactiveKeys.RemoveAt(j);
 				return;
 			}
 		}
+	}
+
+	//called by removeFKey. Checks if an attribute's aspect should be reset.
+	function checkAspectReset(fkey : ForeignKey) {
+		var attributesToReset = new HashSet.<Attribute>();
+		
+		//Add the 'from' attributes of the doomed fkey. 
+		for (var tuple in fkey.getKeyPairs()) {
+			attributesToReset.Add(tuple[0]);
+		}
+
+		//Loop over all fkeys (except this one) and look for these attributes.
+		for (var foreignKey in foreignKeys) {
+			if (foreignKey != fkey) {
+				for (var tuple in foreignKey.getKeyPairs()) {
+					var from_attr = tuple[0];
+					if (attributesToReset.Contains(from_attr)) {
+						attributesToReset.Remove(from_attr);
+					}
+				}
+			}
+		}
+
+		//Any attributes not seen again will remain in the list. Mark them as removed.
+		for (var remaining_attr in attributesToReset) {
+			remaining_attr.setAspect(Attribute.NORMAL);
+		}
+
+
 	}
 
 	//promote or demote a foreign key based on it's number of attributes.

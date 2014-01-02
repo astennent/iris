@@ -24,6 +24,19 @@ class FileMenu extends BaseMenu {
 		title = "File Manager";
 	}
 
+	function getSelectedFile() {
+		if (selected_file_index >= 0) {
+			return fileManager.files[selected_file_index];
+		} else {
+			return null;
+		}
+	}
+
+	function setSelectedFile(index : int) {
+		selected_file_index = index;
+		attributeMenu.setSelectedIndex(-1);
+		fkeyMenu.resetCreation();
+	}
 	function OnGUI(){
 		super.OnGUI();
 		cur_y = 40;
@@ -34,9 +47,7 @@ class FileMenu extends BaseMenu {
 			var file : DataFile = fileManager.files[i];
 			if (i == selected_file_index){ GUI.color = Color.yellow; } else { GUI.color = Color.white;	}
 			if (GUI.Button(button_position, file.shortName())){
-				selected_file_index = i;
-				attributeMenu.setSelectedIndex(-1);
-				fkeyMenu.resetCreation();
+				setSelectedFile(i);
 			}
 			//display files.
 			cur_y += 35;
@@ -45,9 +56,12 @@ class FileMenu extends BaseMenu {
 		
 		button_position = new Rect(x+10, cur_y, width-20, 30);
 		GUI.color = Color.green;
+		
+		//New File Button
 		if (GUI.Button(button_position, "Import New File")){
-			selected_file_index = -2; //indicator for new file.
+			setSelectedFile(-2);
 		}
+
 		GUI.color = Color.white;	
 		cur_y += 40;	
 		
@@ -81,14 +95,14 @@ class FileMenu extends BaseMenu {
 		
 		cur_y+=28;
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
-		GUI.color = new Color(1, .5, 0);
+		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
 		if (GUI.Button(fkey_box, "Foreign Keys")){
 			fkeyMenu.ToggleDisplay();
 		}
 		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);
-		GUI.color = new Color(.8, .5, 1);
-		if (GUI.Button(details_box, "File Details")){
-			fkeyMenu.ToggleDisplay();
+		GUI.color = Attribute.aspectColors[Attribute.TIMESERIES];
+		if (GUI.Button(details_box, "Time Series")){
+			timeFrameMenu.ToggleDisplay();
 		}
 		
 		GUI.color = Color.white;	
@@ -98,10 +112,8 @@ class FileMenu extends BaseMenu {
 		var label_box = new Rect(x+10, cur_y, width-10, 20);
 		GUI.Label(label_box, "Shown");
 		label_box.x += 50;
-		GUI.Label(label_box, "Numeric");
-		label_box.x += 57;
-		GUI.Label(label_box, "Key");
-		label_box.x += 40;
+		GUI.Label(label_box, "PKey");
+		label_box.x += 117;
 		GUI.Label(label_box, "Name");
 
 		cur_y += 25;
@@ -117,29 +129,27 @@ class FileMenu extends BaseMenu {
 			var attribute = file.attributes[i];
 						
 			//is shown toggles
-			if (attribute.is_shown){ GUI.color = new Color(.5, 1, .5); } 
+			if (attribute.is_shown){ GUI.color = Attribute.shownColor; } 
 			else { GUI.color = Color.white; }		
-			var is_name_box = new Rect(18, attribute_y, 20, 20);
+			var is_name_box = new Rect(17, attribute_y, 20, 20);
 			var is_shown_value = GUI.Toggle (is_name_box, attribute.is_shown, "");	
 			if (is_shown_value != attribute.is_shown){
 				attribute.ToggleShown();
 			}		
 	
 			//pkey toggles
-			if (attribute.is_pkey){ GUI.color = new Color(1, .5, .5); } 
+			if (attribute.is_pkey){ GUI.color = Attribute.pkeyColor; } 
 			else { GUI.color = Color.white; }		
-			var is_pkey_box = new Rect(116, attribute_y, 20, 20);
+			var is_pkey_box = new Rect(63, attribute_y, 20, 20);
 			var pkey_value = GUI.Toggle (is_pkey_box, attribute.is_pkey, "");	
 			if (pkey_value != attribute.is_pkey){
 				attribute.TogglePkey();
 			}
 			
 			//attribute buttons			
-			if (file.containsFkeyFrom(attribute)){ GUI.color = new Color(1, .5, 0); } 
-			else { GUI.color = Color.white; }
-			
+			GUI.color = attribute.getAspectColor();			
 			var display_string :String = attribute.getRestrictedName(140);
-	   		if (GUI.Button(new Rect(150, attribute_y, 140, 20), display_string)){
+	   		if (GUI.Button(new Rect(100, attribute_y, 180, 20), display_string)){
 	   			fkeyMenu.DisableDisplay();
 	   			attributeMenu.setSelectedIndex(i);
 	   		}
@@ -276,17 +286,6 @@ class FileMenu extends BaseMenu {
 	function UpdateDirectoryData(){
 		fileManager.UpdateDirectoryData(fileString);
 		error_message = "";
-	}
-
-
-	function ColorByAttribute(){
-		//TODO: Don't forget the difference between discrete and continuous variables.
-	}
-
-	function DisableDisplay(){
-		super.DisableDisplay();
-		fkeyMenu.DisableDisplay();
-		attributeMenu.DisableDisplay();
 	}
 
 }

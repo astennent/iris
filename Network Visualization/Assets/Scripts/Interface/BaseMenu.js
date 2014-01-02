@@ -30,6 +30,9 @@ class BaseMenu extends MonoBehaviour {
     protected var graphMenu : GraphMenu;
     protected var mainMenu : MainMenu;
     protected var guiplus : GuiPlus;
+    protected var timeFrameMenu : TimeFrameMenu;
+    protected var timeSeriesController : TimeSeriesController;
+    
 
 
     /* The text displayed at the top of the menu */
@@ -71,6 +74,8 @@ class BaseMenu extends MonoBehaviour {
 		axisController = GetComponent(AxisController);
 		mainMenu = GetComponent(MainMenu);
 		guiplus = GetComponent(GuiPlus);
+		timeFrameMenu = GetComponent(TimeFrameMenu);
+		timeSeriesController = GetComponent(TimeSeriesController);
 	}
 
 	function Update () {	
@@ -114,7 +119,16 @@ class BaseMenu extends MonoBehaviour {
 
 	function EnableDisplay(){
 		if (parent != null) {
+
+			//Enable the display of the parent menu, if necessary
 			parent.EnableDisplay();
+
+			//Close all sibiling menus
+			for (var child in parent.children) {
+				if (child != this) {
+					child.DisableDisplay(true);
+				}
+			}
 		}
 		displaying = true;
 	}
