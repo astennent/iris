@@ -7,6 +7,7 @@ class TimeFrame {
 	private var startColumns = new List.<AFTuple>();
 	private var endColumns = new List.<AFTuple>();
 
+
 	public function TimeFrame(file : DataFile) {
 		this.file = file;
 	}
@@ -20,40 +21,47 @@ class TimeFrame {
 	}
 
 	function addColumn(attribute : Attribute, start : boolean) {
-
-		//Check if it's in the start columns.
-		for (var column in startColumns) {
-			if (attribute == column.attribute) {
-				Debug.Log("Already Added");
-				return;
-			} 
-		}
-
-		//Check if it's in the end columns.
-		for (var column in endColumns) {
-			if (attribute == column.attribute) {
-				Debug.Log("Already Added");
-				return;
-			} 
-		}
-
-		attribute.setAspect(Attribute.TIMESERIES);
+		//Check if it's in the columns already.
 		if (start) {
-			startColumns.Add(new AFTuple(attribute, ""));
+			var checkColumns = startColumns;
 		} else {
-			endColumns.Add(new AFTuple(attribute, ""));
+			checkColumns = endColumns;
 		}
+
+		//Check if the attribute already in this list.
+		for (var column in checkColumns) {
+			if (attribute == column.attribute) {
+				Debug.Log("Already Added");
+				return;
+			} 
+		}
+
+		//add it to the list and update the aspect.
+		checkColumns.Add(new AFTuple(attribute, ""));
+		attribute.setAspect(Attribute.TIME_SERIES, true);
 
 	}
 
 	function removeColumn(isStart : boolean, index : int) {
 		if (isStart) {
-			startColumns[index].attribute.setAspect(Attribute.NORMAL); //Clear the aspect.
-			startColumns.RemoveAt(index);
+			var relevantColumns = startColumns;
+			var otherColumns = endColumns;
 		} else {
-			endColumns[index].attribute.setAspect(Attribute.NORMAL); //Clear the aspect.
-			endColumns.RemoveAt(index);
+			relevantColumns = endColumns;
+			otherColumns = startColumns;
 		}
+
+		//Remove the tuple from the list of columns.
+		var doomedAttribute = relevantColumns[index].attribute;
+		relevantColumns.RemoveAt(index);
+
+		//Update the aspect
+		for (var column in otherColumns) {
+			if (doomedAttribute == column.attribute) {
+				return;
+			}
+		}
+		doomedAttribute.setAspect(Attribute.TIME_SERIES, false);	
 	}
 
 }

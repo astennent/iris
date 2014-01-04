@@ -12,17 +12,17 @@ var file : DataFile; //the file to which this attribute belongs
 
 var restrictedNameCache = new Dictionary.<int, String>();
 
-static var NORMAL = 0;
-static var FOREIGN_KEY = 1;
-static var TIMESERIES = 2;
-static var GIS = 3;
+static var FOREIGN_KEY = 0;
+static var TIME_SERIES = 1;
+static var GIS = 2;
 
-private var aspect = 0;
-static var aspectColors = [Color.white, //Normal
+private var aspects = new boolean[3];
+static var aspectColors = [
 						new Color(1, .5, 0), //FKey
 						new Color(.2, 1, .5), // Time Series
 						new Color(1, 0, .5) //GIS
 						];
+
 static var shownColor = new Color(1, 1, .5);
 static var pkeyColor = new Color(1, .5, .5);
 
@@ -89,35 +89,55 @@ class Attribute {
 		return defaultNumeric;
 	}
 
-	function getAspect() {
-		return aspect;
+	function getAspect(index : int) {
+		return aspects[index];
 	}
 
 	function getAspectColor() {
-		if (aspect == 0) {
-			if (is_shown && is_pkey) {
-				return mergeColors(shownColor, pkeyColor);
-			} else if (is_shown) {
-				return shownColor;
-			} else if (is_pkey) {
-				return pkeyColor;
+		var colors = new List.<Color>();
+
+		if (is_shown) {
+			colors.Add(shownColor);
+		}
+
+		if (is_pkey) {
+			colors.Add(pkeyColor);
+		}
+
+		for (var index = 0 ; index < aspects.length; index++) {
+			if (aspects[index]) {
+				colors.Add(aspectColors[index]);
 			}
-			return aspectColors[0];
+		}
+
+		if (colors.Count == 0) {
+			return Color.white;
 		} else {
-			return aspectColors[aspect];
+			return mergeColors(colors);
 		}
 	}
 
-	function mergeColors(one : Color, two : Color) {
-		var r = (one.r + two.r)/2;
-		var g = (one.g + two.g)/2;
-		var b = (one.b + two.b)/2;
+	function mergeColors(colors : List.<Color>) {
+
+		var r = 0.0;
+		var g = 0.0;
+		var b = 0.0;
+
+		for (var color in colors) {
+			r += color.r;
+			g += color.g;
+			b += color.b;
+		}
+
+		var numColors = colors.Count;
+		r /= numColors; 
+		g /= numColors;
+		b /= numColors;
+
 		return new Color(r, g, b);
 	}
 
-	function setAspect(aspect : int) {
-		//TOOD: Validate.
-		this.aspect = aspect;
+	function setAspect(aspect : int, on : boolean) {
+		aspects[aspect] = on;
 	}
-
 }

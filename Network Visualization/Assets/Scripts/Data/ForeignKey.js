@@ -21,7 +21,7 @@ class ForeignKey {
 		tuple.Add(to);
 
 		//Update aspect
-		from.setAspect(Attribute.FOREIGN_KEY);
+		from.setAspect(Attribute.FOREIGN_KEY, true);
 
 		keyPairs.Add(tuple);
 		activated = true;

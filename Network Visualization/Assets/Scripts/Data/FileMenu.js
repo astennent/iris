@@ -100,7 +100,7 @@ class FileMenu extends BaseMenu {
 			fkeyMenu.ToggleDisplay();
 		}
 		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);
-		GUI.color = Attribute.aspectColors[Attribute.TIMESERIES];
+		GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 		if (GUI.Button(details_box, "Time Series")){
 			timeFrameMenu.ToggleDisplay();
 		}

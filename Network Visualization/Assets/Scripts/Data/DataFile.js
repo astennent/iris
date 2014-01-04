@@ -211,7 +211,7 @@ class DataFile {
 
 		//Any attributes not seen again will remain in the list. Mark them as removed.
 		for (var remaining_attr in attributesToReset) {
-			remaining_attr.setAspect(Attribute.NORMAL);
+			remaining_attr.setAspect(Attribute.FOREIGN_KEY, false);
 		}
 
 

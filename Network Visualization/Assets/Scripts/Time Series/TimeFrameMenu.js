@@ -20,6 +20,10 @@ class TimeFrameMenu extends BaseMenu {
 	function OnGUI() {
 		super.OnGUI();
 
+		// if (GuiPlus.Button(new Rect(200, 200, 300, 300), "Popup?")){
+		// 	popupWindow.createWindow("messsage!", new PopupOption("test", testFunction));
+		// }
+
 		//get the currently selected file
 		cur_file = fileMenu.getSelectedFile();
 		if (cur_file == null) {
@@ -30,6 +34,10 @@ class TimeFrameMenu extends BaseMenu {
 		var cur_y = DrawColumns(40, true, timeFrame);
 		cur_y = DrawColumns(cur_y+30, false, timeFrame);
 		
+	}
+
+	function testFunction(){
+		Debug.Log("Test" + this);
 	}
 
 	function DrawColumns(cur_y : int, isStart : boolean, timeFrame : TimeFrame) {

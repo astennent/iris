@@ -32,6 +32,7 @@ class BaseMenu extends MonoBehaviour {
     protected var guiplus : GuiPlus;
     protected var timeFrameMenu : TimeFrameMenu;
     protected var timeSeriesController : TimeSeriesController;
+    protected var popupWindow : PopupWindow;
     
 
 
@@ -76,6 +77,7 @@ class BaseMenu extends MonoBehaviour {
 		guiplus = GetComponent(GuiPlus);
 		timeFrameMenu = GetComponent(TimeFrameMenu);
 		timeSeriesController = GetComponent(TimeSeriesController);
+		popupWindow = GetComponent(PopupWindow);
 	}
 
 	function Update () {	

@@ -24,12 +24,18 @@ class MainMenu extends BaseMenu {
 	function Update() {
 		super.Update();
 	    if (Input.GetButtonDown("Escape")) {
-	    	displayMenu.setRuleIndex(-1);
-	    	DisableDisplay(true); //cascade disabling responsibility down the submenus
+
+	    	//Cancel the popup window if its showing, otherwise close an open menu.
+	    	if (popupWindow.isDisplaying()) {
+	    		popupWindow.DisableDisplay();
+	    	} else {
+		    	displayMenu.setRuleIndex(-1);
+		    	DisableDisplay(true); //cascade disabling responsibility down the submenus
+	    	}
 	    } 
 	}
 
-	function OnGUI(){
+	function OnGUI() {
 		var menuRect = new Rect(x, 0, width, Screen.height);
 		guiplus.Box(menuRect, title);
 		
