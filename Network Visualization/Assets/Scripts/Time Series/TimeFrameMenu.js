@@ -58,27 +58,50 @@ class TimeFrameMenu extends BaseMenu {
 		} else {
 			box_text = "End Date: ";
 		}
+
+
+		//Draw the box.
 		if (columns.Count > 0) {
 			box_text += columns.Count + " columns";
-
-			//Remove the 's'
 			if (columns.Count == 1) {
-				box_text = box_text[0:-1];
+				box_text = box_text[0:-1]; //Remove the 's'
+			}			
+			timeframe_box.height += 60; //Column headers (20) + Required (20)
+		} else {
+			box_text += "Undefined";
+		}
+		GUI.Box(timeframe_box, box_text);
+
+		//Draw the column headers and required option.
+		if (columns.Count > 0) {
+
+			//Draw required option.
+			var required = timeFrame.getRequired(isStart);
+			var requiredText : String;
+			if (required) {
+				requiredText = " Required. Rows with invalid dates \nwill not be shown.";
+			} else {
+				requiredText = " Not Required. Rows with invalid dates \nwill ";
+				if (isStart) {
+					requiredText += "start at the earliest date.";
+				} else {
+					requiredText += "end at the latest date.";
+				}
+			}
+			var new_required = GUI.Toggle(new Rect(x+20, cur_y+20, width-20, 40), required, requiredText);
+			if (required != new_required) {
+				timeFrame.setRequired(isStart, new_required);
 			}
 			
 			//Draw the headers
-			cur_y += 20;
+			cur_y += 60;
 			var header_rect = new Rect(x+30, cur_y, 80, 20);
 			GUI.Label(header_rect, "Name");
 			header_rect.x += header_rect.width+5;
 			GUI.Label(header_rect, "Format");
-			timeframe_box.height += 20;
 
-		} else {
-			box_text += "Default";
 		}
 
-		GUI.Box(timeframe_box, box_text);
 
 		//Draw the currently chosen columns.
  		cur_y += 20;
@@ -165,8 +188,6 @@ class TimeFrameMenu extends BaseMenu {
 		}
 
 		return cur_y;
-
-
 	}
 
 	function DisableDisplay(){

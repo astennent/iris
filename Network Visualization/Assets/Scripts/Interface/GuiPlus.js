@@ -30,6 +30,7 @@ public class GuiPlus extends MonoBehaviour {
 	}
 
 	//Respects the popup blocker, still displays the button but always returns false.
+	//TODO: Switch all buttons over to this.
 	static function Button(r : Rect, text : String) {
 		if (popupWindow.isDisplaying()) {
 			GUI.Button(r, text);

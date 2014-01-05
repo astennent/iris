@@ -7,9 +7,28 @@ class TimeFrame {
 	private var startColumns = new List.<AFTuple>();
 	private var endColumns = new List.<AFTuple>();
 
+	private var requireStart = false;
+	private var requireEnd = false;
+
 
 	public function TimeFrame(file : DataFile) {
 		this.file = file;
+	}
+
+	function getRequired(isStart) {
+		if (isStart) {
+			return requireStart;
+		} else {
+			return requireEnd;
+		}
+	}
+
+	function setRequired(isStart : boolean, required : boolean) {
+		if (isStart) {
+			requireStart = required;
+		} else {
+			requireEnd = required;
+		}
 	}
 
 	function getColumns(start : boolean) {
