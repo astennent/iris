@@ -53,22 +53,27 @@ class TimeFrameMenu extends BaseMenu {
 
 		//Determine the text at the top of the box
 		var box_text : String;
-		if (isStart) {
-			box_text = "Start Date: ";
-		} else {
-			box_text = "End Date: ";
-		}
 
+		var invalidMessage = timeFrame.getInvalidMessage(isStart);
+		if (invalidMessage == "") {
+			if (isStart) {
+				box_text = "Start Date: ";
+			} else {
+				box_text = "End Date: ";
+			}
 
-		//Draw the box.
-		if (columns.Count > 0) {
-			box_text += columns.Count + " columns";
-			if (columns.Count == 1) {
-				box_text = box_text[0:-1]; //Remove the 's'
-			}			
-			timeframe_box.height += 60; //Column headers (20) + Required (20)
+			//Draw the box.
+			if (columns.Count > 0) {
+				box_text += columns.Count + " columns";
+				if (columns.Count == 1) {
+					box_text = box_text[0:-1]; //Remove the 's'
+				}			
+				timeframe_box.height += 60; //Column headers (20) + Required (20)
+			} else {
+				box_text += "Not Defined";
+			}
 		} else {
-			box_text += "Undefined";
+			box_text = invalidMessage;
 		}
 
 		if (!timeFrame.isValid(isStart)){

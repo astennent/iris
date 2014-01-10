@@ -127,7 +127,7 @@ class TimeFrame {
 
 		for (var columnSet in startAndEnd) {
 			var seenFormats = new HashSet.<String>();
-			for (var column in startColumns) {
+			for (var column in columnSet) {
 				var format = column.getFormat();
 				if (!column.isValid()) { 
 					setValid(onStart, false);	
