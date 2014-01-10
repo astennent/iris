@@ -325,27 +325,38 @@ class DataFile {
 		UpdateShownIndices();
 
 		var fileContents = getFileContents();
+		var max = 5;
+		var cur = 0;
 	    for (var row in fileContents) {
 	    	
-	    	var data = new Data();
+		    var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
+			var node : Node = GameObject.Instantiate(networkController.nodePrefab, randPos, networkController.transform.rotation).GetComponent(Node);
 
 	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){ //in case there are stray commas or whatever
 		    		var attribute = attributes[i];
 		    		var val : String = row[i];
-		    		data.Set(attribute, val);
+		    		node.Set(attribute, val);
 	    		}
 	    	}
+
+			var randColor : Color = colorController.GenRandomColor(0); //random bright color
+			node.Init(randColor, this);
 	    	
 	    	//Add the node to the dict as a key/value pair of pkeys/node.
-	    	var node : Node = CreateNode(data);
 	    	var key = new Array();
 	    	for (var pkey_index in pkey_indices){
-	    		key.Push(data.Get(pkey_index));
+	    		key.Push(node.Get(pkey_index));
 	    	}
 	    	nodes[key.toString()] = node;
+	    	node.UpdateName();
 	    }
 
+	    cur++;
+	    if (cur > max ) {
+	    	i = 0;
+	    	var x = 5/i;
+	    }
 		   
 		  
 	}
@@ -362,7 +373,7 @@ class DataFile {
 	function GenerateConnectionsForNodeFile(){
 		for (var entry in nodes){
 			var from_node : Node = entry.Value;
-			for (var foreignKey in foreignKeys){
+			for (var foreignKey in foreignKeys) {
 				var other_file : DataFile = foreignKey.to_file;
 				var fkeyPairs = foreignKey.getKeyPairs();
 				//TODO: special case when the foreign key points exactly to the other file's primary keys.
@@ -374,14 +385,15 @@ class DataFile {
 					for (var pair in fkeyPairs){					
 
 						var from_attribute_index = pair[0].column_index;	
-						var from_attribute_value = from_node.data.Get(from_attribute_index);					
+						var from_attribute_value = from_node.Get(from_attribute_index);					
 						
 						var to_attribute_index = pair[1].column_index;
-						var to_attribute_value = to_node.data.Get(to_attribute_index);							
+						var to_attribute_value = to_node.Get(to_attribute_index);							
 						
 						//You found a match. Generate a connection.
 						if (from_attribute_value == to_attribute_value){
-							from_node.AddConnection(to_node, true, foreignKey); 
+							//Data is null here because data should be stored in the node.
+							from_node.AddConnection(null, to_node, true, foreignKey); 
 						}
 						
 					}
@@ -396,7 +408,9 @@ class DataFile {
 		var fileContents = getFileContents();
 		for (var row in fileContents) {
 
-			var data = new Data();
+			//Create a template node as a Data holder.
+			var templateObject = new GameObject();
+			var data = templateObject.AddComponent(Connection);
 
 	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){  //check against attributes count in case there aren't enough commas.
@@ -441,7 +455,7 @@ class DataFile {
 							from_attribute_value = row[from_attribute_index];
 
 							var to_attribute_index = pair[1].column_index;	
-							var to_attribute_value = node.data.Get(to_attribute_index);
+							var to_attribute_value = node.Get(to_attribute_index);
 							
 							if (from_attribute_value != to_attribute_value){
 								matching = false;
@@ -460,22 +474,17 @@ class DataFile {
 			if (matches.Count == 2){
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
-						from_node.AddConnection(to_node, true, foreignKeys[0]);	
-						to_node.AddConnection(from_node, false, foreignKeys[1]);								
+						from_node.AddConnection(data, to_node, true, foreignKeys[0]);	
+						to_node.AddConnection(data, from_node, false, foreignKeys[1]);								
 					}
 				}
 			}
+
+			//Remove the template used to make those connections.
+			MonoBehaviour.Destroy(data);
 	    }
 		   
 	}		
-		
-	function CreateNode(data : Data){
-		var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-		var randColor : Color = colorController.GenRandomColor(0); //random bright color
-		var node : Node = GameObject.Instantiate(networkController.nodePrefab, randPos, networkController.transform.rotation).GetComponent(Node);
-		node.Init(data, randColor, this);
-		return node;
-	}
 
 	function UpdateShownIndices(){
 		var output = new Array();

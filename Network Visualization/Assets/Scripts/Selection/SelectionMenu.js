@@ -111,7 +111,7 @@ class SelectionMenu extends BaseMenu {
 		var data_height = 20;
 
 		dataScrollPosition = GUI.BeginScrollView (Rect (0,node_scroll_y+extra_vertical_space,contentWidth,data_rect_height-extra_vertical_space), 
-				dataScrollPosition, Rect (0, 0, contentWidth-16, data_height*(node.data.Count())));
+				dataScrollPosition, Rect (0, 0, contentWidth-16, data_height*(node.Count())));
 			
 			var data_scroll_y = 0;
 			var source_attrs = node.source.attributes;
@@ -128,12 +128,12 @@ class SelectionMenu extends BaseMenu {
 				attr_value_rect.x = contentWidth/2-10;
 				attr_value_rect.width -= 5;
 
-				var attr_value = node.data.Get(index)+"";
+				var attr_value = node.Get(index)+"";
 				var new_value = GUI.TextField(attr_value_rect, attr_value);
 
 				//Update the data point.
 				if (attr_value != new_value) {
-					node.setData(attribute, new_value);
+					node.Set(attribute, new_value);
 				}
 
 				data_scroll_y += data_height;

@@ -117,7 +117,7 @@ function setAxis(axis_index : int, attribute : Attribute) {
 		minMax.Add(int.MinValue);
 		var nodes = file.nodes;
 		for (var entry in nodes) {
-			var value = entry.Value.data.GetNumeric(attribute);
+			var value = entry.Value.GetNumeric(attribute);
 
 			//update the cache.
 			if (value < minMax[0]) {
@@ -148,7 +148,7 @@ function Update(){
 				var attribute = axes[i];
 
 				if (attribute != null) {
-					var value = node.data.GetNumeric(attribute);
+					var value = node.GetNumeric(attribute);
 
 
 				var coordinate = makeFraction(value, i);

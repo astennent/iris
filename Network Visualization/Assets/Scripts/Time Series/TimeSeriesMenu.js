@@ -8,6 +8,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		super.Start();
 		desired_x = 45;
 		width = Screen.width - 45;
+		x = -width;
 	}
 
 	function OnGUI() {

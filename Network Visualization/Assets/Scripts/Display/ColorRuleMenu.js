@@ -230,7 +230,7 @@ class ColorRuleMenu extends BaseMenu {
 		}
 		attributeMatchCount = 0;
 		for (var node in file.nodes){
-			var data = node.Value.data;
+			var data = node.Value;
 			var value = data.Get(attribute_index);
 			var value_string = (value+"")/*.ToLower()*/;
 			if (value_string.StartsWith(searchString/*.ToLower()*/) && !attributeValueCache.Contains(value)){

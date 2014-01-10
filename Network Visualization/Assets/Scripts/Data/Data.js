@@ -1,12 +1,13 @@
 #pragma strict
-//Owned by Nodes and Connections. 
-class Data {
+
+//Extended by Connection and Node
+class Data extends MonoBehaviour {
 
 	private var attr_dict = new Dictionary.<Attribute, Datum>();
 	private var index_dict = new Dictionary.<int, Datum>();
 
-	//Constructor
-	public function Data() { }
+	//Default Constructor
+	public function Data(){}
 
 	//set an attribute 
 	function Set(attribute : Attribute, value : String) {
@@ -32,8 +33,19 @@ class Data {
 	}
 
 	//Used for enumerating over the dict.
-	function getDict(){
+	function getDict() {
 		return attr_dict;
+	}
+	function getIndexDict() {
+		return index_dict;
+	}
+
+	//Used for the construction of Connections.
+	function CopyData(other : Data) {
+		if (other != null) {
+			this.attr_dict = other.getDict();
+			this.index_dict = other.getIndexDict();
+		}
 	}
 
 	function Count(){
