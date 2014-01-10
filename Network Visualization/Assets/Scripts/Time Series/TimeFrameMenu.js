@@ -70,7 +70,12 @@ class TimeFrameMenu extends BaseMenu {
 		} else {
 			box_text += "Undefined";
 		}
+
+		if (!timeFrame.isValid(isStart)){
+			GUI.color = Color.red;
+		}
 		GUI.Box(timeframe_box, box_text);
+		GUI.color = Color.white;
 
 		//Draw the column headers and required option.
 		if (columns.Count > 0) {
@@ -117,11 +122,19 @@ class TimeFrameMenu extends BaseMenu {
 
 			//Draw the format textbox
 			column_rect.x += column_rect.width+5;
-			var new_format = GUI.TextField(column_rect, column.format);
-			if (new_format != column.format) {
-				column.format = new_format;
-				//TODO: Validate
+
+			if (!column.isValid()) {
+				GUI.color = Color.red;
 			}
+
+			var old_format = column.getFormat();
+			var new_format = GUI.TextField(column_rect, old_format);
+			if (new_format != old_format) {
+				column.setFormat(new_format);
+			}
+
+			//Restore the aspect color (if it was invalid)
+			GUI.color = column.attribute.getAspectColor();
 
 			//Draw the Remove button
 			column_rect.x += column_rect.width+5;

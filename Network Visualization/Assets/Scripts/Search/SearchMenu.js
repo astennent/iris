@@ -38,7 +38,7 @@ class SearchMenu extends BaseMenu {
 			}
 		}
 		var top_display = GUIContent(title);		
-		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,Screen.height-60),
+		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,menuController.getScreenHeight()-60),
 	    scrollPosition, Rect (0, 0, 400, matches.Count*30));
 	    
 	    var count = 0;

@@ -76,7 +76,7 @@ class FileMenu extends BaseMenu {
 	function DrawLoadedFileDetails(){
 		var file = fileManager.files[selected_file_index];
 
-		var menuRect = new Rect(x, cur_y, width, Screen.height-cur_y);
+		var menuRect = new Rect(x, cur_y, width, menuController.getScreenHeight()-cur_y);
 		if (file.imported){
 			var title = "Imported File";
 		} else {
@@ -119,7 +119,7 @@ class FileMenu extends BaseMenu {
 		cur_y += 25;
 
 		//File Attributes (columns)
-		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,Screen.height-cur_y-50), 
+		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,menuController.getScreenHeight()-cur_y-50), 
 			attributeScrollPosition, Rect (0, 0, width-30, 20*file.attributes.Count+20));
 		
 		
@@ -164,7 +164,7 @@ class FileMenu extends BaseMenu {
 			//Disable button
 			GUI.color = new Color(1, .7, 0);
 			cur_y += 30;
-			import_button = new Rect(x+10, Screen.height-40, width/2-10, 30);
+			import_button = new Rect(x+10, menuController.getScreenHeight()-40, width/2-10, 30);
 			if (GUI.Button(import_button, "Deavtivate File")){
 				fileManager.DeactivateFile(selected_file_index);
 			}
@@ -172,7 +172,7 @@ class FileMenu extends BaseMenu {
 			//Import button
 			GUI.color = new Color(0, 1, 0);
 			cur_y += 30;
-			import_button = new Rect(x+10, Screen.height-40, width/2-10, 30);
+			import_button = new Rect(x+10, menuController.getScreenHeight()-40, width/2-10, 30);
 			if (GUI.Button(import_button, "Activate File")){
 				fileManager.ActivateFile(selected_file_index);
 			}
@@ -181,7 +181,7 @@ class FileMenu extends BaseMenu {
 		//Remove button
 		GUI.color = Color.red;
 		cur_y += 30;
-		var remove_button = new Rect(x+width/2+5, Screen.height-40, width/2-12.5, 30);
+		var remove_button = new Rect(x+width/2+5, menuController.getScreenHeight()-40, width/2-12.5, 30);
 		if (GUI.Button(remove_button, "Remove File")){
 			//TODO: Removing files from workspace
 			//fileManager.removeFile(selected_file_index);
@@ -192,7 +192,7 @@ class FileMenu extends BaseMenu {
 
 	//displays information / actions for a new file.
 	function DrawNewFileDetails(){
-		var menuRect = new Rect(x, cur_y, width, Screen.height-cur_y);
+		var menuRect = new Rect(x, cur_y, width, menuController.getScreenHeight()-cur_y);
 		GUI.Box(menuRect, "New File");
 		
 		cur_y+=30;
@@ -238,7 +238,7 @@ class FileMenu extends BaseMenu {
 
 	function DrawDirectoryData(){
 		//loop over directories
-		directoryScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,Screen.height-cur_y), 
+		directoryScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,menuController.getScreenHeight()-cur_y), 
 			directoryScrollPosition, Rect (0, 0, width, 20*fileManager.dest_directories.Count + 20*fileManager.dest_files.Count));
 		cur_y = 0;
 		

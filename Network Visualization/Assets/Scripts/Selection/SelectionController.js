@@ -55,10 +55,6 @@ function Update () {
 
 	ProcessBoxing();
 
-	if (Input.GetButtonDown("Escape")){
-		clearSelectedNodes();
-	}
-
 	if ( (Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) 
 			&& Input.GetKeyDown(KeyCode.A)){
         selectAll();

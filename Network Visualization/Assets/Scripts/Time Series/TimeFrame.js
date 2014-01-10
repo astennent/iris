@@ -10,9 +10,38 @@ class TimeFrame {
 	private var requireStart = false;
 	private var requireEnd = false;
 
+	private var validStart = true; //is every column valid?
+	private var validEnd = true;
+	private var invalidMessages = ["",""];
+
+	static var timeFormats = ["Year", "Month", "Day", "Hour", "Minute", "Second"];
 
 	public function TimeFrame(file : DataFile) {
 		this.file = file;
+	}
+
+	function isValid(isStart : boolean) {
+		if (isStart) {
+			return validStart;
+		} else {
+			return validEnd;
+		}
+	}
+
+	private function setValid(isStart : boolean, val : boolean) {
+		if (isStart) {
+			validStart = val;
+		} else {
+			validEnd = val;
+		}
+	}
+
+	function getInvalidMessage(isStart : boolean) {
+		if (isStart) {
+			return invalidMessages[0];
+		} else {
+			return invalidMessages[1];
+		}
 	}
 
 	function getRequired(isStart) {
@@ -56,9 +85,9 @@ class TimeFrame {
 		}
 
 		//add it to the list and update the aspect.
-		checkColumns.Add(new AFTuple(attribute, ""));
+		checkColumns.Add(new AFTuple(this, attribute, ""));
 		attribute.setAspect(Attribute.TIME_SERIES, true);
-
+		updateValid();
 	}
 
 	function removeColumn(isStart : boolean, index : int) {
@@ -81,6 +110,51 @@ class TimeFrame {
 			}
 		}
 		doomedAttribute.setAspect(Attribute.TIME_SERIES, false);	
+		updateValid();
+	}
+
+	function updateValid() {
+
+		validStart = true;
+		validEnd = true;
+		invalidMessages = ["",""];
+
+		var startAndEnd = [startColumns, endColumns];
+		
+		//Used for tracking which columnSet you're on
+		var onStart = true;
+		var messageIndex = 0;
+
+		for (var columnSet in startAndEnd) {
+			var seenFormats = new HashSet.<String>();
+			for (var column in startColumns) {
+				var format = column.getFormat();
+				if (!column.isValid()) { 
+					setValid(onStart, false);	
+					invalidMessages[messageIndex] = "Invalid Column(s)";
+					break;
+				} else if (seenFormats.Contains(format)) {
+					setValid(onStart, false);
+					invalidMessages[messageIndex] = "Duplicate Formats";
+					break;	
+				}
+				seenFormats.Add(format);
+			}
+
+			//Use the second columnSet.
+			onStart = false;
+			messageIndex = 1;
+		}
+
+		seenFormats = new HashSet.<String>();
+		for (var column in endColumns) {
+			format = column.getFormat();
+			if (!column.isValid() || seenFormats.Contains(format)) {
+				validEnd = false;
+				return;
+			}
+			seenFormats.Add(format);
+		}
 	}
 
 }
@@ -88,10 +162,31 @@ class TimeFrame {
 // Holds attributes and formats
 class AFTuple {
 	var attribute : Attribute;
-	var format : String;
+	private var format : String;
+	private var valid : boolean;
+	private var timeFrame : TimeFrame;
 
-	public function AFTuple (attribute : Attribute, format : String) {
+	public function AFTuple (timeFrame : TimeFrame, attribute : Attribute, format : String) {
 		this.attribute = attribute;
+		this.timeFrame = timeFrame;
+		setFormat(format);
+	}
+
+	function getFormat() {
+		return format;
+	}
+
+	function setFormat(format : String) {
 		this.format = format;
+		if (format in TimeFrame.timeFormats) {
+			valid = true;
+		} else {
+			valid = false;
+		}
+		timeFrame.updateValid();
+	}
+
+	function isValid() {
+		return valid;
 	}
 }

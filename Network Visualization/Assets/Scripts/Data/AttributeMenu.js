@@ -78,7 +78,7 @@ class AttributeMenu extends BaseMenu {
 			box.y+=40;
 			cur_y += 110;
 
-			var fkey_rect = new Rect(x, cur_y, width, Screen.height-cur_y);
+			var fkey_rect = new Rect(x, cur_y, width, menuController.getScreenHeight()-cur_y);
 			GUI.Box(fkey_rect, "Select Referencing Attributes");
 			
 			//determine the number of lines required.
@@ -87,7 +87,7 @@ class AttributeMenu extends BaseMenu {
 				line_count += 3+cur_file.attributes.Count;
 			}
 			
-			fkeyScrollPosition = GUI.BeginScrollView (Rect (x,cur_y+20,width,Screen.height-cur_y), 
+			fkeyScrollPosition = GUI.BeginScrollView (Rect (x,cur_y+20,width, menuController.getScreenHeight()-cur_y), 
 				fkeyScrollPosition, Rect (0, 0, width, 20*line_count));
 			
 			box = new Rect(10, 0, width-10, 40);

@@ -124,15 +124,21 @@ class DisplayMenu extends BaseMenu {
 	}
 	
 	function setRuleIndex(index : int) {
-		rule_index = index;
-		if (rule_index > -1){
-			var rule : ColorRule = colorController.rules[rule_index];
-			colorPicker.setColor(rule.color);
+		if (rule_index != index) {
+			rule_index = index;
+			if (rule_index > -1){
+				var rule : ColorRule = colorController.rules[rule_index];
+				colorPicker.setColor(rule.color);
+				colorRuleColorMenu.EnableDisplay();
+				if (rule_index > 0) {
+					colorRuleMenu.EnableDisplay();
+				} else {
+					colorRuleMenu.DisableDisplay();
+				}
+			} else {
+				colorRuleColorMenu.DisableDisplay();
+				colorRuleMenu.DisableDisplay();
+			}
 		}
-	}
-
-	function DisableDisplay(){
-		super.DisableDisplay();
-		setRuleIndex(-1);
 	}
 }

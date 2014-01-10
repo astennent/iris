@@ -21,20 +21,6 @@ class MainMenu extends BaseMenu {
 		displaying = true;
 	}
 
-	function Update() {
-		super.Update();
-	    if (Input.GetButtonDown("Escape")) {
-
-	    	//Cancel the popup window if its showing, otherwise close an open menu.
-	    	if (popupWindow.isDisplaying()) {
-	    		popupWindow.DisableDisplay();
-	    	} else {
-		    	displayMenu.setRuleIndex(-1);
-		    	DisableDisplay(true); //cascade disabling responsibility down the submenus
-	    	}
-	    } 
-	}
-
 	function OnGUI() {
 		var menuRect = new Rect(x, 0, width, Screen.height);
 		guiplus.Box(menuRect, title);
@@ -142,13 +128,19 @@ class MainMenu extends BaseMenu {
 			}
 			if (button_position.Contains(mousePosition)){}
 
+			button_position = new Rect(x+5, Screen.height-50, 35, 35);
+			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+			if (GUI.Button(button_position, upload)){
+				timeSeriesMenu.ToggleDisplay();
+			}
+
 		}
 		
 	}
 
 	function chooseMenu(chosenMenu : System.Type){
-		var menus : BaseMenu[] = [GetComponent(SearchMenu), 
-				GetComponent(DisplayMenu), GetComponent(FileMenu), GetComponent(GraphMenu)];
+		var menus : BaseMenu[] = [GetComponent(SearchMenu), GetComponent(DisplayMenu),
+				GetComponent(FileMenu), GetComponent(GraphMenu)];
 
 		for (var menu : BaseMenu in menus) {
 			if (typeof(menu) == chosenMenu) {

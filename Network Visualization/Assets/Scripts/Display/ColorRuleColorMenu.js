@@ -12,24 +12,13 @@ class ColorRuleColorMenu extends BaseMenu {
 
 	function OnGUI(){
 		super.OnGUI();
-		var button_text : String;
-		var label_text : String;
-
-		var rule_index = displayMenu.rule_index;
-		if (rule_index >= 0) {
-			if (!displaying){
-				EnableDisplay();
-			}
-		} else {
-			if (displaying) {
-				DisableDisplay();
-			} 
-			return;
-		}
-
-		rule = colorController.rules[displayMenu.rule_index];
-
 		if (displaying){
+			var button_text : String;
+			var label_text : String;
+
+			var rule_index = displayMenu.rule_index;
+			rule = colorController.rules[displayMenu.rule_index];
+
 			var y = DrawMethod(35);
 			var method = rule.getMethod();
 			if (method == 0) {
@@ -85,7 +74,7 @@ class ColorRuleColorMenu extends BaseMenu {
 
 		var schemeNames = colorController.getSchemeNames();
 
-		schemeScrollPosition = GUI.BeginScrollView (Rect (x,y,width,Screen.height-33), 
+		schemeScrollPosition = GUI.BeginScrollView (Rect (x,y,width,menuController.getScreenHeight()-33), 
 			schemeScrollPosition, Rect (0, 0, width, 30*schemeNames.length+20));
 
 		var cur_y = 0;

@@ -138,7 +138,7 @@ class GraphMenu extends BaseMenu {
 
 		var attrs = file.attributes;
 
-		var axesRect = new Rect(x+5, cur_y, width-10, Screen.height-cur_y-5);
+		var axesRect = new Rect(x+5, cur_y, width-10, menuController.getScreenHeight()-cur_y-5);
 		GUI.Box(axesRect, "Select Axes");
 
 		if (file.linking_table) {
@@ -170,8 +170,6 @@ class GraphMenu extends BaseMenu {
 		for (var attribute : Attribute in attrs) {
 			var attrRect = new Rect(10, scroll_y, width-25, 20);
 				
-			GUI.Label(attrRect, attribute.getRestrictedName(width/2-10));
-			
 			if (attribute == axes[0]) {
 				GUI.color = Color.red;
 			} else if (attribute == axes[1]) {
@@ -181,6 +179,8 @@ class GraphMenu extends BaseMenu {
 			} else {
 				GUI.color = Color.white;
 			}
+			
+			GUI.Label(attrRect, attribute.getRestrictedName(width/2-10));
 			
 			attrRect.x+=width/2; attrRect.width = 15;
 			for (var i = 0 ; i < 3 ; i++) {

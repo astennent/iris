@@ -73,6 +73,7 @@
      <Compile Include="Assets\Scripts\Interface\BaseMenu.js" />
      <Compile Include="Assets\Scripts\Interface\GuiPlus.js" />
      <Compile Include="Assets\Scripts\Interface\MainMenu.js" />
+     <Compile Include="Assets\Scripts\Interface\MenuController.js" />
      <Compile Include="Assets\Scripts\Interface\PopupOption.js" />
      <Compile Include="Assets\Scripts\Interface\PopupWindow.js" />
      <Compile Include="Assets\Scripts\Interface\RightClickController.js" />
@@ -87,6 +88,7 @@
      <Compile Include="Assets\Scripts\Time Series\TimeFrame.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeFrameMenu.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeSeriesController.js" />
+     <Compile Include="Assets\Scripts\Time Series\TimeSeriesMenu.js" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>

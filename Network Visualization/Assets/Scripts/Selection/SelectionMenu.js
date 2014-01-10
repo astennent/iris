@@ -31,12 +31,12 @@ class SelectionMenu extends BaseMenu {
 				enumerator.MoveNext();
 				title = enumerator.Current.getDisplayName() + "";
 			}
-			var menuRect = new Rect(x, 0, width, Screen.height);
+			var menuRect = new Rect(x, 0, width, menuController.getScreenHeight());
 			guiplus.Box(menuRect, title);
 			
 			//"More" button
 			//var button_position : Rect = new Rect(Screen.width, 5, 35, 35);
-			var button_position : Rect = new Rect(x-15, 0, 15, Screen.height);
+			var button_position : Rect = new Rect(x-15, 0, 15, menuController.getScreenHeight());
 			if (GUI.Button(button_position, more)){
 				ToggleDisplay();
 			}	
@@ -54,7 +54,7 @@ class SelectionMenu extends BaseMenu {
 		//decide how big the box should be. 
 		var data_rect_height : int;
 		if (numNodes == 1) {
-			data_rect_height = Screen.height-cur_y;
+			data_rect_height = menuController.getScreenHeight()-cur_y;
 		} else {
 			data_rect_height = 250;
 		}
@@ -62,13 +62,13 @@ class SelectionMenu extends BaseMenu {
 		//the width and height of the list of buttons
 		var contentHeight = (selectionController.nodes.Count-1)*30 + data_rect_height;
 		var contentWidth : int;
-		if (contentHeight > Screen.height-cur_y) {
+		if (contentHeight > menuController.getScreenHeight()-cur_y) {
 			contentWidth = width-16; //make space for the scrollbar
 		} else {
 			contentWidth = width;
 		}
 
-		nodeScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,Screen.height-cur_y), 
+		nodeScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,menuController.getScreenHeight()-cur_y), 
 				nodeScrollPosition, Rect (0, 0, contentWidth, contentHeight));
 
 			var node_scroll_y = 0;

@@ -28,14 +28,7 @@ class ColorRuleMenu extends BaseMenu {
 
 		var rule_index = displayMenu.rule_index;
 
-		if (rule_index >= 1) {
-			if (!displaying){
-				EnableDisplay();
-			}
-		} else{ 
-			if (displaying) {
-				DisableDisplay();
-			}
+		if (!displaying) {
 			return;
 		}
 
@@ -216,8 +209,6 @@ class ColorRuleMenu extends BaseMenu {
 			} else if (attributeMatchCount > 20){
 				GUI.Label(message_box, attributeMatchCount-20 + " more...");
 			}
-
-
 				
 			GUI.EndScrollView();
 		}

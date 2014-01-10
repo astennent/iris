@@ -33,6 +33,8 @@ class BaseMenu extends MonoBehaviour {
     protected var timeFrameMenu : TimeFrameMenu;
     protected var timeSeriesController : TimeSeriesController;
     protected var popupWindow : PopupWindow;
+    protected var menuController : MenuController;
+    protected var timeSeriesMenu : TimeSeriesMenu;
     
 
 
@@ -78,6 +80,8 @@ class BaseMenu extends MonoBehaviour {
 		timeFrameMenu = GetComponent(TimeFrameMenu);
 		timeSeriesController = GetComponent(TimeSeriesController);
 		popupWindow = GetComponent(PopupWindow);
+		menuController = GetComponent(MenuController);
+		timeSeriesMenu = GetComponent(TimeSeriesMenu);
 	}
 
 	function Update () {	
@@ -90,7 +94,7 @@ class BaseMenu extends MonoBehaviour {
 	}
 
 	function OnGUI() {
-		var menuRect = new Rect(x, 0, width, Screen.height);
+		var menuRect = new Rect(x, 0, width, menuController.getScreenHeight());
 		guiplus.Box(menuRect, title);
 
 		var box = new Rect(x+width-30, 4, 26, 26);
@@ -107,13 +111,9 @@ class BaseMenu extends MonoBehaviour {
 		desired_x += diff;
 	}
 
-	function ToggleDisplay() {
-		ToggleDisplay(false);
-	}
-
-	function ToggleDisplay(passItOn : boolean){
+	function ToggleDisplay(){
 		if (displaying) {
-			DisableDisplay(passItOn);
+			DisableDisplay();
 		} else {
 			EnableDisplay();
 		}
@@ -135,7 +135,7 @@ class BaseMenu extends MonoBehaviour {
 		displaying = true;
 	}
 
-	function DisableDisplay(){
+	function DisableDisplay() {
 		DisableDisplay(false);
 	}
 
@@ -144,17 +144,29 @@ class BaseMenu extends MonoBehaviour {
 	function DisableDisplay(passItOn : boolean) {
 		if (displaying) {
 			var closedChild = false;
+			print("check: " + typeof(this));
 			for (var subMenu in children) {
 				if (subMenu.displaying){
 					subMenu.DisableDisplay(passItOn);
 					closedChild = true;
+					print("check3: Called from " + typeof(this) + ", child is " + typeof(subMenu));
 				}
 			}
-			if (passItOn && !closedChild || !passItOn) {
+			if ( (passItOn && !closedChild) || !passItOn) {
+				print("check2: " + typeof(this) + " CloseChild: " + closedChild + " passItOn" + passItOn);
 				displaying = false;
 			}
 			GUI.FocusControl("");
 		}
+	}
+
+	function isDisplayingChild() {
+		for (var subMenu in children) {
+			if (subMenu.displaying){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
