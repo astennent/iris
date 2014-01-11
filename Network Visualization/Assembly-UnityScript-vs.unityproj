@@ -87,6 +87,7 @@
      <Compile Include="Assets\Scripts\StreamReader\IrisStreamReader.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeFrame.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeFrameMenu.js" />
+     <Compile Include="Assets\Scripts\Time Series\TimeObject.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeSeriesController.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeSeriesMenu.js" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />

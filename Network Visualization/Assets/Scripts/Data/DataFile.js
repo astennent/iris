@@ -217,6 +217,28 @@ class DataFile {
 
 	}
 
+	function UpdateDates() {
+		if (linking_table) {
+			var alreadyUpdated = new HashSet.<DataFile>();
+			for (var fkey in foreignKeys) {
+				var from_file = fkey.from_file;
+				var to_file = fkey.to_file;
+				if (!alreadyUpdated.Contains(from_file)) {
+					from_file.UpdateDates();
+					alreadyUpdated.Add(from_file);
+				} 
+				if (!alreadyUpdated.Contains(to_file)) {
+					to_file.UpdateDates();
+					alreadyUpdated.Add(to_file);
+				}
+			}
+		} else {
+			for (var node in nodes) {
+				node.Value.UpdateDate();
+			}
+		}
+	}
+
 	//promote or demote a foreign key based on it's number of attributes.
 	//called by ForeignKey
 	function promoteFkey(fkey : ForeignKey){
@@ -356,9 +378,7 @@ class DataFile {
 	    if (cur > max ) {
 	    	i = 0;
 	    	var x = 5/i;
-	    }
-		   
-		  
+	    }	  
 	}
 
 
@@ -370,7 +390,7 @@ class DataFile {
 		}
 	}
 		
-	function GenerateConnectionsForNodeFile(){
+	function GenerateConnectionsForNodeFile() {
 		for (var entry in nodes){
 			var from_node : Node = entry.Value;
 			for (var foreignKey in foreignKeys) {
@@ -393,7 +413,7 @@ class DataFile {
 						//You found a match. Generate a connection.
 						if (from_attribute_value == to_attribute_value){
 							//Data is null here because data should be stored in the node.
-							from_node.AddConnection(null, to_node, true, foreignKey); 
+							from_node.AddConnection(null, this, to_node, true, foreignKey); 
 						}
 						
 					}
@@ -408,9 +428,9 @@ class DataFile {
 		var fileContents = getFileContents();
 		for (var row in fileContents) {
 
-			//Create a template node as a Data holder.
+			//Create a template Object as a Data holder.
 			var templateObject = new GameObject();
-			var data = templateObject.AddComponent(Connection);
+			var data = templateObject.AddComponent(Data);
 
 	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){  //check against attributes count in case there aren't enough commas.
@@ -474,8 +494,8 @@ class DataFile {
 			if (matches.Count == 2){
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
-						from_node.AddConnection(data, to_node, true, foreignKeys[0]);	
-						to_node.AddConnection(data, from_node, false, foreignKeys[1]);								
+						from_node.AddConnection(data, this, to_node, true, foreignKeys[0]);	
+						to_node.AddConnection(data, this, from_node, false, foreignKeys[1]);								
 					}
 				}
 			}

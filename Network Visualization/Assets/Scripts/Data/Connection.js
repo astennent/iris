@@ -1,6 +1,6 @@
 #pragma strict
 
-class Connection extends Data {
+class Connection extends TimeObject {
 
 	var mat : Material; //the material drawn by the connection.
 	var color : Color; //line color
@@ -14,7 +14,7 @@ class Connection extends Data {
 	private var graphController : GraphController;
 
 
-	function Init (data : Data, m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
+	function Init (data : Data, source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
 		mat = m;
 		color = c;
 		isOutgoing = o;
@@ -27,6 +27,10 @@ class Connection extends Data {
 		networkController = nC;
 		graphController = networkController.GetComponent(GraphController);
 		CopyData(data);
+		this.source =  source;
+		
+		initialized = true;
+		UpdateDate();
 	}
 
 	function LateUpdate () {

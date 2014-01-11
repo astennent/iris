@@ -1,7 +1,6 @@
 #pragma strict
 
-class Node extends Data {
-	var source : DataFile;
+class Node extends TimeObject {
 
 	var labelObject : GameObject;
 
@@ -15,13 +14,11 @@ class Node extends Data {
 	var reticlePrefab : Reticle; //used to instantiate reticle
 	private var reticle : Reticle; //singleton reticle, instantiated on target
 
-
 	var desiredDistance : float;
 
 
 	var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
 	private var activated = true;
-	private var initialized = false;
 
 	private var networkController : NetworkController;
 
@@ -50,12 +47,11 @@ class Node extends Data {
 		label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 		label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 		label.transform.parent = this.transform;
-		UpdateName();
+		UpdateSize();
 		
 		connections = new List.<Connection>();
 		
 		sizing_type = 0; //by # connections
-		UpdateSize();
 			
 		renderer.material = new Material(networkController.nodeTexture);
 		lineMat = new Material(networkController.lineTexture);
@@ -63,6 +59,8 @@ class Node extends Data {
 		resetHaloColor();	
 
 		initialized = true;
+		UpdateName();
+		UpdateDate();
 	}
 
 	function setColor(c : Color, colorConnections : boolean){
@@ -75,14 +73,14 @@ class Node extends Data {
 		}
 	}
 
-	function AddConnection (data : Data, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
+	function AddConnection (data : Data, connectionSource : DataFile, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
 		for (var conn in connections){
 			if (conn == other){
 				return;
 			}
 		}
 		var newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
-		newConn.Init(data, lineMat, color, isOutgoing, this, other, networkController, foreignKey);
+		newConn.Init(data, connectionSource, lineMat, color, isOutgoing, this, other, networkController, foreignKey);
 		connections.Add( newConn );
 		UpdateSize();
 	}
@@ -211,6 +209,7 @@ class Node extends Data {
 	}
 
 	function OnMouseOver() {
+		Debug.Log("Date: " + startDate + " - " + endDate);
 		if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 			selectionController.NodeClick(this);
 	    } 
@@ -329,6 +328,15 @@ class Node extends Data {
 		//Update visible values in case that changed.
 		if (initialized) {
 			UpdateName();
+		}
+	}
+
+	function UpdateDate() {
+		//update its own date.
+		super.UpdateDate();
+
+		for (var connection in connections) {
+			connection.UpdateDate();
 		}
 	}
 }

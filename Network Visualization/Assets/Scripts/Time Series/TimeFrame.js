@@ -20,6 +20,12 @@ class TimeFrame {
 		this.file = file;
 	}
 
+	//Checks that both start and end are valid.
+	function isValid() {
+		return (isValid(true) && isValid(false) );
+	}
+
+	//Checks that start or end is valid.
 	function isValid(isStart : boolean) {
 		if (isStart) {
 			return validStart;
@@ -115,6 +121,8 @@ class TimeFrame {
 
 	function updateValid() {
 
+		var wasValid = isValid();
+
 		validStart = true;
 		validEnd = true;
 		invalidMessages = ["",""];
@@ -155,6 +163,15 @@ class TimeFrame {
 			}
 			seenFormats.Add(format);
 		}
+
+		var valid = isValid();
+
+		// If there has been a change and it is valid or 
+		// If it used to be valid but has been invalidated.
+		if (valid || wasValid && !valid) {
+			file.UpdateDates();
+		}
+
 	}
 
 }
@@ -162,6 +179,7 @@ class TimeFrame {
 // Holds attributes and formats
 class AFTuple {
 	var attribute : Attribute;
+	private var formatIndex : int;
 	private var format : String;
 	private var valid : boolean;
 	private var timeFrame : TimeFrame;
@@ -176,13 +194,25 @@ class AFTuple {
 		return format;
 	}
 
+	function getFormatIndex() {
+		return formatIndex;
+	}
+
 	function setFormat(format : String) {
 		this.format = format;
-		if (format in TimeFrame.timeFormats) {
-			valid = true;
-		} else {
-			valid = false;
+		valid = false;
+		for (var index = 0; index < TimeFrame.timeFormats.length ; index++) {
+			var timeFormat = TimeFrame.timeFormats[index];
+			if (format == timeFormat) {
+				formatIndex = index;
+				valid = true;
+			}
 		}
+
+		if (!valid) {
+			formatIndex = -1;
+		}
+
 		timeFrame.updateValid();
 	}
 

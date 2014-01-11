@@ -1,7 +1,11 @@
 #pragma strict
 
-//Extended by Connection and Node
+//Extended by Connection and Node through TimeObject
 class Data extends MonoBehaviour {
+
+	//Used by Node and Connection.
+	var source : DataFile;
+	protected var initialized = false;
 
 	private var attr_dict = new Dictionary.<Attribute, Datum>();
 	private var index_dict = new Dictionary.<int, Datum>();
