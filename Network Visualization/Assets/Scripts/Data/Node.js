@@ -86,35 +86,47 @@ class Node extends TimeObject {
 	}
 
 
-	function Update () {
+	function Update() {
+		super.Update();
+
+		if (graphController.isGraphing() && graphController.getFile() != source || 
+				!hasValidTime) {
+			setRender(false);
+			return;
+		}
+
 		GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1);
 		
-		if (graphController.isGraphing() && graphController.getFile() != source) {
-			setRender(false);
-		} else {
-			setRender(true);
-			var oldRotation = transform.rotation;
-			
-			for (var i = 0 ; i < connections.Count ; i++){
-				var other_node : Node = connections[i].to;
-				var weightModifier : float = connections[i].foreignKey.weightModifier;
-				moveRelativeTo(other_node.transform.position, other_node.size, false, weightModifier);
+		setRender(true);
+		var oldRotation = transform.rotation;
+		
+		for (var i = 0 ; i < connections.Count ; i++){
+			var connection = connections[i];
+			var other_node : Node = connection.to;
 
-				if (selectionController.dragging){
-					var other_connections = other_node.connections;
-					for (var other_connection : Connection in other_connections){
-						var other_other_node = other_connection.to;
-						moveRelativeTo(other_other_node.transform.position, other_node.size, true, weightModifier);
-					}
+			//Do not process the connection if the connection or node is not in the correct time.
+			if (!connection.hasValidTime || !other_node.hasValidTime) {
+				continue;
+			}
+
+			var weightModifier : float = connections[i].foreignKey.weightModifier;
+			moveRelativeTo(other_node, other_node.size, false, weightModifier);
+
+			if (selectionController.dragging){
+				var other_connections = other_node.connections;
+				for (var other_connection : Connection in other_connections){
+					var other_other_node = other_connection.to;
+					moveRelativeTo(other_other_node, other_node.size, true, weightModifier);
 				}
 			}
-		    
-		    transform.rotation = oldRotation;
-		    
-		    if (networkController.flatten){
-		    	transform.position.z/=1.1;
-		    } 
 		}
+	    
+	    transform.rotation = oldRotation;
+	    
+	    if (networkController.flatten){
+	    	transform.position.z/=1.1;
+	    } 
+	
 	}
 
 	//called every frame, based on graphing.
@@ -182,7 +194,8 @@ class Node extends TimeObject {
 		return new Color(color.r, color.g, color.b);
 	}
 
-	function moveRelativeTo(target : Vector3, other_size: float, second_level : boolean, connectionWeight : float){
+	function moveRelativeTo(other_node : Node, other_size: float, second_level : boolean, connectionWeight : float) {
+		var target = other_node.transform.position;
 		if (networkController.isPaused() || connectionWeight == 0){
 			return;
 		}

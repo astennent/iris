@@ -4,7 +4,6 @@ public class TimeSeriesMenu extends BaseMenu {
 
 	static var height = 65;	
 	private var sliding : boolean = false;
-	private var current_date : Date;
 
 	function Start() {
 		super.Start();
@@ -87,14 +86,14 @@ public class TimeSeriesMenu extends BaseMenu {
 			var rect = new Rect(date_x-5, timeLineBox.y, 10, timeLineBox.height);
 			if (GUI.Button(rect, "")) {
 				locked = true;
-				current_date = dateRatio.date;
+				timeSeriesController.current_date = dateRatio.date;
 			}
 		}
 
 		DrawSlider(timeLineBox, locked);
 
 		//Draw Current Date
-		var current_date_text = getDateText(current_date);
+		var current_date_text = getDateText(timeSeriesController.current_date);
 		GUI.Label(timeLineBox, current_date_text, centeredStyle);
 	}
 
@@ -107,9 +106,9 @@ public class TimeSeriesMenu extends BaseMenu {
 		if (sliding) {
 			sliderX = Mathf.Clamp(mousePosition.x, timeLineBox.x, timeLineBox.x+timeLineBox.width);
 			var ratio : float = (sliderX - timeLineBox.x) / timeLineBox.width;
-			current_date = timeSeriesController.ratioToDate(ratio);
+			timeSeriesController.current_date = timeSeriesController.ratioToDate(ratio);
 		} else {
-			ratio = timeSeriesController.dateToRatio(current_date);
+			ratio = timeSeriesController.dateToRatio(timeSeriesController.current_date);
 			sliderX = timeLineBox.x+ratio*timeLineBox.width;
 		}
 

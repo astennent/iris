@@ -1,7 +1,5 @@
 //Reads in compiled Strings for use on the web
 
-#pragma strict
-
 public class DemoStreamReader implements IrisStreamReader {
 
 private var currentFile : String;

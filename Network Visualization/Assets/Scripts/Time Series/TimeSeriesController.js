@@ -6,9 +6,10 @@ private var dates = new SortedDictionary.<Date, int>();
 private var datesList : List.<DateRatio>;
 private var lastWidth : int = 1;
 
-
 private var first_date : Date;
 private var last_date : Date;
+
+var current_date : Date;
 
 
 function getEnabled() {
@@ -91,6 +92,9 @@ function updateDates(width : int) {
 	//Calculate the first and last dates and find the difference in seconds.
 	var allDates = dates.Keys;
 
+	first_date = TimeObject.DEFAULT_START_DATE;
+	last_date = TimeObject.DEFAULT_END_DATE;
+
 	//Update first and last dates
 	var on_first = true;
 	for (var date in dates.Keys) {
@@ -99,14 +103,6 @@ function updateDates(width : int) {
 			on_first = false;
 		}
 		last_date = date;
-	}
-
-	//Weird cases
-	if (allDates.Count == 0) {
-		return datesList;
-	} else if (allDates.Count == 1) {
-		datesList.Add(new DateRatio(getFirstDate(), 0));
-		return datesList;
 	}
 
 	var timeDiff : float = (last_date-first_date).TotalSeconds;

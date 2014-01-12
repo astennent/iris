@@ -7,11 +7,28 @@ class TimeObject extends Data {
 	static var DEFAULT_END_DATE = new Date(9999, 1, 1);
 	var startDate : Date = DEFAULT_START_DATE;
 	var endDate : Date = DEFAULT_END_DATE;
+	var hasValidTime : boolean = true;
+
+	function Update() {
+		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
+		var current_date = timeSeriesController.current_date;
+
+
+		if (timeSeriesController.getEnabled() && 
+				(startDate > current_date && startDate != DEFAULT_START_DATE || 
+				 endDate < current_date && endDate != DEFAULT_END_DATE)
+			) {
+			hasValidTime = false;
+		} else {
+			hasValidTime = true;
+		}
+		renderer.enabled = hasValidTime;
+	}
 
 	function UpdateDate() {
 		var timeFrame = source.timeFrame;
 		
-		if (timeFrame == null || !timeFrame.isValid()) {
+		if (timeFrame == null || !timeFrame.isValid() || !timeFrame.isUsed()) {
 			resetDate(true);	resetDate(false);
 		} else {
 			UpdateDate(timeFrame, true);

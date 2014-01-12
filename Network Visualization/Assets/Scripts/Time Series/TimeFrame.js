@@ -7,9 +7,6 @@ class TimeFrame {
 	private var startColumns = new List.<AFTuple>();
 	private var endColumns = new List.<AFTuple>();
 
-	private var requireStart = false;
-	private var requireEnd = false;
-
 	private var validStart = true; //is every column valid?
 	private var validEnd = true;
 	private var invalidMessages = ["",""];
@@ -34,6 +31,10 @@ class TimeFrame {
 		}
 	}
 
+	function isUsed() {
+		return (startColumns.Count > 0 || endColumns.Count > 0);
+	}
+
 	private function setValid(isStart : boolean, val : boolean) {
 		if (isStart) {
 			validStart = val;
@@ -47,22 +48,6 @@ class TimeFrame {
 			return invalidMessages[0];
 		} else {
 			return invalidMessages[1];
-		}
-	}
-
-	function getRequired(isStart) {
-		if (isStart) {
-			return requireStart;
-		} else {
-			return requireEnd;
-		}
-	}
-
-	function setRequired(isStart : boolean, required : boolean) {
-		if (isStart) {
-			requireStart = required;
-		} else {
-			requireEnd = required;
 		}
 	}
 

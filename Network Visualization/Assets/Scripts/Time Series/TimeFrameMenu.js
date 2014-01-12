@@ -68,7 +68,7 @@ class TimeFrameMenu extends BaseMenu {
 				if (columns.Count == 1) {
 					box_text = box_text[0:-1]; //Remove the 's'
 				}			
-				timeframe_box.height += 60; //Column headers (20) + Required (20)
+				timeframe_box.height += 40; //Column headers (20)
 			} else {
 				box_text += "Not Defined";
 			}
@@ -82,27 +82,8 @@ class TimeFrameMenu extends BaseMenu {
 		GUI.Box(timeframe_box, box_text);
 		GUI.color = Color.white;
 
-		//Draw the column headers and required option.
+		//Draw the column headers.
 		if (columns.Count > 0) {
-
-			//Draw required option.
-			var required = timeFrame.getRequired(isStart);
-			var requiredText : String;
-			if (required) {
-				requiredText = " Required. Rows with invalid dates \nwill not be shown.";
-			} else {
-				requiredText = " Not Required. Rows with invalid dates \nwill ";
-				if (isStart) {
-					requiredText += "start at the earliest date.";
-				} else {
-					requiredText += "end at the latest date.";
-				}
-			}
-			var new_required = GUI.Toggle(new Rect(x+20, cur_y+20, width-20, 40), required, requiredText);
-			if (required != new_required) {
-				timeFrame.setRequired(isStart, new_required);
-			}
-			
 			//Draw the headers
 			cur_y += 60;
 			var header_rect = new Rect(x+30, cur_y, 80, 20);

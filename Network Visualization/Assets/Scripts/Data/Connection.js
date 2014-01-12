@@ -39,13 +39,15 @@ class Connection extends TimeObject {
 			return;
 		}
 
-		//Logic for hiding the lines. Currently only responds to graphing,
+		//Logic for hiding the lines. Currently only responds to graphing and timeSeries,
 		//TODO: more options for hiding based on rules or one-way connections
-		if (graphController.isGraphing()) {
+		if (graphController.isGraphing() || !hasValidTime ||
+				!from.hasValidTime || !to.hasValidTime) {
 			lineRenderer.enabled = false;
-		} else {
-			lineRenderer.enabled = true;
-		}
+			return;
+		} 
+
+		lineRenderer.enabled = true;
 
 		//Adjust the line to match the from and to nodes.
 		var incomingAdjust : Vector3;
