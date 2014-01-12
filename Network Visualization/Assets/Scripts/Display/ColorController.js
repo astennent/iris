@@ -36,9 +36,11 @@ function createRule(){
 	new_rule.Init();
 	rules.Add(new_rule);
 }
+
 function removeRule(i : int){
 	rules.RemoveAt(i);
 }
+
 function moveRuleUp(i : int){
 	if (i > 1){
 		var temp = rules[i];
@@ -303,4 +305,15 @@ function randBinary(){ //true or false
 		return true;
 	} 
 	return false;
+}
+
+function handleDateChange() {
+	for (var rule in rules) {
+		
+		if (rule.getMethod() == 2) {		//centrality
+			ApplyRule(rule, true, true);
+		} else { //Don't recolor if it's not centrality.
+			ApplyRule(rule, false, true);
+		}
+	}
 }

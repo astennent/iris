@@ -6,7 +6,7 @@ class Node extends TimeObject {
 
 	private var label : GameObject;
 
-	var connections : List.<Connection>;
+	private var connections : List.<Connection>;
 	var connectionPrefab : GameObject;
 	var lineMat : Material;
 	var color : Color;
@@ -90,7 +90,7 @@ class Node extends TimeObject {
 		super.Update();
 
 		if (graphController.isGraphing() && graphController.getFile() != source || 
-				!hasValidTime) {
+				!hasValidTime()) {
 			setRender(false);
 			return;
 		}
@@ -105,7 +105,7 @@ class Node extends TimeObject {
 			var other_node : Node = connection.to;
 
 			//Do not process the connection if the connection or node is not in the correct time.
-			if (!connection.hasValidTime || !other_node.hasValidTime) {
+			if (!connection.hasValidTime() || !other_node.hasValidTime()) {
 				continue;
 			}
 
@@ -149,7 +149,9 @@ class Node extends TimeObject {
 			size = graphController.getForcedNodeSize();
 		} else {
 			if (sizing_type == 0){ //by # connections
-				size = (3 + connections.Count * 2.5)/2;
+				//Only count connections in the current time.
+				var validCount = getConnections(true).Count;
+				size = validCount * 1.25 + 1.5;
 			} else if (sizing_type == 1) { //manual
 				size = manual_size;
 			} else if (sizing_type == 2) { //by attribute
@@ -347,9 +349,31 @@ class Node extends TimeObject {
 	function UpdateDate() {
 		//update its own date.
 		super.UpdateDate();
-
 		for (var connection in connections) {
 			connection.UpdateDate();
 		}
+	}
+
+	function validateDate() {
+		//update its own date.
+		super.validateDate();
+		UpdateSize();
+		for (var connection in connections) {
+			connection.validateDate();
+		}
+	}
+
+	function getConnections(respectTimeSeries : boolean) {
+		if (!respectTimeSeries) {
+			return connections;
+		}
+
+		var output = new List.<Connection>();
+		for (var connection in connections) {
+			if (connection.hasValidTime() && connection.to.hasValidTime()) {
+				output.Add(connection);
+			}
+		}
+		return output;
 	}
 }

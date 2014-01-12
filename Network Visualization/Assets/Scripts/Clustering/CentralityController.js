@@ -84,7 +84,10 @@ function CalculateDegreeCentrality(){
 		var nodes = entry.Value;
 		for (var node in nodes) {			
 			//Degree centrality is simply a count of connected nodes.
-			var node_centrality : float = node.connections.Count;
+			var node_centrality : float = node.getConnections(true).Count;
+			if (node.Get(1) == "al-Qaeda") {
+				print(node_centrality);
+			}
 			degreeCentralities[node] = node_centrality;
 
 			var group_id = node.group_id;
@@ -159,11 +162,9 @@ function CalculateClosenessCentrality(){
 			//update the global min and max inverted distance
 			if ( !(GLOBAL_CLUSTER_ID in minMaxInvertedDistanceCache[0]) || minMaxInvertedDistanceCache[0][GLOBAL_CLUSTER_ID] > node_inverted_distance) {
 				minMaxInvertedDistanceCache[0][GLOBAL_CLUSTER_ID] = node_inverted_distance;
-				print("Uupdated to " + node_inverted_distance);
 			}
 			if ( !(GLOBAL_CLUSTER_ID in minMaxInvertedDistanceCache[1]) || minMaxInvertedDistanceCache[1][GLOBAL_CLUSTER_ID] < node_inverted_distance) {
 				minMaxInvertedDistanceCache[1][GLOBAL_CLUSTER_ID] = node_inverted_distance;
-				print("Updated to " + node_inverted_distance);
 			}	
 
 		}
@@ -188,7 +189,7 @@ function CalculateDistanceSums(from_node : Node) {
 			total_inverted_distance += (1.0/cur_count);
 		}
 
-		for (var connection : Connection in cur_node.connections) {
+		for (var connection : Connection in cur_node.getConnections(true)) {
 			var connection_node = connection.to;
 			if (! (alreadySeen.Contains(connection_node))){
 				alreadySeen.Add(connection_node);
@@ -259,7 +260,7 @@ function CalculateBetweennessSums(from_node : Node) {
 		var cur_node = cur_path.node;
 		var cur_depth = cur_path.depth;
 
-		for (var connection : Connection in cur_node.connections) {
+		for (var connection : Connection in cur_node.getConnections(true)) {
 			var connection_node = connection.to;
 			if (! (alreadySeen.ContainsKey(connection_node))){
 				alreadySeen[connection_node] = cur_depth;

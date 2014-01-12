@@ -233,6 +233,7 @@ class DataFile {
 				}
 			}
 		} else {
+			print("Updating File");
 			for (var node in nodes) {
 				node.Value.UpdateDate();
 			}

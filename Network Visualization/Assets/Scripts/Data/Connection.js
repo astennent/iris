@@ -41,8 +41,8 @@ class Connection extends TimeObject {
 
 		//Logic for hiding the lines. Currently only responds to graphing and timeSeries,
 		//TODO: more options for hiding based on rules or one-way connections
-		if (graphController.isGraphing() || !hasValidTime ||
-				!from.hasValidTime || !to.hasValidTime) {
+		if (graphController.isGraphing() || !hasValidTime() ||
+				!from.hasValidTime() || !to.hasValidTime()) {
 			lineRenderer.enabled = false;
 			return;
 		} 

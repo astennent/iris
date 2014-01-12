@@ -7,22 +7,23 @@ class TimeObject extends Data {
 	static var DEFAULT_END_DATE = new Date(9999, 1, 1);
 	var startDate : Date = DEFAULT_START_DATE;
 	var endDate : Date = DEFAULT_END_DATE;
-	var hasValidTime : boolean = true;
+	private var validTime : boolean = true;
 
 	function Update() {
+		renderer.enabled = hasValidTime();
+	}
+
+	//Called when the current date changes in the TimeLine or when the TimeObject's date is changed.
+	function validateDate() {
 		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
-		var current_date = timeSeriesController.current_date;
+		var current_date = timeSeriesController.getCurrentDate();
+		validTime = ((startDate < current_date || startDate == DEFAULT_START_DATE) && 
+				 (endDate > current_date || endDate == DEFAULT_END_DATE)); 
+	}
 
-
-		if (timeSeriesController.getEnabled() && 
-				(startDate > current_date && startDate != DEFAULT_START_DATE || 
-				 endDate < current_date && endDate != DEFAULT_END_DATE)
-			) {
-			hasValidTime = false;
-		} else {
-			hasValidTime = true;
-		}
-		renderer.enabled = hasValidTime;
+	function hasValidTime() : boolean {
+		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
+		return (validTime || !source.timeFrame.isUsed() || !timeSeriesController.getEnabled());
 	}
 
 	function UpdateDate() {
@@ -34,6 +35,7 @@ class TimeObject extends Data {
 			UpdateDate(timeFrame, true);
 			UpdateDate(timeFrame, false);
 		}
+		validateDate();
 	}
 
 	private function UpdateDate(timeFrame : TimeFrame, isStart : boolean) {
@@ -63,7 +65,7 @@ class TimeObject extends Data {
 		}
 	}
 
-	function resetDate(isStart : boolean) {
+	private function resetDate(isStart : boolean) {
 		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
 		if (isStart) {
 			if (startDate != DEFAULT_START_DATE) {

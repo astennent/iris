@@ -9,8 +9,7 @@ private var lastWidth : int = 1;
 private var first_date : Date;
 private var last_date : Date;
 
-var current_date : Date;
-
+private var current_date : Date;
 
 function getEnabled() {
 	return timeSeriesEnabled;
@@ -19,8 +18,42 @@ function getEnabled() {
 function toggleEnabled() {
 	setEnabled(!timeSeriesEnabled);
 }
+
+function getCurrentDate() {
+	return current_date;
+}
+function setCurrentDate(date : Date) {
+	var dates_equivalent = datesAreEquivalent(current_date, date);
+	current_date = date;
+	if (!dates_equivalent) {
+		validateAllTimeObjects();
+	}
+}
+
+//Checks whether there are any changes in the timeline between the two dates.
+function datesAreEquivalent(date1 : Date, date2 : Date) {
+	//Determine which date is earlier.
+	if (date1 == date2) {
+		return true;
+	} else if (date1 < date2) {
+		var early_date = date1;
+		var later_date = date2;
+	} else {
+		early_date = date2;
+		later_date = date1;
+	}
+
+	for (var date in dates.Keys) {
+		if (date > early_date) {
+			return (date > later_date);
+		}
+	}
+	return true;
+}
+
 function setEnabled(timeSeriesEnabled : boolean) {
 	this.timeSeriesEnabled = timeSeriesEnabled;
+	validateAllTimeObjects();
 }
 
 function addDate(date : Date) {
@@ -111,6 +144,20 @@ function updateDates(width : int) {
 		var thisDiff : float = (date-first_date).TotalSeconds;
 		var ratio : float = thisDiff * 1.0 / timeDiff;
 		datesList.Add(new DateRatio(date, ratio));
+	}
+
+}
+
+function validateAllTimeObjects() {
+	if (timeSeriesEnabled) {
+		for (var file in GetComponent(FileManager).files) {
+			for (var node in file.nodes.Values) {
+				node.validateDate();
+			}
+		}
+		GetComponent(ClusterController).ReInit();
+		GetComponent(CentralityController).ReInit();
+		GetComponent(ColorController).handleDateChange();
 	}
 }
 

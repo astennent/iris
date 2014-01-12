@@ -114,7 +114,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		}
 
 		cur_y+=5;
-		GUI.Label(new Rect(x+10, cur_y, width, 20), "Invert Colors: ");
+		GUI.Label(new Rect(x+10, cur_y, 85, 20), "Invert Colors: ");
 		if (GUI.Toggle(new Rect(x+95, cur_y, width, 20), wasInverted, inversion_text) != wasInverted){
 			rule.toggleInvertCentrality();
 		}
@@ -129,7 +129,7 @@ class ColorRuleColorMenu extends BaseMenu {
 
 		cur_y += 25;
 
-		GUI.Label(new Rect(x+10, cur_y, width, 20), "Centrality Method: ");
+		GUI.Label(new Rect(x+10, cur_y, 120, 20), "Centrality Method: ");
 		cur_y += 20;
 
 		for (var index : int = 0 ; index < centrality_types.length ; index++){
