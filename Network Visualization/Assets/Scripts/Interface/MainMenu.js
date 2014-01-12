@@ -13,6 +13,7 @@ class MainMenu extends BaseMenu {
 	var upload : Texture;
 	var zoom_to_fit : Texture;
 	var graph : Texture;
+	var clock : Texture;
 
 	function Start() {
 		super.Start();
@@ -130,7 +131,7 @@ class MainMenu extends BaseMenu {
 
 			button_position = new Rect(x+5, Screen.height-50, 35, 35);
 			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
-			if (GUI.Button(button_position, upload)){
+			if (GUI.Button(button_position, clock)){
 				timeSeriesMenu.ToggleDisplay();
 			}
 

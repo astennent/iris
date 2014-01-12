@@ -26,6 +26,8 @@ function Start(){
 		fga_id.is_shown = false;
 		fga_id.is_pkey = false;
 		fga_name.is_pkey = true;
+
+
 		full_group_attrs.Activate();
 		
 		var ael_ego : Attribute = alliance_edge_list.attributes[0];
@@ -35,6 +37,12 @@ function Start(){
 		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_alter, fga_name);
 		alliance_edge_list.linking_table = true;
 		alliance_edge_list.Activate();	
+
+		//TimeFrame
+		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[2], true);
+		full_group_attrs.timeFrame.getColumns(true)[0].setFormat("Year");
+		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[3], false);
+		full_group_attrs.timeFrame.getColumns(false)[0].setFormat("Year");
 	}
 }
 
