@@ -11,6 +11,8 @@ private var last_date : Date;
 
 private var current_date : Date;
 
+private var playing = false;
+
 function getEnabled() {
 	return timeSeriesEnabled;
 }
@@ -18,6 +20,15 @@ function getEnabled() {
 function toggleEnabled() {
 	setEnabled(!timeSeriesEnabled);
 }
+
+function isPlaying() {
+	return playing;
+}
+
+function togglePlaying() {
+	playing = !playing;
+}
+
 
 function getCurrentDate() {
 	return current_date;
@@ -160,6 +171,32 @@ function validateAllTimeObjects() {
 		GetComponent(ColorController).handleDateChange();
 	}
 }
+
+function skipToNext() {
+	for (var date in dates.Keys) {
+		if (date > current_date) {
+			setCurrentDate(date);
+			break;
+		}
+	}
+}
+
+function skipToPrev() {
+	var on_first = true;
+	var prev_date : Date;
+	for (var date in dates.Keys) {
+		if (on_first) {
+			on_first = false;
+			prev_date = date;
+		}
+		if (date >= current_date) {
+			setCurrentDate(prev_date);
+			break;
+		}
+		prev_date = date;
+	}
+}
+
 
 //wrapper class for Date and x-coordinate in the width given in getDates 
 private class DateRatio {

@@ -5,6 +5,11 @@ public class TimeSeriesMenu extends BaseMenu {
 	static var height = 65;	
 	private var sliding : boolean = false;
 
+	var play : Texture;
+	var pause : Texture;
+	var next : Texture;
+	var prev : Texture;
+
 	function Start() {
 		super.Start();
 		desired_x = 45;
@@ -18,12 +23,6 @@ public class TimeSeriesMenu extends BaseMenu {
 		var y = Screen.height - height;
 		var menuRect = new Rect(x, y, width, height);
 		guiplus.Box(menuRect, "");
-
-		var box = new Rect(x+width-30, menuRect.y+4, 26, 26);
-		if (GUI.Button(box, "X")){
-			DisableDisplay();
-		};
-
 
 		if (!displaying) {
 			return;
@@ -48,6 +47,9 @@ public class TimeSeriesMenu extends BaseMenu {
 
 		//Draw the timeline
 		DrawTimeline(y);
+
+		//Draw Play/Pause/Skip
+		DrawButtons(y);
 		
 	}
 
@@ -58,7 +60,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		centeredStyle.alignment = TextAnchor.MiddleCenter;
 
 		var lineX = x + width * .1;
-		var lineWidth = width * .8;
+		var lineWidth = width * .75;
 		var timeLineBox = new Rect(lineX, y+10, lineWidth, height-20);
 
 		GUI.color = new Color(1, 1, 1, .5);
@@ -113,7 +115,11 @@ public class TimeSeriesMenu extends BaseMenu {
 		}
 
 		var sliderRect = new Rect(sliderX-5, timeLineBox.y+5, 10, timeLineBox.height-10);
+		if (timeSeriesController.getEnabled()) {
+			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+		}
 		GUI.Button(sliderRect, ""); 
+		GUI.color = Color.white;
 
 		//Decide if it should be sliding next frame.
 		if (!Input.GetMouseButton(0)) {
@@ -129,6 +135,31 @@ public class TimeSeriesMenu extends BaseMenu {
 	function getDateText(current_date : Date) {
 		//TODO: Respect options for what to show.
 		return "" + current_date;
+	}
+
+	function DrawButtons(y:int) {
+		var buttonLeft = x + width * .85 + 5;
+		var buttonSide = (width*.15 - 30)/3;
+		var buttonRect = new Rect(buttonLeft+5, y+(Screen.height - y - buttonSide)/2 , buttonSide, buttonSide);
+		//BackButton
+		if (GUI.Button(buttonRect, prev)) {
+			timeSeriesController.skipToPrev();
+		}
+
+		buttonRect.x+=buttonSide+5;
+		if (timeSeriesController.isPlaying()) {
+			var image = pause;
+		} else {
+			image = play;
+		}
+		if (GUI.Button(buttonRect, image)) {
+			timeSeriesController.togglePlaying();
+		}
+
+		buttonRect.x+=buttonSide+5;
+		if (GUI.Button(buttonRect, next)) {
+			timeSeriesController.skipToNext();
+		}
 	}
 
 }
