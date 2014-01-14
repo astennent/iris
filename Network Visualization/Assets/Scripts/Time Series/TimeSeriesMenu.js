@@ -82,6 +82,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		var mouseCoords = Input.mousePosition;
 		var locked = false;
 		mouseCoords.y = Screen.height - mouseCoords.y;
+		GUI.color = new Color(1, 1, 1, .2);
 		for (var dateRatio in dates) {
 			var ratio : float = dateRatio.ratio;
 			var date_x = lineX + ratio*lineWidth;

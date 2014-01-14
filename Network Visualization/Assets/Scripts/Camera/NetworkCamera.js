@@ -1,10 +1,12 @@
 #pragma strict
 
-var selectionController : SelectionController;
+private var selectionController : SelectionController;
+private var guiplus : GuiPlus;
 var target: Transform;
 function Start () {
 	target = GameObject.FindGameObjectWithTag("GameController").transform;
 	selectionController = GameObject.FindGameObjectWithTag("GameController").GetComponent(SelectionController);
+	guiplus = selectionController.GetComponent(GuiPlus);
 	transform.parent = target;
 }
 
@@ -18,7 +20,15 @@ var bubbleSize : int = 0;
 
 var freeCamera : boolean = false;
 
+//When a user clicks, if the mouse is in a menu then dragging will not spin the camera around.
+private var allowedToSpin : boolean = true;
+
 function Update () {
+
+	if (Input.GetMouseButtonDown(0)) {
+		allowedToSpin = !guiplus.isBlocked();
+	}
+
 	if (target == null){
 		freeCamera = true;	
 	}	
@@ -68,11 +78,11 @@ function UpdateLocked(selectionCenter : Vector3){
 	var mouseCoords = Input.mousePosition;
 
 	
-	if (Input.GetMouseButton(0)){
+	if (Input.GetMouseButton(0) && allowedToSpin){
 		x += Input.GetAxis("Mouse X")*5;
 		y += Input.GetAxis("Mouse Y")*5;
 	}
-	if (Input.GetMouseButton(1)){
+	if (Input.GetMouseButton(1) && allowedToSpin){
 		if (mouseCoords.x < coordinates.x && mouseCoords.y > coordinates.y){
 			r += Input.GetAxis("Mouse X")*.05;
 			r += Input.GetAxis("Mouse Y")*.05;

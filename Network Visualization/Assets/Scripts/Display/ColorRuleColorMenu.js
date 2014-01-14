@@ -59,7 +59,7 @@ class ColorRuleColorMenu extends BaseMenu {
 
 		cur_y += 190;
 		var original_variation = rule.variation;
-		GUI.Label(new Rect(x+10, cur_y, width, 20), "Randomness: " + rule.variation.ToString("f2"));
+		GUI.Label(new Rect(x+10, cur_y, 130, 20), "Randomness: " + rule.variation.ToString("f2"));
 		rule.variation = GUI.HorizontalSlider(Rect(x+130, cur_y+5, width-140, 20), rule.variation, 0.0, 1.0);
 
 		if (rule.color != original_color || rule.variation != original_variation){

@@ -12,23 +12,46 @@ private var last_date : Date;
 private var current_date : Date;
 
 private var playing = false;
+private var playTimeSeconds : float = 60;
 
-function getEnabled() {
-	return timeSeriesEnabled;
-}
-
-function toggleEnabled() {
-	setEnabled(!timeSeriesEnabled);
-}
 
 function isPlaying() {
 	return playing;
 }
-
 function togglePlaying() {
 	playing = !playing;
 }
 
+function Update() {
+	if (playing) {
+		var totalSeconds = getTotalSeconds();
+		var elapsedTime = Time.deltaTime;
+		var curRatio = dateToRatio(current_date);
+		var nextRatio = curRatio + elapsedTime/playTimeSeconds;
+		if (nextRatio >= 1) { 
+
+			//If you go over the end of the timeline, stop.
+			setCurrentDate(getLastDate());
+			playing = false;
+		
+		} else {
+			var nextDate = ratioToDate(nextRatio);
+			setCurrentDate(nextDate);
+		}
+	}
+	
+}
+
+function getEnabled() {
+	return timeSeriesEnabled;
+}
+function toggleEnabled() {
+	setEnabled(!timeSeriesEnabled);
+}
+function setEnabled(timeSeriesEnabled : boolean) {
+	this.timeSeriesEnabled = timeSeriesEnabled;
+	validateAllTimeObjects();
+}
 
 function getCurrentDate() {
 	return current_date;
@@ -62,10 +85,6 @@ function datesAreEquivalent(date1 : Date, date2 : Date) {
 	return true;
 }
 
-function setEnabled(timeSeriesEnabled : boolean) {
-	this.timeSeriesEnabled = timeSeriesEnabled;
-	validateAllTimeObjects();
-}
 
 function addDate(date : Date) {
 	if (dates.ContainsKey(date)) {
@@ -160,16 +179,14 @@ function updateDates(width : int) {
 }
 
 function validateAllTimeObjects() {
-	if (timeSeriesEnabled) {
-		for (var file in GetComponent(FileManager).files) {
-			for (var node in file.nodes.Values) {
-				node.validateDate();
-			}
+	for (var file in GetComponent(FileManager).files) {
+		for (var node in file.nodes.Values) {
+			node.validateDate();
 		}
-		GetComponent(ClusterController).ReInit();
-		GetComponent(CentralityController).ReInit();
-		GetComponent(ColorController).handleDateChange();
 	}
+	GetComponent(ClusterController).ReInit();
+	GetComponent(CentralityController).ReInit();
+	GetComponent(ColorController).handleDateChange();
 }
 
 function skipToNext() {

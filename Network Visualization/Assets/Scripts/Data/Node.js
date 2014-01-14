@@ -35,6 +35,8 @@ class Node extends TimeObject {
 
 	private var display_name : String = "";
 
+	private var dateValidationResizeRequired = false;
+
 	function Init(color : Color, source : DataFile){
 		this.color = color;
 		this.source = source;
@@ -242,6 +244,11 @@ class Node extends TimeObject {
 		}	else {
 			label.GetComponent(GUIText).text = "";
 		}
+
+		if (dateValidationResizeRequired) {
+			dateValidationResizeRequired = false;
+			UpdateSize();
+		}
 	}
 
 	function setSelected(selected : boolean){
@@ -354,13 +361,16 @@ class Node extends TimeObject {
 		}
 	}
 
+	//Called by TimeSeriesController.
 	function validateDate() {
 		//update its own date.
 		super.validateDate();
-		UpdateSize();
 		for (var connection in connections) {
 			connection.validateDate();
 		}
+
+		//delay resizing until after all other nodes have been validated.
+		dateValidationResizeRequired = true;
 	}
 
 	function getConnections(respectTimeSeries : boolean) {

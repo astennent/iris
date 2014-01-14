@@ -18,6 +18,8 @@ public class GuiPlus extends MonoBehaviour {
 
 	function isBlocked() {
 		for (var box in boxes) {
+			var mousePosition = Input.mousePosition;
+			mousePosition.y = Screen.height - mousePosition.y; //Stupid unity.
 			if (box.Contains(Input.mousePosition)){
 				return true;
 			}
