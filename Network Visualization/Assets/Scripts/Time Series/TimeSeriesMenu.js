@@ -55,10 +55,12 @@ public class TimeSeriesMenu extends BaseMenu {
 
 	function DrawTimeline(y : int) {
 
+		//Center alignment
 		var centeredStyle : GUIStyle;
 		centeredStyle = GUI.skin.GetStyle("Label");
+		var oldAlignment = centeredStyle.alignment;
 		centeredStyle.alignment = TextAnchor.MiddleCenter;
-
+		
 		var lineX = x + width * .1;
 		var lineWidth = width * .75;
 		var timeLineBox = new Rect(lineX, y+10, lineWidth, height-20);
@@ -98,6 +100,11 @@ public class TimeSeriesMenu extends BaseMenu {
 		//Draw Current Date
 		var current_date_text = getDateText(timeSeriesController.getCurrentDate());
 		GUI.Label(timeLineBox, current_date_text, centeredStyle);
+
+		//Restore Alignment.
+		centeredStyle.alignment = oldAlignment;
+
+
 	}
 
 	function DrawSlider(timeLineBox : Rect, locked : boolean) {

@@ -168,7 +168,7 @@ class GraphMenu extends BaseMenu {
 		var scroll_y = 0;
 
 		for (var attribute : Attribute in attrs) {
-			var attrRect = new Rect(10, scroll_y, width-25, 20);
+			var attrRect = new Rect(10, scroll_y, width/2-10, 20);
 				
 			if (attribute == axes[0]) {
 				GUI.color = Color.red;
