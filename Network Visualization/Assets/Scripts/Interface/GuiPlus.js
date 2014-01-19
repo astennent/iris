@@ -20,7 +20,7 @@ public class GuiPlus extends MonoBehaviour {
 		for (var box in boxes) {
 			var mousePosition = Input.mousePosition;
 			mousePosition.y = Screen.height - mousePosition.y; //Stupid unity.
-			if (box.Contains(Input.mousePosition)){
+			if (box.Contains(mousePosition)){
 				return true;
 			}
 		}

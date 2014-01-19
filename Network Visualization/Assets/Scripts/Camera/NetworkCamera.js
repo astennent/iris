@@ -121,7 +121,7 @@ function UpdateLocked(selectionCenter : Vector3){
 	
 	transform.LookAt(selectionCenter, transform.up);
 	transform.RotateAround(transform.forward, r);
-	transform.position = transform.position*.75 + targetPosition*.25;
+	transform.position = Vector3.Lerp(transform.position, targetPosition, .25);
 	transform.rotation = Quaternion.Slerp(originalRotation, transform.rotation,.3);
 
 }

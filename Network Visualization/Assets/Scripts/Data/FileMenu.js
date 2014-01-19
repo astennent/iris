@@ -5,6 +5,9 @@ import System.IO;
 
 class FileMenu extends BaseMenu {
 
+	var plus : Texture;
+	var cross : Texture;
+
 	private var cur_y : float;
 	private var directoryScrollPosition : Vector2 = Vector2.zero;
 	private var attributeScrollPosition : Vector2 = Vector2.zero;
@@ -13,10 +16,10 @@ class FileMenu extends BaseMenu {
 
 	
 	/*	Used to decide what to display below the line.
-		-2 : new File
 		-1 : nothing
 		0+ : index in FileManager.files */
 	var selected_file_index : int = -1; //used to decide what to display below the line.
+	var creating_file : boolean = false;
 
 	function Start(){
 		parent = GetComponent(MainMenu);
@@ -33,39 +36,54 @@ class FileMenu extends BaseMenu {
 	}
 
 	function setSelectedFile(index : int) {
-		selected_file_index = index;
+		if (selected_file_index != index) {
+			selected_file_index = index;
+			attributeMenu.setSelectedIndex(-1);
+			fkeyMenu.resetCreation();
+			creating_file = false;
+		}
+	}
+
+	function toggleCreatingFile() {
+		creating_file = !creating_file;
 		attributeMenu.setSelectedIndex(-1);
 		fkeyMenu.resetCreation();
 	}
+
 	function OnGUI(){
 		super.OnGUI();
-		cur_y = 40;
-		//make buttons for each of the files.
-		var button_position : Rect;
-		for (var i=0 ; i<fileManager.files.Count ; i++){
-			button_position = new Rect(x+10, cur_y, width-20, 30);
-			var file : DataFile = fileManager.files[i];
-			if (i == selected_file_index){ GUI.color = Color.yellow; } else { GUI.color = Color.white;	}
-			if (GUI.Button(button_position, file.shortName())){
-				setSelectedFile(i);
-			}
-			//display files.
-			cur_y += 35;
+		cur_y = 35;
+		
+		//Draw the file selection dropdown
+		var selection_rect = new Rect(x+10, cur_y, width-50, 30);
+		var dropHeight = 120;
+		var filesList = new String[fileManager.files.Count];
+		for (var i = 0 ; i < fileManager.files.Count ; i++) {
+			filesList[i] = fileManager.files[i].shortName();
 		}
-		GUI.color = Color.white;
-		
-		button_position = new Rect(x+10, cur_y, width-20, 30);
-		GUI.color = Color.green;
-		
-		//New File Button
-		if (GUI.Button(button_position, "Import New File")){
-			setSelectedFile(-2);
+		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, filesList, selected_file_index, 0, "Select a File");
+		if (new_selected_index != selected_file_index) {
+			setSelectedFile(new_selected_index);
 		}
 
-		GUI.color = Color.white;	
-		cur_y += 40;	
 		
-		if (selected_file_index == -2){
+		//Draw the new file button
+		selection_rect.x = x+width-40;
+		selection_rect.width = 30;
+		if (creating_file) {
+			var image = cross;
+			GUI.color = Color.red;
+		} else {
+			image = plus;
+			GUI.color = Color.green;
+		}
+		if (GUI.Button(selection_rect, image)){
+			toggleCreatingFile();
+		}
+		GUI.color = Color.white;			
+		cur_y += 37;
+		
+		if (creating_file){
 			DrawNewFileDetails();	
 		} else if (selected_file_index >= 0){
 			DrawLoadedFileDetails();

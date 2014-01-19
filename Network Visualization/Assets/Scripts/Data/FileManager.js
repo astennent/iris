@@ -43,6 +43,9 @@ function Start(){
 		full_group_attrs.timeFrame.getColumns(true)[0].setFormat("Year");
 		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[3], false);
 		full_group_attrs.timeFrame.getColumns(false)[0].setFormat("Year");
+
+		//Guatamala
+		Load("Guatamala", true);
 	}
 }
 

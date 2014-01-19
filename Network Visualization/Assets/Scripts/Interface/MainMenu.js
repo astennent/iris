@@ -37,6 +37,7 @@ class MainMenu extends BaseMenu {
 		GUI.color = Color.white;
 		var button_position : Rect = new Rect(5, 5, 35, 35);
 		if (GUI.Button(button_position, more)){
+			timeSeriesMenu.DisableDisplay();
 			ToggleDisplay();
 		}	
 			
