@@ -39,12 +39,20 @@ function Start(){
 
 		//TimeFrame
 		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[2], true);
-		full_group_attrs.timeFrame.getColumns(true)[0].setFormat("Year");
+		full_group_attrs.timeFrame.getColumns(true)[0].setTimeFrameFormat("Year");
 		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[3], false);
-		full_group_attrs.timeFrame.getColumns(false)[0].setFormat("Year");
+		full_group_attrs.timeFrame.getColumns(false)[0].setTimeFrameFormat("Year");
 
 		//Guatamala
 		Load("Guatamala", true);
+		var guatamala = files[2];
+		guatamala.attributes[0].is_shown = false;
+		guatamala.attributes[0].is_pkey = false;
+		guatamala.attributes[2].is_pkey = true;
+		guatamala.attributes[3].is_pkey = true;
+		guatamala.createSimpleFkey(full_group_attrs,  guatamala.attributes[4], fga_name);
+		guatamala.Activate();
+
 	}
 }
 

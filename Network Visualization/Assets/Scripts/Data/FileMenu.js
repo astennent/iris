@@ -245,7 +245,7 @@ class FileMenu extends BaseMenu {
 		}
 		if (GUI.Button(loadRect, "Load")){
 			selected_file_index = fileManager.Load(fileString); //switches to loaded menu if successful.
-			attributeMenu.selected_index = -1;
+			attributeMenu.setSelectedIndex(-1);
 		}
 		GUI.color = Color.white;
 		

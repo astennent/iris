@@ -3,7 +3,7 @@
 private var keyPairs = new List.<List.<Attribute> >(); //array of tuples. [ [from,to] [from,to] [from,to]...]
 var from_file : DataFile; //
 var to_file : DataFile;
-var isBidirectional : boolean = true;
+var isBidirectional : boolean = false;
 var activated : boolean = false;
 var weightModifier : float = 1.0;
 

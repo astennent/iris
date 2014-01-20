@@ -166,12 +166,16 @@ class Node extends TimeObject {
 		desiredDistance = Random.Range(50.0, 50.0);
 	}
 
+
 	function getManualSize(){
 		return manual_size;
 	}
-
 	function setManualSize(s : float){
 		manual_size = s;
+	}
+
+	function getSize() {
+		return size;
 	}
 
 	function UpdateName(){
@@ -226,7 +230,6 @@ class Node extends TimeObject {
 	}
 
 	function OnMouseOver() {
-		Debug.Log("Date: " + startDate + " - " + endDate);
 		if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 			selectionController.NodeClick(this);
 	    } 

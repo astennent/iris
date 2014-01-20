@@ -4,8 +4,8 @@
 class TimeFrame {
 
 	private var file : DataFile;
-	private var startColumns = new List.<AFTuple>();
-	private var endColumns = new List.<AFTuple>();
+	private var startColumns = new List.<Attribute>();
+	private var endColumns = new List.<Attribute>();
 
 	private var validStart = true; //is every column valid?
 	private var validEnd = true;
@@ -35,6 +35,20 @@ class TimeFrame {
 		return (startColumns.Count > 0 || endColumns.Count > 0);
 	}
 
+	function getColumnIndex(attribute : Attribute, isStart : boolean) {
+		if (isStart) {
+			var relevantColumns = startColumns;
+		} else {
+			relevantColumns = endColumns;
+		}
+		for (var i = 0 ; i < relevantColumns.Count ; i++) {
+			if (relevantColumns[i] == attribute) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	private function setValid(isStart : boolean, val : boolean) {
 		if (isStart) {
 			validStart = val;
@@ -59,9 +73,9 @@ class TimeFrame {
 		}
 	}
 
-	function addColumn(attribute : Attribute, start : boolean) {
+	function addColumn(attribute : Attribute, isStart : boolean) {
 		//Check if it's in the columns already.
-		if (start) {
+		if (isStart) {
 			var checkColumns = startColumns;
 		} else {
 			checkColumns = endColumns;
@@ -69,19 +83,24 @@ class TimeFrame {
 
 		//Check if the attribute already in this list.
 		for (var column in checkColumns) {
-			if (attribute == column.attribute) {
+			if (attribute == column) {
 				Debug.Log("Already Added");
 				return;
 			} 
 		}
 
 		//add it to the list and update the aspect.
-		checkColumns.Add(new AFTuple(this, attribute, ""));
+		checkColumns.Add(attribute);
 		attribute.setAspect(Attribute.TIME_SERIES, true);
 		updateValid();
 	}
 
-	function removeColumn(isStart : boolean, index : int) {
+	function removeColumn(attribute : Attribute, isStart : boolean) {
+		var columnIndex = getColumnIndex(attribute, isStart);
+		removeColumn(columnIndex, isStart);
+	}
+
+	function removeColumn(index : int, isStart : boolean) {
 		if (isStart) {
 			var relevantColumns = startColumns;
 			var otherColumns = endColumns;
@@ -91,13 +110,13 @@ class TimeFrame {
 		}
 
 		//Remove the tuple from the list of columns.
-		var doomedAttribute = relevantColumns[index].attribute;
+		var doomedAttribute = relevantColumns[index];
 		relevantColumns.RemoveAt(index);
 
 		//Update the aspect
 		for (var column in otherColumns) {
-			if (doomedAttribute == column.attribute) {
-				return;
+			if (doomedAttribute == column) {
+				return; //It's present in the other columnSet, don't update aspect.
 			}
 		}
 		doomedAttribute.setAspect(Attribute.TIME_SERIES, false);	
@@ -121,8 +140,8 @@ class TimeFrame {
 		for (var columnSet in startAndEnd) {
 			var seenFormats = new HashSet.<String>();
 			for (var column in columnSet) {
-				var format = column.getFormat();
-				if (!column.isValid()) { 
+				var format = column.getTimeFrameFormat();
+				if (!column.hasValidTimeFrameFormat()) { 
 					setValid(onStart, false);	
 					invalidMessages[messageIndex] = "Invalid Column(s)";
 					break;
@@ -141,8 +160,8 @@ class TimeFrame {
 
 		seenFormats = new HashSet.<String>();
 		for (var column in endColumns) {
-			format = column.getFormat();
-			if (!column.isValid() || seenFormats.Contains(format)) {
+			format = column.getTimeFrameFormat();
+			if (!column.hasValidTimeFrameFormat() || seenFormats.Contains(format)) {
 				validEnd = false;
 				return;
 			}
@@ -159,49 +178,19 @@ class TimeFrame {
 
 	}
 
-}
-
-// Holds attributes and formats
-class AFTuple {
-	var attribute : Attribute;
-	private var formatIndex : int;
-	private var format : String;
-	private var valid : boolean;
-	private var timeFrame : TimeFrame;
-
-	public function AFTuple (timeFrame : TimeFrame, attribute : Attribute, format : String) {
-		this.attribute = attribute;
-		this.timeFrame = timeFrame;
-		setFormat(format);
-	}
-
-	function getFormat() {
-		return format;
-	}
-
-	function getFormatIndex() {
-		return formatIndex;
-	}
-
-	function setFormat(format : String) {
-		this.format = format;
-		valid = false;
-		for (var index = 0; index < TimeFrame.timeFormats.length ; index++) {
-			var timeFormat = TimeFrame.timeFormats[index];
-			if (format == timeFormat) {
-				formatIndex = index;
-				valid = true;
+	//Checks if a given attribute is present in the TimeFrame.
+	function getPresence(attr : Attribute, isStart : boolean) {
+		if (isStart) {
+			var relevantColumns = startColumns;
+		} else {
+			relevantColumns = endColumns;
+		}
+		for (var attribute in relevantColumns) {
+			if (attribute == attr) {
+				return true;
 			}
 		}
-
-		if (!valid) {
-			formatIndex = -1;
-		}
-
-		timeFrame.updateValid();
+		return false;
 	}
 
-	function isValid() {
-		return valid;
-	}
 }

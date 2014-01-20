@@ -26,6 +26,13 @@ static var aspectColors = [
 static var shownColor = new Color(1, 1, .5);
 static var pkeyColor = new Color(1, .5, .5);
 
+
+//TimeFrame variables
+private var timeFrameFormatIndex : int = -1;
+private var timeFrameFormat : String = "";
+private var validTimeFrameFormat : boolean = false;
+
+
 class Attribute {
 
 	//Constructor
@@ -136,8 +143,39 @@ class Attribute {
 
 		return new Color(r, g, b);
 	}
-
 	function setAspect(aspect : int, on : boolean) {
 		aspects[aspect] = on;
 	}
+
+
+	function getTimeFramePresence(isStart : boolean) {
+		return file.timeFrame.getPresence(this, isStart);
+	}
+	function getTimeFrameFormat() {
+		return timeFrameFormat;
+	}
+	function getTimeFrameFormatIndex() {
+		return timeFrameFormatIndex;
+	}
+	function setTimeFrameFormat(format : String) {
+		this.timeFrameFormat = format;
+		validTimeFrameFormat = false;
+		for (var index = 0; index < TimeFrame.timeFormats.length ; index++) {
+			var timeFormat = TimeFrame.timeFormats[index];
+			if (format == timeFormat) {
+				timeFrameFormatIndex = index;
+				validTimeFrameFormat = true;
+			}
+		}
+
+		if (!validTimeFrameFormat) {
+			timeFrameFormatIndex = -1;
+		}
+
+		file.timeFrame.updateValid();
+	}
+	function hasValidTimeFrameFormat() {
+		return validTimeFrameFormat;
+	}
+
 }

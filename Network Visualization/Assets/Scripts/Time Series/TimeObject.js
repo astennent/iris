@@ -44,8 +44,8 @@ class TimeObject extends Data {
 		dateValues[0] = dateValues[1] = dateValues[2] = 1;
 
 		for (var column in columns) {
-			var attr_index = column.attribute.column_index;
-			dateValues[column.getFormatIndex()] = GetNumeric(attr_index);
+			var attr_index = column.column_index;
+			dateValues[column.getTimeFrameFormatIndex()] = GetNumeric(attr_index);
 		}
 
 		try {

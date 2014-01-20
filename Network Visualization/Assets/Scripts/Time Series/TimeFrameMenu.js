@@ -41,7 +41,7 @@ class TimeFrameMenu extends BaseMenu {
 	}
 
 	function DrawColumns(cur_y : int, isStart : boolean, timeFrame : TimeFrame) {
-		var columns : List.<AFTuple> = timeFrame.getColumns(isStart);
+		var columns = timeFrame.getColumns(isStart);
 
 		var timeframe_box = new Rect(x+10, cur_y, width-20, columns.Count*20+50);
 		
@@ -101,32 +101,32 @@ class TimeFrameMenu extends BaseMenu {
 			var column_rect = new Rect(x+30, cur_y, 80, 20);
 
 			//Use the aspect color.
-			GUI.color = column.attribute.getAspectColor();
+			GUI.color = column.getAspectColor();
 			
 			//Draw the attribute label
-			GUI.Label(column_rect, column.attribute.getRestrictedName(column_rect.width));
+			GUI.Label(column_rect, column.getRestrictedName(column_rect.width));
 
 			//Draw the format textbox
 			column_rect.x += column_rect.width+5;
 
-			if (!column.isValid()) {
+			if (!column.hasValidTimeFrameFormat()) {
 				GUI.color = Color.red;
 			}
 
-			var old_format = column.getFormat();
+			var old_format = column.getTimeFrameFormat();
 			var new_format = GUI.TextField(column_rect, old_format);
 			if (new_format != old_format) {
-				column.setFormat(new_format);
+				column.setTimeFrameFormat(new_format);
 			}
 
 			//Restore the aspect color (if it was invalid)
-			GUI.color = column.attribute.getAspectColor();
+			GUI.color = column.getAspectColor();
 
 			//Draw the Remove button
 			column_rect.x += column_rect.width+5;
 			column_rect.width = 20;
 			if (GUI.Button(column_rect, "x")) {
-				timeFrame.removeColumn(isStart, column_index);
+				timeFrame.removeColumn(column_index, isStart);
 			}
 
 			cur_y += 20;

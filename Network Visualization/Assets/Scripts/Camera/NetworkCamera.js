@@ -3,12 +3,7 @@
 private var selectionController : SelectionController;
 private var guiplus : GuiPlus;
 var target: Transform;
-function Start () {
-	target = GameObject.FindGameObjectWithTag("GameController").transform;
-	selectionController = GameObject.FindGameObjectWithTag("GameController").GetComponent(SelectionController);
-	guiplus = selectionController.GetComponent(GuiPlus);
-	transform.parent = target;
-}
+
 
 //Used for camera movement
 var x : float = 0;
@@ -22,6 +17,13 @@ var freeCamera : boolean = false;
 
 //When a user clicks, if the mouse is in a menu then dragging will not spin the camera around.
 private var allowedToSpin : boolean = true;
+
+function Start () {
+	target = GameObject.FindGameObjectWithTag("GameController").transform;
+	selectionController = GameObject.FindGameObjectWithTag("GameController").GetComponent(SelectionController);
+	guiplus = selectionController.GetComponent(GuiPlus);
+	transform.parent = target;
+}
 
 function Update () {
 
@@ -98,41 +100,46 @@ function UpdateLocked(selectionCenter : Vector3){
 		}
 		x += Input.GetAxis("Mouse X")*2;
 		y += Input.GetAxis("Mouse Y")*2;
+	}	
+	var z : float = Input.GetAxis("Mouse ScrollWheel");
+	desired_distance += z;
+	desired_distance = Mathf.Clamp(desired_distance, 1, 1000);
+	if (z > 0) {
+		print(z + " " + desired_distance);
 	}
-	
+
+	//Save the original position and rotation for Lerping.
 	var originalRotation : Quaternion = transform.rotation;
 	var originalPosition : Vector3 = transform.position;
-	var targetPosition :Vector3 = transform.position;
+	var current_distance : float = Vector3.Distance(selectionCenter, originalPosition);
 
+	//Calculate target position based on x and y movement..
+	var targetPosition : Vector3 = transform.position;
 	targetPosition += transform.right*-x;
 	targetPosition += transform.up*-y;
-	
-	x*=.9;
-	y*=.9;
-	r*=.9;
 
-	var z : float = Input.GetAxis("Mouse ScrollWheel");
+	//Adjust based on distance to the target
+	targetPosition += transform.forward * (current_distance - desired_distance)/2;
 
-	desired_distance = Mathf.Clamp(desired_distance+z, 20, 1000);
-
-	var current_distance : float = Vector3.Distance(selectionCenter, targetPosition);
-	transform.position += transform.forward * (current_distance - desired_distance) / 12;
-	
-	
 	transform.LookAt(selectionCenter, transform.up);
 	transform.RotateAround(transform.forward, r);
 	transform.position = Vector3.Lerp(transform.position, targetPosition, .25);
 	transform.rotation = Quaternion.Slerp(originalRotation, transform.rotation,.3);
 
+	//Add friction
+	x*=.9;
+	y*=.9;
+	r*=.9;
 }
 
 
-function setTarget(n : Node){
-	if (n != null) {
-		target = n.transform;
-		desired_distance = 100;
+function setTarget(node : Node){
+	if (node != null) {
+		target = node.transform;
+		desired_distance = 15 + 2*node.getSize();
 	} else {
 		target = null;
+		desired_distance = 50;
 	}
 
 	if (!freeCamera){
