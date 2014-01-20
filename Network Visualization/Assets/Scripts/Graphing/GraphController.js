@@ -2,6 +2,7 @@
 
 private var graphing = false;
 private var file : DataFile;
+private var file_index : int = -1;
 
 private var axes : Attribute[];
 private var fileManager : FileManager;
@@ -63,26 +64,24 @@ function toggleGraphing(){
 }
 function setGraphing(graphing : boolean) {
 	this.graphing = graphing;
-
-	//if file hasn't yet been set, make it the first file.
-	if (file == null) {
-		if (fileManager.files.Count > 0) {
-			file = fileManager.files[0];
-		}
-	}
-
 	fileManager.UpdateNodeSizes();
 	axisController.Redraw();
-
 }
 
-function setFile(file : DataFile){
-	this.file = file;
+function setFileIndex(file_index : int) {
+	this.file_index = file_index;
+	if (file_index >= 0 && file_index < fileManager.files.Count) {
+		this.file = fileManager.files[file_index];
+	} else {
+		this.file = null;
+	}
 	resetAxes();
 }
-
 function getFile() {
 	return file;
+}
+function getFileIndex() {
+	return file_index;
 }
 
 function getAxes() {
@@ -139,7 +138,7 @@ function setAxis(axis_index : int, attribute : Attribute) {
 }
 
 function Update(){
-	if (graphing) {
+	if (graphing && file != null) {
 		var nodes = file.nodes;
 		for (var entry in nodes) {
 			var node = entry.Value;

@@ -85,7 +85,7 @@ class TimeFrameMenu extends BaseMenu {
 		//Draw the column headers.
 		if (columns.Count > 0) {
 			//Draw the headers
-			cur_y += 60;
+			cur_y += 30;
 			var header_rect = new Rect(x+30, cur_y, 80, 20);
 			GUI.Label(header_rect, "Name");
 			header_rect.x += header_rect.width+5;

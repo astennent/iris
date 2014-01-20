@@ -39,7 +39,6 @@ class Dropdown extends MonoBehaviour {
 				continue;
 			}
 		
-
 			//aligns the arrow image to the right side and the label to the center.
 			var oldButtonAlignment = GUI.skin.button.alignment;
 			var oldLabelAlignment = GUI.skin.label.alignment;
@@ -83,7 +82,6 @@ class Dropdown extends MonoBehaviour {
 				//Draw a Box to darken the background behind the buttons.
 				GUI.Box(outerBox, "");
 				GUI.Box(outerBox, "");
-
 
 				//Create a scroll pane the size of the outer box.
 				var innerBox = new Rect(0, 0, optionBox.width-3, requiredHeight);

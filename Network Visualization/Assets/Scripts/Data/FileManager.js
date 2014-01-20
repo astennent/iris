@@ -27,7 +27,6 @@ function Start(){
 		fga_id.is_pkey = false;
 		fga_name.is_pkey = true;
 
-
 		full_group_attrs.Activate();
 		
 		var ael_ego : Attribute = alliance_edge_list.attributes[0];
@@ -47,6 +46,14 @@ function Start(){
 		//Guatamala
 		Load("Guatamala", true);
 	}
+}
+
+function getFileNames() : String[]{
+	var output = new String[files.Count];
+	for (var i = 0 ; i < files.Count ; i++) {
+		output[i] = files[i].shortName();
+	}
+	return output;
 }
 
 function UpdateDirectoryData(dest : String){

@@ -40,43 +40,30 @@ class GraphMenu extends BaseMenu {
 
 	function DrawFileSelection(cur_y : int) {
 		cur_y += 5;
-		var files = fileManager.files;
-
-		var fileRect = new Rect(x+5, cur_y, width-10, 90);
-		GUI.Box(fileRect, "Select File");
-		fileRect.height -= 20; fileRect.y+=20;
-
-		fileScrollPosition = GUI.BeginScrollView (fileRect, 
-				fileScrollPosition, Rect (0, 0, width-26, 25*files.Count));
-
-		var scroll_y = 0;
-
-		for (var file in files) {
-			
-			var buttonRect = new Rect(5, scroll_y, width-25, 25);
-			var selected = false;
-
-			if (file == graphController.getFile()) {
-				GUI.color = new Color(1, .8, .1);
-				selected = true;
-			} else {
-				GUI.color = Color.white;
-			}
-
-			if (GUI.Button(buttonRect,file.shortName()) && !selected) {
-				graphController.setFile(file);
-			}
-
-			scroll_y += 25;
+	
+		//Draw the file selection dropdown
+		var selection_rect = new Rect(x+5, cur_y, width-10, 30);
+		var dropHeight = 120;
+		var fileNames = fileManager.getFileNames();
+		var selected_file_index = graphController.getFileIndex();
+		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, fileNames, selected_file_index, 1, "Select a File");
+		
+		//Update file if necessary
+		if (new_selected_index != selected_file_index) {
+			graphController.setFileIndex(new_selected_index);
 		}
 
-		GUI.EndScrollView();
-
-		GUI.color = Color.white;
-		return cur_y+90;
+		return cur_y+30;
 	}
 
 	function DrawOptions(cur_y : int) {
+
+		//Don't draw options if it's a linking table or you're graphing.
+		var file = graphController.getFile();
+		if (file == null || file.linking_table) {
+			return cur_y;
+		}
+
 		cur_y += 5;
 
 		var optionsRect = new Rect(x+5, cur_y, width-10, 70);
@@ -134,17 +121,24 @@ class GraphMenu extends BaseMenu {
 		var file = graphController.getFile();
 		if (file == null) {
 			return -1;
-		} 
+		} else if (file.linking_table) {
+			//store alignment and center.
+			var oldLabelAlignment = GUI.skin.label.alignment;
+			GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+
+			GUI.Label(new Rect(x+5, cur_y+20, width-10, 20), "Cannot graph linking tables.");
+			
+			//restore alignment and return
+			GUI.skin.label.alignment = oldLabelAlignment;
+			return cur_y + 20;
+		}
 
 		var attrs = file.attributes;
 
 		var axesRect = new Rect(x+5, cur_y, width-10, menuController.getScreenHeight()-cur_y-5);
 		GUI.Box(axesRect, "Select Axes");
 
-		if (file.linking_table) {
-			GUI.Label(new Rect(x+5, cur_y+20, width-10, 20), "[Cannot graph linking tables]");
-			return cur_y + 20;
-		}
+		
 
 		cur_y+=20;
 		var axis_spacing = 25; //horizontal space between radio buttons
