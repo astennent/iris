@@ -8,11 +8,13 @@ class AttributeMenu extends BaseMenu {
 
 	private var fkeyScrollPosition : Vector2 = Vector2.zero;
 
+	static var DROPDOWN_ID = 3;
+
 	function Start() {
 		parent = GetComponent(FileMenu);
 		super.Start();
 		title = "Attribute Manager";
-		width = 250;
+		width = 280;
 	}
 
 	function setSelectedIndex(index : int){
@@ -23,6 +25,7 @@ class AttributeMenu extends BaseMenu {
 			selected_index = index;
 			file = fileManager.files[fileMenu.selected_file_index];
 			attribute = file.attributes[selected_index];
+			Dropdown.reset(DROPDOWN_ID);
 		} 
 	}
 
@@ -111,7 +114,6 @@ class AttributeMenu extends BaseMenu {
 			if (attribute.getTimeFramePresence(isStart)) {
 				//The attribute is present in the TimeFrame.
 				GUI.Label(label_box, "Part of " + name + " Date");
-				var old_format = attribute.getTimeFrameFormat();
 				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 				if (GUI.Button(button_box, "Remove")) {
 					attribute.file.timeFrame.removeColumn(attribute, isStart);
@@ -124,7 +126,7 @@ class AttributeMenu extends BaseMenu {
 					attribute.file.timeFrame.addColumn(attribute, isStart);
 				}
 			}
-			
+
 			label_box.y += 20;
 			button_box.y += 20;
 		}
@@ -132,16 +134,50 @@ class AttributeMenu extends BaseMenu {
 		if (present) {
 			GUI.color = Color.white;
 			GUI.Label(label_box, "Format:");
-			button_box.width += 30;
+
+			//Draw the format textbox
+			var old_format = attribute.getTimeFrameFormat();
+			var text_box = new Rect(x+58, label_box.y, 80, 20);
 			if (attribute.hasValidTimeFrameFormat()) {
 				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 			} else {
 				GUI.color = Color.red;
 			}
-			var new_format = GUI.TextField(button_box, attribute.getTimeFrameFormat());
+			var new_format = GUI.TextField(text_box, old_format);
 			if (old_format != new_format) {
 				attribute.setTimeFrameFormat(new_format);
+				Dropdown.setSelectedIndex(DROPDOWN_ID, TimeParser.getFormatIndex(new_format));
 			}
+
+			//Update the dropdown for any changes in the ..
+			var format = attribute.getTimeFrameFormat();
+			var selected_index = TimeParser.getFormatIndex(format);
+
+			//Draw the dropdown
+			var presetNames = TimeParser.presetNames;
+			var dropdown_box = new Rect(x+142, label_box.y, width-153, 20);
+			var new_selected_index = Dropdown.Select(dropdown_box, 200, presetNames, selected_index, DROPDOWN_ID, "Presets");
+
+			//If the selected index changed
+			if (new_selected_index == -1) {
+				attribute.setTimeFrameFormat("");
+			} else if (new_selected_index != TimeParser.presetNames.length - 1 && // The value is not "Custom"
+					selected_index != new_selected_index) {
+				attribute.setTimeFrameFormat(TimeParser.presetValues[new_selected_index]);
+			}
+
+			if (!attribute.hasValidTimeFrameFormat()) {
+				cur_y += 20;
+				var warning_rect = new Rect(x+5, dropdown_box.y+25, width-10, 20);
+				GUI.Box(warning_rect, "");
+				GUI.color = Color.red;
+
+				var oldAlignment = GUI.skin.label.alignment;
+				GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+				GUI.Label(warning_rect, attribute.getTimeFrameFormatWarning());
+				GUI.skin.label.alignment = oldAlignment;
+			}		
+
 		}
 
 		GUI.color = Color.white;

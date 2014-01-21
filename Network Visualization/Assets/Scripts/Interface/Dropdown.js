@@ -26,6 +26,16 @@ class Dropdown extends MonoBehaviour {
 		}
 	}
 
+	static function setSelectedIndex(id : int, selectedIndex : int) {
+		if (dropdowns.ContainsKey(id)) {
+			dropdowns[id].selectedIndex = selectedIndex;
+		}
+	}
+
+	static function reset(id : int) {
+		dropdowns.Remove(id);
+	}
+
 	function OnGUI() {
 
 		//Set special GUI properties.

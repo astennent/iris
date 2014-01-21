@@ -11,8 +11,6 @@ class TimeFrame {
 	private var validEnd = true;
 	private var invalidMessages = ["",""];
 
-	static var timeFormats = ["Year", "Month", "Day", "Hour", "Minute", "Second"];
-
 	public function TimeFrame(file : DataFile) {
 		this.file = file;
 	}
@@ -138,34 +136,42 @@ class TimeFrame {
 		var messageIndex = 0;
 
 		for (var columnSet in startAndEnd) {
-			var seenFormats = new HashSet.<String>();
+
+			var invalidated = false;
+
+			//Check each column to make sure it's actually valid.
+			for (var column in columnSet) {
+				if (!column.hasValidTimeFrameFormat()) {
+					invalidMessages[messageIndex] = column.getTimeFrameFormatWarning();
+					setValid(onStart, false);
+					invalidated = true;
+					break;
+				}
+			}
+
+			//If any individual column is invalid, stop.
+			if (invalidated) {
+				continue;
+			}
+
+			//Check each column to make sure you're not duplicating times.
+			var seenLetters = new HashSet.<String>();
 			for (var column in columnSet) {
 				var format = column.getTimeFrameFormat();
-				if (!column.hasValidTimeFrameFormat()) { 
-					setValid(onStart, false);	
-					invalidMessages[messageIndex] = "Invalid Column(s)";
-					break;
-				} else if (seenFormats.Contains(format)) {
-					setValid(onStart, false);
-					invalidMessages[messageIndex] = "Duplicate Formats";
-					break;	
+				var letters = TimeParser.getUsedLetters(format);
+				for (var letter in letters) {
+					if (seenLetters.Contains(letter)) {
+						invalidMessages[messageIndex] = "Duplicate entries for " + TimeParser.getNameOfLetter(letter);
+						setValid(onStart, false);
+					} else {
+						seenLetters.Add(letter);
+					}
 				}
-				seenFormats.Add(format);
 			}
 
 			//Use the second columnSet.
 			onStart = false;
 			messageIndex = 1;
-		}
-
-		seenFormats = new HashSet.<String>();
-		for (var column in endColumns) {
-			format = column.getTimeFrameFormat();
-			if (!column.hasValidTimeFrameFormat() || seenFormats.Contains(format)) {
-				validEnd = false;
-				return;
-			}
-			seenFormats.Add(format);
 		}
 
 		var valid = isValid();

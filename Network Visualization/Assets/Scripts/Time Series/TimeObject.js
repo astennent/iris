@@ -3,10 +3,9 @@
 //extended by Connection and Node
 class TimeObject extends Data {
 
-	static var DEFAULT_START_DATE = new Date(1, 1, 1);
-	static var DEFAULT_END_DATE = new Date(9999, 1, 1);
-	var startDate : Date = DEFAULT_START_DATE;
-	var endDate : Date = DEFAULT_END_DATE;
+	static var DEFAULT_DATE = new Date(1, 1, 1);
+	var startDate : Date = DEFAULT_DATE;
+	var endDate : Date = DEFAULT_DATE;
 	private var validTime : boolean = true;
 
 	function Update() {
@@ -17,8 +16,8 @@ class TimeObject extends Data {
 	function validateDate() {
 		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
 		var current_date = timeSeriesController.getCurrentDate();
-		validTime = ((startDate < current_date || startDate == DEFAULT_START_DATE) && 
-				 (endDate > current_date || endDate == DEFAULT_END_DATE)); 
+		validTime = ((startDate <= current_date || startDate == DEFAULT_DATE) && 
+				 (endDate > current_date || endDate == DEFAULT_DATE)); 
 	}
 
 	function hasValidTime() : boolean {
@@ -40,19 +39,20 @@ class TimeObject extends Data {
 
 	private function UpdateDate(timeFrame : TimeFrame, isStart : boolean) {
 		var columns = timeFrame.getColumns(isStart);
-		var dateValues = new int[6];
-		dateValues[0] = dateValues[1] = dateValues[2] = 1;
+		var formats = new List.<String>(); //list of all the formats of the attributes
+		var values = new List.<String>(); //list of all this TimeObject's values for those attributes
 
 		for (var column in columns) {
 			var attr_index = column.column_index;
-			dateValues[column.getTimeFrameFormatIndex()] = GetNumeric(attr_index);
+			formats.Add(column.getTimeFrameFormat());
+			values.Add(Get(attr_index));
 		}
 
 		try {
-			var date = new Date(dateValues[0], dateValues[1], //create the date
-					dateValues[2], dateValues[3], dateValues[4], dateValues[5]);
+			var date = TimeParser.parse(formats, values);
 			setDate(isStart, date);
 		} catch (err) {
+			//Debug.Log(err);
 			resetDate(isStart);
 		}
 	}
@@ -67,16 +67,14 @@ class TimeObject extends Data {
 
 	private function resetDate(isStart : boolean) {
 		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
+		var date = getDate(isStart);
+		if (date != DEFAULT_DATE) {
+			timeSeriesController.removeDate(date);
+		}
 		if (isStart) {
-			if (startDate != DEFAULT_START_DATE) {
-				timeSeriesController.removeDate(startDate);
-			}
-			startDate = DEFAULT_START_DATE;
+			startDate = date;
 		} else {
-			if (endDate != DEFAULT_END_DATE) {
-				timeSeriesController.removeDate(endDate);
-			}
-			endDate = DEFAULT_END_DATE;
+			endDate = date;
 		}
 	}
 
@@ -88,7 +86,7 @@ class TimeObject extends Data {
 		} else {
 			endDate = date;
 		}
-		if (date != DEFAULT_START_DATE && date != DEFAULT_END_DATE) {
+		if (date != DEFAULT_DATE) {
 			timeSeriesController.addDate(startDate);
 		}
 	}

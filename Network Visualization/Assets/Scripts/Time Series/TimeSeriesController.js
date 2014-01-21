@@ -155,8 +155,7 @@ function updateDates(width : int) {
 	//Calculate the first and last dates and find the difference in seconds.
 	var allDates = dates.Keys;
 
-	first_date = TimeObject.DEFAULT_START_DATE;
-	last_date = TimeObject.DEFAULT_END_DATE;
+	first_date = last_date = TimeObject.DEFAULT_DATE;
 
 	//Update first and last dates
 	var on_first = true;

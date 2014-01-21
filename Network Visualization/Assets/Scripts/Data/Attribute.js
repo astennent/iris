@@ -28,9 +28,9 @@ static var pkeyColor = new Color(1, .5, .5);
 
 
 //TimeFrame variables
-private var timeFrameFormatIndex : int = -1;
 private var timeFrameFormat : String = "";
 private var validTimeFrameFormat : boolean = false;
+private var timeFrameFormatWarning : String = "";
 
 
 class Attribute {
@@ -154,24 +154,13 @@ class Attribute {
 	function getTimeFrameFormat() {
 		return timeFrameFormat;
 	}
-	function getTimeFrameFormatIndex() {
-		return timeFrameFormatIndex;
+	function getTimeFrameFormatWarning() {
+		return timeFrameFormatWarning;
 	}
 	function setTimeFrameFormat(format : String) {
 		this.timeFrameFormat = format;
-		validTimeFrameFormat = false;
-		for (var index = 0; index < TimeFrame.timeFormats.length ; index++) {
-			var timeFormat = TimeFrame.timeFormats[index];
-			if (format == timeFormat) {
-				timeFrameFormatIndex = index;
-				validTimeFrameFormat = true;
-			}
-		}
-
-		if (!validTimeFrameFormat) {
-			timeFrameFormatIndex = -1;
-		}
-
+		timeFrameFormatWarning = TimeParser.getFormatWarning(format);
+		validTimeFrameFormat = (timeFrameFormatWarning == "");
 		file.timeFrame.updateValid();
 	}
 	function hasValidTimeFrameFormat() {

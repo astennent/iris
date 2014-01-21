@@ -359,8 +359,10 @@ class Node extends TimeObject {
 	function UpdateDate() {
 		//update its own date.
 		super.UpdateDate();
-		for (var connection in connections) {
-			connection.UpdateDate();
+		if (source.linking_table) {
+			for (var connection in connections) {
+				connection.UpdateDate();
+			}
 		}
 	}
 
@@ -368,8 +370,10 @@ class Node extends TimeObject {
 	function validateDate() {
 		//update its own date.
 		super.validateDate();
-		for (var connection in connections) {
-			connection.validateDate();
+		if (source.linking_table) {
+			for (var connection in connections) {
+				connection.validateDate();
+			}
 		}
 
 		//delay resizing until after all other nodes have been validated.

@@ -37,12 +37,6 @@ function Start(){
 		alliance_edge_list.linking_table = true;
 		alliance_edge_list.Activate();	
 
-		//TimeFrame
-		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[2], true);
-		full_group_attrs.timeFrame.getColumns(true)[0].setTimeFrameFormat("Year");
-		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[3], false);
-		full_group_attrs.timeFrame.getColumns(false)[0].setTimeFrameFormat("Year");
-
 		//Guatamala
 		Load("Guatamala", true);
 		var guatamala = files[2];
@@ -52,6 +46,14 @@ function Start(){
 		guatamala.attributes[3].is_pkey = true;
 		guatamala.createSimpleFkey(full_group_attrs,  guatamala.attributes[4], fga_name);
 		guatamala.Activate();
+
+		//TimeFrame
+		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[2], true);
+		full_group_attrs.timeFrame.getColumns(true)[0].setTimeFrameFormat("yyyy");
+		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[3], false);
+		full_group_attrs.timeFrame.getColumns(false)[0].setTimeFrameFormat("yyyy");
+		guatamala.timeFrame.addColumn(guatamala.attributes[1], true);
+		guatamala.timeFrame.getColumns(true)[0].setTimeFrameFormat("MM/dd/yyyy");
 
 	}
 }
