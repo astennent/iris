@@ -14,6 +14,8 @@ class FileMenu extends BaseMenu {
 	private var fileString : String = "";
 	var error_message : String = "";
 
+	static var DROPDOWN_ID = "0";
+
 	
 	/*	Used to decide what to display below the line.
 		-1 : nothing
@@ -61,7 +63,7 @@ class FileMenu extends BaseMenu {
 		for (var i = 0 ; i < fileManager.files.Count ; i++) {
 			filesList[i] = fileManager.files[i].shortName();
 		}
-		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, filesList, selected_file_index, 0, "Select a File");
+		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, filesList, selected_file_index, DROPDOWN_ID, "Select a File");
 		if (new_selected_index != selected_file_index) {
 			setSelectedFile(new_selected_index);
 		}

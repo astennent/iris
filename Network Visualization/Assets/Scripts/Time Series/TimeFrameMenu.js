@@ -25,8 +25,11 @@ class TimeFrameMenu extends BaseMenu {
 		// }
 
 		//get the currently selected file
+		if (cur_file != fileMenu.getSelectedFile()) {
+			setFile(fileMenu.getSelectedFile());
+		}
 		cur_file = fileMenu.getSelectedFile();
-		if (cur_file == null) {
+		if (cur_file == null || !displaying) {
 			return;
 		}		
 		var timeFrame = cur_file.timeFrame;
@@ -36,6 +39,15 @@ class TimeFrameMenu extends BaseMenu {
 		
 	}
 
+	function setFile(cur_file : DataFile) {
+		this.cur_file = cur_file;
+		for (var key in Dropdown.getIDs()) {
+			if (key.StartsWith("2") || key.StartsWith("3")) {
+				Dropdown.reset(key);
+			}
+		}
+	}
+
 	function testFunction(){
 		Debug.Log("Test" + this);
 	}
@@ -43,17 +55,20 @@ class TimeFrameMenu extends BaseMenu {
 	function DrawColumns(cur_y : int, isStart : boolean, timeFrame : TimeFrame) {
 		var columns = timeFrame.getColumns(isStart);
 
-		var timeframe_box = new Rect(x+10, cur_y, width-20, columns.Count*20+50);
+		var timeframe_box = new Rect(x+5, cur_y, width-10, columns.Count*20+50);
+		//Adjust height
+		if (columns.Count > 0) {
+			timeframe_box.height += 40;
+		}
 		
 		//Adjust the length of the box when adding an attribute
 		var creating = (creatingStart && isStart || creatingEnd && !isStart); 
 		if (creating) {
- 			timeframe_box.height += 105;
+ 			timeframe_box.height += 100;
 		}
 
 		//Determine the text at the top of the box
 		var box_text : String;
-
 		var invalidMessage = timeFrame.getInvalidMessage(isStart);
 		if (invalidMessage == "") {
 			if (isStart) {
@@ -61,16 +76,13 @@ class TimeFrameMenu extends BaseMenu {
 			} else {
 				box_text = "End Date: ";
 			}
-
-			//Draw the box.
 			if (columns.Count > 0) {
 				box_text += columns.Count + " columns";
 				if (columns.Count == 1) {
 					box_text = box_text[0:-1]; //Remove the 's'
 				}			
-				timeframe_box.height += 40; //Column headers (20)
 			} else {
-				box_text += "Not Defined";
+				box_text += "None";
 			}
 		} else {
 			box_text = invalidMessage;
@@ -86,9 +98,9 @@ class TimeFrameMenu extends BaseMenu {
 		if (columns.Count > 0) {
 			//Draw the headers
 			cur_y += 30;
-			var header_rect = new Rect(x+30, cur_y, 80, 20);
+			var header_rect = new Rect(x+12, cur_y, 80, 20);
 			GUI.Label(header_rect, "Name");
-			header_rect.x += header_rect.width+5;
+			header_rect.x += 63;
 			GUI.Label(header_rect, "Format");
 
 		}
@@ -98,7 +110,9 @@ class TimeFrameMenu extends BaseMenu {
  		cur_y += 20;
 		for (var column_index : int = 0 ; column_index < columns.Count ; column_index++) {
 			var column = columns[column_index];
-			var column_rect = new Rect(x+30, cur_y, 80, 20);
+			var column_rect = new Rect(x+12, cur_y, 80, 20);
+
+			var DROPDOWN_ID = attributeMenu.getDropdownId(column);
 
 			//Use the aspect color.
 			GUI.color = column.getAspectColor();
@@ -107,23 +121,39 @@ class TimeFrameMenu extends BaseMenu {
 			GUI.Label(column_rect, column.getRestrictedName(column_rect.width));
 
 			//Draw the format textbox
-			column_rect.x += column_rect.width+5;
-
+			column_rect.x += 63;
 			if (!column.hasValidTimeFrameFormat()) {
 				GUI.color = Color.red;
 			}
-
 			var old_format = column.getTimeFrameFormat();
 			var new_format = GUI.TextField(column_rect, old_format);
 			if (new_format != old_format) {
 				column.setTimeFrameFormat(new_format);
+				Dropdown.setSelectedIndex(DROPDOWN_ID, TimeParser.getFormatIndex(new_format));
 			}
+
+			//Update the dropdown for any changes in the text
+			var format = column.getTimeFrameFormat();
+			var selected_index = TimeParser.getFormatIndex(format);
 
 			//Restore the aspect color (if it was invalid)
 			GUI.color = column.getAspectColor();
 
+			column_rect.x += 85;
+			//Draw the dropdown
+			var presetNames = TimeParser.presetNames;
+			var new_selected_index = Dropdown.Select(column_rect, 200, presetNames, selected_index, DROPDOWN_ID, "Presets");
+
+			//If the selected index changed
+			if (new_selected_index == -1) {
+				column.setTimeFrameFormat("");
+			} else if (new_selected_index != TimeParser.presetNames.length - 1 && // The value is not "Custom"
+					selected_index != new_selected_index) {
+				column.setTimeFrameFormat(TimeParser.presetValues[new_selected_index]);
+			}
+
 			//Draw the Remove button
-			column_rect.x += column_rect.width+5;
+			column_rect.x += 85;
 			column_rect.width = 20;
 			if (GUI.Button(column_rect, "x")) {
 				timeFrame.removeColumn(column_index, isStart);

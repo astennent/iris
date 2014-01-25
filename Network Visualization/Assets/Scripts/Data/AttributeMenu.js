@@ -8,8 +8,6 @@ class AttributeMenu extends BaseMenu {
 
 	private var fkeyScrollPosition : Vector2 = Vector2.zero;
 
-	static var DROPDOWN_ID = 3;
-
 	function Start() {
 		parent = GetComponent(FileMenu);
 		super.Start();
@@ -22,10 +20,10 @@ class AttributeMenu extends BaseMenu {
 			DisableDisplay();
 		} else {
 			EnableDisplay();
-			selected_index = index;
 			file = fileManager.files[fileMenu.selected_file_index];
+			selected_index = index;
 			attribute = file.attributes[selected_index];
-			Dropdown.reset(DROPDOWN_ID);
+			Dropdown.reset(getDropdownId(attribute));
 		} 
 	}
 
@@ -132,24 +130,26 @@ class AttributeMenu extends BaseMenu {
 		}
 
 		if (present) {
+			var DROPDOWN_ID = getDropdownId(attribute);
 			GUI.color = Color.white;
 			GUI.Label(label_box, "Format:");
 
 			//Draw the format textbox
-			var old_format = attribute.getTimeFrameFormat();
 			var text_box = new Rect(x+58, label_box.y, 80, 20);
 			if (attribute.hasValidTimeFrameFormat()) {
 				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 			} else {
 				GUI.color = Color.red;
 			}
+
+			var old_format = attribute.getTimeFrameFormat();
 			var new_format = GUI.TextField(text_box, old_format);
 			if (old_format != new_format) {
 				attribute.setTimeFrameFormat(new_format);
 				Dropdown.setSelectedIndex(DROPDOWN_ID, TimeParser.getFormatIndex(new_format));
 			}
 
-			//Update the dropdown for any changes in the ..
+			//Update the dropdown for any changes in the text
 			var format = attribute.getTimeFrameFormat();
 			var selected_index = TimeParser.getFormatIndex(format);
 
@@ -166,6 +166,7 @@ class AttributeMenu extends BaseMenu {
 				attribute.setTimeFrameFormat(TimeParser.presetValues[new_selected_index]);
 			}
 
+			// Draw out the warning label
 			if (!attribute.hasValidTimeFrameFormat()) {
 				cur_y += 20;
 				var warning_rect = new Rect(x+5, dropdown_box.y+25, width-10, 20);
@@ -185,10 +186,12 @@ class AttributeMenu extends BaseMenu {
 	}
 
 	function DrawForeignKeyEditing(cur_y : int) {
-
 		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
-
 		return cur_y;
+	}
+
+	function getDropdownId(attribute : Attribute) {
+		return "3"+ attribute.file.shortName()+attribute.column_index;
 	}
 
 	function DisableDisplay(){

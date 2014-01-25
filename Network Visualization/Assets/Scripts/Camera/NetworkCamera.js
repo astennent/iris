@@ -81,8 +81,8 @@ function UpdateLocked(selectionCenter : Vector3){
 
 	
 	if (Input.GetMouseButton(0) && allowedToSpin){
-		x += Input.GetAxis("Mouse X")*5;
-		y += Input.GetAxis("Mouse Y")*5;
+		x += Input.GetAxis("Mouse X")*4;
+		y += Input.GetAxis("Mouse Y")*4;
 	}
 	if (Input.GetMouseButton(1) && allowedToSpin){
 		if (mouseCoords.x < coordinates.x && mouseCoords.y > coordinates.y){

@@ -4,6 +4,8 @@ class GraphMenu extends BaseMenu {
 	private var fileScrollPosition : Vector2 = Vector2.zero;
 	private var axesScrollPosition : Vector2 = Vector2.zero;
 
+	static var DROPDOWN_ID = "1";
+
 	function Start(){
 		parent = GetComponent(MainMenu);
 		super.Start();
@@ -46,7 +48,7 @@ class GraphMenu extends BaseMenu {
 		var dropHeight = 120;
 		var fileNames = fileManager.getFileNames();
 		var selected_file_index = graphController.getFileIndex();
-		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, fileNames, selected_file_index, 1, "Select a File");
+		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, fileNames, selected_file_index, DROPDOWN_ID, "Select a File");
 		
 		//Update file if necessary
 		if (new_selected_index != selected_file_index) {
