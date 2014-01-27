@@ -496,6 +496,7 @@ class DataFile {
 			
 			for (var fkey in foreignKeys) {
 				fkey.linking = true;
+				fkey.source_file = this;
 			}
 				
 			//TODO: make n-way connections.

@@ -114,15 +114,7 @@ class Node extends TimeObject {
 				continue;
 			}
 
-			moveRelativeTo(other_node, other_node.size, false, connection);
-
-			if (selectionController.dragging){
-				var other_connections = other_node.connections;
-				for (var other_connection : Connection in other_connections){
-					var other_other_node = other_connection.to;
-					moveRelativeTo(other_other_node, other_node.size, true, connection);
-				}
-			}
+			moveRelativeTo(other_node, other_node.size, null, connection);
 		}
 	    
 	    transform.rotation = oldRotation;
@@ -203,7 +195,7 @@ class Node extends TimeObject {
 		return new Color(color.r, color.g, color.b);
 	}
 
-	function moveRelativeTo(other_node : Node, other_size: float, second_level : boolean, connection : Connection) {
+	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, connection : Connection) {
 
 		if (networkController.isPaused()){
 			return;
@@ -224,7 +216,7 @@ class Node extends TimeObject {
 			}
 			connectionAttributeWeight = dataSource.GetNumeric(fkeyWeightAttribute);
 
-			averageValue = 1;//fkeyWeightAttribute.getAverageValue();
+			averageValue = fkeyWeightAttribute.getAverageValue();
 		} else {
 			connectionAttributeWeight = 1;
 			averageValue = 1;
@@ -257,23 +249,10 @@ class Node extends TimeObject {
 		var target = other_node.transform.position;
 		var sizeCompensation = (size+other_size)/10;
 
-		var speed = other_size*(Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )/1000;
-		
-		//only move away if you're recursing.
-		if (second_level){
-			speed = Mathf.Clamp(speed, -1, 0);
-		}	
-		
-		//To prevent infinite sliding, don't allow nodes to back
-		//off from each other unless you are dragging them around.
-		if (selectionController.dragging){
-			speed = Mathf.Clamp(speed, -.2, 1);		
-		} else {
-			speed = Mathf.Clamp(speed, -.1, 1);
-		}
+		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
 		
 		transform.LookAt(target);
-		var motion : Vector3 = transform.forward*speed*networkController.gameSpeed;
+		var motion : Vector3 = transform.forward*speed*networkController.gameSpeed;		
 		transform.position += motion;
 	}
 

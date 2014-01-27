@@ -10,11 +10,12 @@ private var weightAttribute : Attribute = null;
 private var weightModifier : float = 1.0;
 var weightInverted = false;
 static var MIN_WEIGHT_MODIFIER : float = 0.01;
-static var MAX_WEIGHT_MODIFIER : float = 3;
+static var MAX_WEIGHT_MODIFIER : float = 10;
 
 //The other connection if this is a linking table.
 private var linkedFKey : ForeignKey;
 var linking : boolean = false; //Is the source of this foreign key a linking table?
+var source_file : DataFile;
 
 
 class ForeignKey {

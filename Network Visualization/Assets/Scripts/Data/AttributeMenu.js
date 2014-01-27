@@ -300,6 +300,9 @@ class AttributeMenu extends BaseMenu {
 	}
 
 	function getFkeyDropdownId(fkey : ForeignKey) {
+		if (fkey.linking) {
+			return "4" + fkey.source_file.shortName();
+		}
 		var id = "4" + fkey.from_file.shortName() + fkey.to_file.shortName();
 		for (var keyPair in fkey.getKeyPairs()) {
 			id += keyPair[0].column_index + " " + keyPair[1].column_index + " ";
