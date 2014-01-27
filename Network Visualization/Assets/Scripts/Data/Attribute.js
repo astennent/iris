@@ -32,6 +32,13 @@ private var timeFrameFormat : String = "";
 private var validTimeFrameFormat : boolean = false;
 private var timeFrameFormatWarning : String = "";
 
+private var minValue : float = 0;
+private var maxValue : float = 0;
+private var averageValue : float = 0;
+private var sum : float = 0;
+private var countValue : int = 0;
+private var minMaxValid = false;
+
 
 class Attribute {
 
@@ -165,6 +172,103 @@ class Attribute {
 	}
 	function hasValidTimeFrameFormat() {
 		return validTimeFrameFormat;
+	}
+
+	function getSimpleFKeys() {
+		var output = new List.<ForeignKey>();
+		for (var fkey in file.getForeignKeys(true)) {
+			var keyPairs = fkey.getKeyPairs();
+			if (keyPairs.Count == 1 && keyPairs[0][0] == this) {
+				output.Add(fkey);
+			}
+		}
+		return output;
+	}
+
+	function updateMinMax() {
+		updateMinMax(false);
+	}
+	function updateMinMax(force : boolean) {
+		if (minMaxValid && !force) {
+			return;
+		}
+		minValue = 0;
+		maxValue = 0;
+		averageValue = 0;
+		sum = 0;
+		countValue = 0;
+		if (file.linking_table) { // There is no central location for connections 
+									//in linking tables, so this is expensive.
+			
+			// Find all files that are be connected with the linking table.
+			var filesToCheck = new HashSet.<DataFile>();
+			for (var fkey in file.getForeignKeys(true)) {
+				filesToCheck.Add(fkey.to_file);
+			}
+
+			//Loop over those files and check the relevant connections
+			var checkedFiles = new HashSet.<DataFile>();
+			for (var file in filesToCheck) {
+				if (checkedFiles.Contains(file)) {
+					continue;				
+				} 
+
+				for (var node in file.getNodes()) {
+					for (var connection in node.getConnections(true)) {
+						//check that the connection's data source is this file.
+						if (connection.source == file) {
+							updateMinMax(connection);
+						}
+					}
+				}
+
+				checkedFiles.Add(file);
+			}
+		} else {
+			var nodes = file.getNodes();
+			for (var node in nodes) {
+				updateMinMax(node);
+			}
+		}
+		averageValue = sum / countValue;
+		minMaxValid = true;
+	}
+
+	//helper function called by the public one, uses connections or nodes.
+	private function updateMinMax(data : Data) {
+		var val = data.GetNumeric(this);
+		if (val > maxValue) {
+			maxValue = val;
+		}
+		if (val < minValue) {
+			minValue = val;
+		}
+		sum+=val;
+		countValue += 1;
+	}
+
+	function getMinValue() {
+		if (!minMaxValid) {
+			updateMinMax();
+		}
+		return minValue;
+	}
+	function getMaxValue() {
+		if (!minMaxValid) {
+			updateMinMax();
+		}
+		return maxValue;
+	}
+	function getAverageValue() {
+		if (!minMaxValid) {
+			updateMinMax();
+		}
+		return averageValue;
+	}
+
+	//TODO: make this called by time series changes and removing and adding nodes and connections.
+	function invalidateMinMax() {
+		minMaxValid = false;
 	}
 
 }

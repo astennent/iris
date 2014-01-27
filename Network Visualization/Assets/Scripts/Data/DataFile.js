@@ -220,6 +220,7 @@ class DataFile {
 	function UpdateDates() {
 		if (linking_table) {
 			var alreadyUpdated = new HashSet.<DataFile>();
+			alreadyUpdated.Add(this);
 			for (var fkey in foreignKeys) {
 				var from_file = fkey.from_file;
 				var to_file = fkey.to_file;
@@ -233,7 +234,6 @@ class DataFile {
 				}
 			}
 		} else {
-			print("Updating File");
 			for (var node in nodes) {
 				node.Value.UpdateDate();
 			}
@@ -280,9 +280,9 @@ class DataFile {
 		removeFkey(doomed_key);
 	}
 
-	//only returns true if attribute is found AND the size of that dictionary is 1.
 	function getSimpleFkey(from : Attribute, to : Attribute){
 		for (var foreignKey in foreignKeys){
+			//only returns true if attribute is found and the size of that dictionary is 1.
 			if (foreignKey.isSimpleFkey(from, to)){
 				return foreignKey;
 			}
@@ -443,7 +443,7 @@ class DataFile {
 	    	
 	    	var matches = new List.<List.<Node> >(); //Arrays of matching nodes for each fkey.
 
-	    	for (i = 0 ; i < foreignKeys.Count ; i++){
+	    	for (i = 0 ; i < foreignKeys.Count ; i++) {
 	    		var foreignKey = foreignKeys[i];
 	    		var other_file = foreignKey.to_file;    		
 				var keyPairs = foreignKey.getKeyPairs();
@@ -489,6 +489,14 @@ class DataFile {
 					matches.Add(these_matches);
 				}
 			}
+
+			//Update the linked foreign keys so that an update to one can update the other.
+			foreignKeys[0].setLinkedFKey(foreignKeys[1]);
+			foreignKeys[1].setLinkedFKey(foreignKeys[0]);
+			
+			for (var fkey in foreignKeys) {
+				fkey.linking = true;
+			}
 				
 			//TODO: make n-way connections.
 
@@ -496,7 +504,7 @@ class DataFile {
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
 						from_node.AddConnection(data, this, to_node, true, foreignKeys[0]);	
-						to_node.AddConnection(data, this, from_node, false, foreignKeys[1]);								
+						to_node.AddConnection(data, this, from_node, false, foreignKeys[1]);	
 					}
 				}
 			}
@@ -642,4 +650,7 @@ class DataFile {
 		return sr;
 	}
 
+	function getNodes() {
+		return nodes.Values;
+	}
 }

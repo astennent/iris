@@ -5,7 +5,17 @@ var from_file : DataFile; //
 var to_file : DataFile;
 var isBidirectional : boolean = false;
 var activated : boolean = false;
-var weightModifier : float = 1.0;
+
+private var weightAttribute : Attribute = null;
+private var weightModifier : float = 1.0;
+var weightInverted = false;
+static var MIN_WEIGHT_MODIFIER : float = 0.01;
+static var MAX_WEIGHT_MODIFIER : float = 3;
+
+//The other connection if this is a linking table.
+private var linkedFKey : ForeignKey;
+var linking : boolean = false; //Is the source of this foreign key a linking table?
+
 
 class ForeignKey {
 
@@ -73,6 +83,50 @@ class ForeignKey {
 			}
 		}
 		return true;
+	}
+
+	function getWeightModifier() {
+		return weightModifier;
+	}
+
+	function setWeightModifier(weightModifier : float) {
+		this.weightModifier = weightModifier;
+		if (linkedFKey != null && linkedFKey.getWeightModifier() != weightModifier) {
+			linkedFKey.setWeightModifier(weightModifier);
+		}
+	}
+
+	function getWeightAttribute() {
+		return weightAttribute;
+	}
+	function getWeightAttributeIndex() {
+		if (weightAttribute == null) {
+			return -1;
+		}
+		return weightAttribute.column_index;
+	}
+ 
+	//Only set by id so that you can only have weights from the "from" file.
+	function setWeightAttributeIndex(weightAttributeIndex : int) {
+		if (weightAttributeIndex == -1) {
+			this.weightAttribute = null;
+		} else {
+			this.weightAttribute = from_file.attributes[weightAttributeIndex];
+			weightAttribute.invalidateMinMax();
+		}
+
+
+		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {
+			linkedFKey.setWeightAttributeIndex(weightAttributeIndex);
+		} 
+
+		if (weightAttribute != null) {
+			weightAttribute.updateMinMax();
+		}
+	}
+
+	function setLinkedFKey(linkedFKey : ForeignKey) {
+		this.linkedFKey = linkedFKey;
 	}
 
 }

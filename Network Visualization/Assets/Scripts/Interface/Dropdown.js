@@ -52,84 +52,93 @@ class Dropdown extends MonoBehaviour {
 		var oldLabelAlignment = GUI.skin.label.alignment;
 		GUI.skin.label.alignment = TextAnchor.MiddleCenter;
 
-		for (var dropdown in dropdowns.Values) {
-			
-			//Don't render anything if the dropdown hasn't been called on this frame.
-			if (!dropdown.showing) {
-				continue;
-			}
-		
-			//Note that most of the time there will only be one optionBox displayed.
-			for (var optionBox in dropdown.optionBoxes) {
-
-				//Draw the dropdown button
-				var position = optionBox.position;
-				GUI.skin.button.alignment = TextAnchor.MiddleRight; //right-align the arrow.
-				if (GUI.Button(position, dropdownArrow)) {
-					optionBox.open = !optionBox.open;
+		for (var pass = 1 ; pass <= 2 ; pass++) { //Do two passes, for non-open then open dropdowns.
+			for (var dropdown in dropdowns.Values) {
+				
+				//Don't render anything if the dropdown hasn't been called on this frame.
+				if (!dropdown.showing) {
+					continue;
 				}
+			
+				//Note that most of the time there will only be one optionBox displayed.
+				for (var optionBox in dropdown.optionBoxes) {
 
-				//Draw the current selection as a label.
-				var options = dropdown.options;
-				var selectedIndex = dropdown.selectedIndex;
-				var blankText = dropdown.blankText;
-				var selectedText = (selectedIndex < 0 || selectedIndex > options.length) ? blankText : options[selectedIndex];
-				GUI.Label(position, selectedText);
-
-				//show the other options if dropdown is open.
-				if (optionBox.open && dropdown.showing) {
-
-					var outerBox = new Rect(position.x, position.y + position.height, position.width, dropdown.dropHeight);
-					var requiredHeight = options.length * position.height;
-					
-					if (blankText != null) {
-						requiredHeight += position.height;
+					//On first pass skip open dropdowns, on second pass skip closed dropdowns.
+					if ((pass == 1 && optionBox.open) || (pass == 2 && !optionBox.open)) {
+						continue;
 					}
 
-					if (outerBox.height > requiredHeight) {
-						outerBox.height = requiredHeight; //truncate the bottom of the outer box, so you don't see extra space.
-					} else if (outerBox.height < requiredHeight) {
-						position.width-=14; //make space for the scroll bar.
+					//Draw the dropdown button
+					var position = optionBox.position;
+					GUI.skin.button.alignment = TextAnchor.MiddleRight; //right-align the arrow.
+					if (GUI.Button(position, dropdownArrow)) {
+						optionBox.open = !optionBox.open;
 					}
 
-					//Draw a Box to darken the background behind the buttons.
-					GUI.Box(outerBox, "");
-					GUI.Box(outerBox, "");
+					//Draw the current selection as a label.
+					var options = dropdown.options;
+					var selectedIndex = dropdown.selectedIndex;
+					var blankText = dropdown.blankText;
+					var selectedText = (selectedIndex < 0 || selectedIndex > options.length) ? blankText : options[selectedIndex];
+					GUI.Label(position, selectedText);
 
-					//Create a scroll pane the size of the outer box.
-					var innerBox = new Rect(0, 0, position.width-3, requiredHeight);
-					
-					dropdown.scrollPosition = GUI.BeginScrollView (outerBox, 
-							dropdown.scrollPosition, innerBox);
+					//show the other options if dropdown is open.
+					if (optionBox.open && dropdown.showing) {
+						GUI.depth = 2; //open dropdowns should be on "top"
 
-						position.x = position.y = 0; //move to the top left of the scrollable pane.
-
-						//Calculate the number of hypens
-						var hyphenSize : double = GUI.skin.button.CalcSize(new GUIContent("- ")).x;
-						var hypenCount = (position.width / hyphenSize);
-						var hypenRatio = 1.3; //arbitrary number that looks pretty good.
-
-						//Create a button for the blank option.
-						GUI.skin.button.alignment = TextAnchor.MiddleCenter; //center the contents (since the arrow was right-aligned)
-						if (GUI.Button(position, "- " * (hypenCount * hypenRatio))) {
-							optionBox.open = false;
-							dropdown.selectedIndex = -1;
+						var outerBox = new Rect(position.x, position.y + position.height, position.width, dropdown.dropHeight);
+						var requiredHeight = options.length * position.height;
+						
+						if (blankText != null) {
+							requiredHeight += position.height;
 						}
-						position.y+=position.height;
 
-						for (var optionIndex = 0 ; optionIndex < options.length ; optionIndex ++) {
+						if (outerBox.height > requiredHeight) {
+							outerBox.height = requiredHeight; //truncate the bottom of the outer box, so you don't see extra space.
+						} else if (outerBox.height < requiredHeight) {
+							position.width-=14; //make space for the scroll bar.
+						}
 
-							//Create a button for the current option.
-							if (GUI.Button(position, options[optionIndex])) {
+						//Draw a Box to darken the background behind the buttons.
+						GUI.Box(outerBox, "");
+						GUI.Box(outerBox, "");
+
+						//Create a scroll pane the size of the outer box.
+						var innerBox = new Rect(0, 0, position.width-3, requiredHeight);
+						
+						dropdown.scrollPosition = GUI.BeginScrollView (outerBox, 
+								dropdown.scrollPosition, innerBox);
+
+							position.x = position.y = 0; //move to the top left of the scrollable pane.
+
+							//Calculate the number of hypens
+							var hyphenSize : double = GUI.skin.button.CalcSize(new GUIContent("- ")).x;
+							var hypenCount = (position.width / hyphenSize);
+							var hypenRatio = 1.3; //arbitrary number that looks pretty good.
+
+							//Create a button for the blank option.
+							GUI.skin.button.alignment = TextAnchor.MiddleCenter; //center the contents (since the arrow was right-aligned)
+							if (GUI.Button(position, "- " * (hypenCount * hypenRatio))) {
 								optionBox.open = false;
-								dropdown.selectedIndex = optionIndex;
+								dropdown.selectedIndex = -1;
+							}
+							position.y+=position.height;
+
+							for (var optionIndex = 0 ; optionIndex < options.length ; optionIndex ++) {
+
+								//Create a button for the current option.
+								if (GUI.Button(position, options[optionIndex])) {
+									optionBox.open = false;
+									dropdown.selectedIndex = optionIndex;
+								}
+
+								//adjust the y value
+								position.y += position.height;
 							}
 
-							//adjust the y value
-							position.y += position.height;
-						}
-
-					GUI.EndScrollView();
+						GUI.EndScrollView();
+						GUI.depth = 0; //restore to just above normal depth.
+					}
 				}
 			}
 		}

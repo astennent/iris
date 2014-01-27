@@ -31,7 +31,9 @@ function Start(){
 		
 		var ael_ego : Attribute = alliance_edge_list.attributes[0];
 		var ael_alter : Attribute = alliance_edge_list.attributes[1];
-		ael_alter.is_pkey = true;
+		ael_alter.is_pkey = false;
+		ael_ego.is_shown = false;
+		ael_alter.is_shown = false;
 		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_ego, fga_name);
 		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_alter, fga_name);
 		alliance_edge_list.linking_table = true;
@@ -161,4 +163,13 @@ function UpdateNodeSizes(){
 			node.UpdateSize();
 		}
 	}
+}
+
+function getFileIndex(file : DataFile) {
+	for (var i = 0 ; i < files.Count ; i++) {
+		if (files[i] == file) {
+			return i;
+		}
+	}
+	return -1;
 }

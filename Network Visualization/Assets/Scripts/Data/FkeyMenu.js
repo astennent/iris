@@ -70,7 +70,7 @@ class FkeyMenu extends BaseMenu {
 			var keyPairs = foreignKey.getKeyPairs();
 			var pair_count = keyPairs.Count;
 			
-			var fkey_box = new Rect(x, cur_y, width, pair_count*20 + 115);
+			var fkey_box = new Rect(x, cur_y, width, pair_count*20 + 135);
 
 			//deletes the foreign key.
 			if (GUI.Button(new Rect(x+width-30, cur_y+7, 23, 23), "X")){
@@ -86,8 +86,57 @@ class FkeyMenu extends BaseMenu {
 						
 			cur_y += 20;
 
-			GUI.Label(new Rect(x+10, cur_y, width, 20), "Weight Modifier: " + foreignKey.weightModifier.ToString("f1"));
-			foreignKey.weightModifier = GUI.HorizontalSlider(Rect(x+155, cur_y+5, width-180, 20), foreignKey.weightModifier, 0.0, 10.0);
+			//Draw the weight attribute label
+			var weightLabelWidth = 105;
+			var weightLabelRect = new Rect(x+10, cur_y, weightLabelWidth, 20);
+			GUI.Label(weightLabelRect, "Weight Attribute: ");
+
+
+
+			//Draw the dropdown for choosing the weight attribute
+			var weightWidth = width-weightLabelWidth-20;
+
+			//populate the weight options with the attributes of the current (from) file.
+			var file_attribute_count = file.attributes.Count;
+			var weightDropdownOptions = new String[file_attribute_count];
+			for (var i =0 ; i < file_attribute_count ; i++) {
+				weightDropdownOptions[i] = file.attributes[i].getRestrictedName(weightWidth-10);
+			}
+
+			var weightRect = new Rect(weightLabelRect.x+weightLabelWidth, cur_y, weightWidth, 20);
+			var dropdownHeight = 300;
+			var weightAttribute = foreignKey.getWeightAttribute();
+			var selectedIndex = (weightAttribute == null) ? -1 : weightAttribute.column_index;
+			var newSelectedIndex = Dropdown.Select(weightRect, dropdownHeight, 
+					weightDropdownOptions, selectedIndex, attributeMenu.getFkeyDropdownId(foreignKey), "None");
+
+			//Change the weight attribute if necessary.
+			if (selectedIndex != newSelectedIndex) {
+				print("check " + selectedIndex + " / " + newSelectedIndex);
+				foreignKey.setWeightAttributeIndex(newSelectedIndex);
+			}
+
+			cur_y += 20;
+
+			var old_weight_modifier = foreignKey.getWeightModifier();
+			GUI.Label(new Rect(x+10, cur_y, width, 20), "Strength: " + old_weight_modifier.ToString("f1"));
+			var new_weight_modifier = GUI.HorizontalSlider(Rect(x+85, cur_y+5, 60, 20), old_weight_modifier, 
+					ForeignKey.MIN_WEIGHT_MODIFIER, ForeignKey.MAX_WEIGHT_MODIFIER);
+			if (old_weight_modifier != new_weight_modifier) {
+				foreignKey.setWeightModifier(new_weight_modifier);
+			}
+
+			//Draw the inversion option.
+			// Draw the inverted selection
+			var invertedText : String;
+			if (foreignKey.weightInverted) {
+				invertedText = " Inverted";
+			} else {
+				invertedText = " Not Inverted";
+			}
+			var invertedRect = new Rect(x+150, cur_y, width-160, 20);
+			foreignKey.weightInverted = GUI.Toggle(invertedRect, foreignKey.weightInverted, invertedText);
+
 			cur_y += 30;
 			
 			for (var pair in keyPairs){
@@ -163,7 +212,7 @@ class FkeyMenu extends BaseMenu {
 						tempFileScrollPosition, Rect (0, 0, width-10, 20*foreignKey.to_file.attributes.Count));			
 					
 					file_box = new Rect(0, 0, width-20, 20);
-					for (var i = 0 ; i < foreignKey.to_file.attributes.Count ; i++){
+					for (i = 0 ; i < foreignKey.to_file.attributes.Count ; i++){
 						var attr : Attribute = foreignKey.to_file.attributes[i];
 						if (GUI.Button(file_box, attr.getColumnName())){
 							foreignKey.addKeyPair(adding_from_attr, attr);

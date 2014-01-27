@@ -25,9 +25,6 @@ class TimeFrameMenu extends BaseMenu {
 		// }
 
 		//get the currently selected file
-		if (cur_file != fileMenu.getSelectedFile()) {
-			setFile(fileMenu.getSelectedFile());
-		}
 		cur_file = fileMenu.getSelectedFile();
 		if (cur_file == null || !displaying) {
 			return;
@@ -40,7 +37,6 @@ class TimeFrameMenu extends BaseMenu {
 	}
 
 	function setFile(cur_file : DataFile) {
-		this.cur_file = cur_file;
 		for (var key in Dropdown.getIDs()) {
 			if (key.StartsWith("2") || key.StartsWith("3")) {
 				Dropdown.reset(key);

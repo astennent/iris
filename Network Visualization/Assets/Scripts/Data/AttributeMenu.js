@@ -168,7 +168,7 @@ class AttributeMenu extends BaseMenu {
 
 			// Draw out the warning label
 			if (!attribute.hasValidTimeFrameFormat()) {
-				cur_y += 20;
+				cur_y += 25;
 				var warning_rect = new Rect(x+5, dropdown_box.y+25, width-10, 20);
 				GUI.Box(warning_rect, "");
 				GUI.color = Color.red;
@@ -182,16 +182,129 @@ class AttributeMenu extends BaseMenu {
 		}
 
 		GUI.color = Color.white;
-		return cur_y + 10;
+		return cur_y + box_height-5;
 	}
 
 	function DrawForeignKeyEditing(cur_y : int) {
 		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
-		return cur_y;
+
+		var outerBoxHeight = menuController.getScreenHeight()-cur_y;
+		var outerBox = new Rect(x+5, cur_y, width-10, outerBoxHeight);
+
+		//get the attributes that are pointed to by simple fkeys
+		var simpleFKeys = attribute.getSimpleFKeys();
+
+		var innerBoxBaseHeight = 40;
+		var innerBoxHeight = simpleFKeys.Count*70 + innerBoxBaseHeight;
+
+		var nameWidth = 85;
+		var weightLabelWidth = 105;
+		var weightWidth = 110;
+		var weightScaleLabelWidth = 84;
+		var weightScaleWidth = 73;
+		var invertedWidth = 90;
+		var innerBoxWidth = outerBox.width;
+		
+		//make room for the scrollbar
+		if (outerBox.height <= innerBoxHeight) {
+			innerBoxWidth = outerBox.width - 18; 
+			weightScaleWidth -= 18;
+			weightWidth -= 18;
+		}
+		
+		var innerBox = new Rect(0, 0, innerBoxWidth, innerBoxHeight);
+		var fkeyRect = new Rect(5, 20, innerBoxWidth-10, 70);
+
+		//populate the weight options with the attributes of the current (from) file.
+		var file_attribute_count = file.attributes.Count;
+		var weightDropdownOptions = new String[file_attribute_count];
+		for (var i =0 ; i < file_attribute_count ; i++) {
+			weightDropdownOptions[i] = file.attributes[i].getRestrictedName(weightWidth-10);
+		}
+
+		fkeyScrollPosition = GUI.BeginScrollView (outerBox, 
+				fkeyScrollPosition, innerBox);
+
+			GUI.color = new Color(1, 1, 1, .5);
+			GUI.Box(innerBox, "Single-Attribute Foreign Keys");
+			GUI.color = Color.white;
+
+			var oldAlignment = GUI.skin.label.alignment;
+			GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+	
+
+			for (var fkey in simpleFKeys) {
+				var to_attr = fkey.getKeyPairs()[0][1];
+
+				//Draw the box that surrounds the fkey options.
+				GUI.Box(fkeyRect, fkey.to_file.shortName() + " / " + to_attr.getRestrictedName(80));
+
+
+				//Draw the weight attribute label
+				var weightLabelRect = new Rect(fkeyRect.x+5, fkeyRect.y+25, weightLabelWidth, 20);
+				GUI.Label(weightLabelRect, "Weight Attribute: ");
+
+				//Draw the dropdown for choosing the weight attribute
+				var weightRect = new Rect(weightLabelRect.x+weightLabelWidth, fkeyRect.y+25, weightWidth, 20);
+				weightRect.x += outerBox.x; weightRect.y += outerBox.y; //Adjust for scrolling, since Dropdown doesn't know about it.
+				var dropdownHeight = 300;
+				var weightAttribute = fkey.getWeightAttribute();
+				var selectedIndex = (weightAttribute == null) ? -1 : weightAttribute.column_index;
+				var newSelectedIndex = Dropdown.Select(weightRect, dropdownHeight, weightDropdownOptions, selectedIndex, getFkeyDropdownId(fkey), "None");
+
+				//Change the weight attribute if necessary.
+				if (selectedIndex != newSelectedIndex) {
+					fkey.setWeightAttributeIndex(newSelectedIndex);
+				}
+
+				// Draw the delete button.
+				if (GUI.Button(new Rect(fkeyRect.width-30, fkeyRect.y+20, 25, 25), "X")) {
+					file.destroySimpleFkey(attribute, to_attr);
+					return;
+				}
+
+				//Draw the weight scale
+				var old_weight_modifier = fkey.getWeightModifier();
+				var weightScaleLabelRect = new Rect(fkeyRect.x+5, fkeyRect.y+45, weightScaleLabelWidth, 20);
+				var sliderRect = new Rect(weightScaleLabelRect.x+weightScaleLabelWidth, fkeyRect.y+50, weightScaleWidth, 20);
+				GUI.Label(weightScaleLabelRect, "Strength: " + old_weight_modifier.ToString("f1"));
+				var new_weight_modifier = GUI.HorizontalSlider(sliderRect, old_weight_modifier, 
+						ForeignKey.MIN_WEIGHT_MODIFIER,  ForeignKey.MAX_WEIGHT_MODIFIER);
+				if (old_weight_modifier != new_weight_modifier) {
+					fkey.setWeightModifier(new_weight_modifier);
+				}
+
+				// Draw the inverted selection
+				var invertedText : String;
+				if (fkey.weightInverted) {
+					invertedText = " Inverted";
+				} else {
+					invertedText = " Not Inverted";
+				}
+
+				var invertedRect = new Rect(sliderRect.x+sliderRect.width+5, fkeyRect.y+45, invertedWidth, 20);
+				fkey.weightInverted = GUI.Toggle(invertedRect, fkey.weightInverted, invertedText);
+
+				fkeyRect.y += fkeyRect.height;
+
+			}
+			GUI.skin.label.alignment = oldAlignment;
+
+		GUI.EndScrollView();
+
+		return cur_y+fkeyRect.y;
 	}
 
 	function getDropdownId(attribute : Attribute) {
-		return "3"+ attribute.file.shortName()+attribute.column_index;
+		return "3" + attribute.file.shortName()+attribute.column_index;
+	}
+
+	function getFkeyDropdownId(fkey : ForeignKey) {
+		var id = "4" + fkey.from_file.shortName() + fkey.to_file.shortName();
+		for (var keyPair in fkey.getKeyPairs()) {
+			id += keyPair[0].column_index + " " + keyPair[1].column_index + " ";
+		}
+		return id;
 	}
 
 	function DisableDisplay(){
