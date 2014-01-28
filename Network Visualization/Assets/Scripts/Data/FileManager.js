@@ -34,9 +34,9 @@ function Start(){
 		ael_alter.is_pkey = false;
 		ael_ego.is_shown = false;
 		ael_alter.is_shown = false;
+		alliance_edge_list.linking_table = true;
 		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_ego, fga_name);
 		alliance_edge_list.createSimpleFkey(full_group_attrs, ael_alter, fga_name);
-		alliance_edge_list.linking_table = true;
 		alliance_edge_list.Activate();	
 
 		//Guatamala

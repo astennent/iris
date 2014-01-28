@@ -209,7 +209,7 @@ class Node extends TimeObject {
 
 		if (fkeyWeightAttribute != null) {
 			var dataSource : Data;
-			if (foreignKey.linking) {
+			if (foreignKey.isLinking()) {
 				dataSource = connection;
 			} else {
 				dataSource = this;

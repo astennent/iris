@@ -3,6 +3,7 @@
 private var keyPairs = new List.<List.<Attribute> >(); //array of tuples. [ [from,to] [from,to] [from,to]...]
 var from_file : DataFile; //
 var to_file : DataFile;
+var source_file : DataFile;
 var isBidirectional : boolean = false;
 var activated : boolean = false;
 
@@ -14,15 +15,14 @@ static var MAX_WEIGHT_MODIFIER : float = 10;
 
 //The other connection if this is a linking table.
 private var linkedFKey : ForeignKey;
-var linking : boolean = false; //Is the source of this foreign key a linking table?
-var source_file : DataFile;
 
 
 class ForeignKey {
 
-	public function ForeignKey(from_file : DataFile, to_file : DataFile) {
+	public function ForeignKey(from_file : DataFile, to_file : DataFile, source_file : DataFile) {
 		this.from_file = from_file;
 		this.to_file = to_file;
+		this.source_file = source_file; //equal to from_file with non-linking tables.
 	}
 
 	//add a from/to keyPair pair. 
@@ -116,7 +116,6 @@ class ForeignKey {
 			weightAttribute.invalidateMinMax();
 		}
 
-
 		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {
 			linkedFKey.setWeightAttributeIndex(weightAttributeIndex);
 		} 
@@ -128,6 +127,10 @@ class ForeignKey {
 
 	function setLinkedFKey(linkedFKey : ForeignKey) {
 		this.linkedFKey = linkedFKey;
+	}
+
+	function isLinking() {
+		return source_file.linking_table;
 	}
 
 }

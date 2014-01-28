@@ -265,12 +265,12 @@ class DataFile {
 
 	//creates an empty foreign key and marks it as inactive.
 	function createEmptyFkey(other_file : DataFile){
-		var foreignKey = new ForeignKey(this, other_file);
+		var foreignKey = new ForeignKey(this, other_file, this);
 		inactiveKeys.Add(foreignKey);
 	}
 
 	function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
-		var foreignKey = new ForeignKey(this, other_file);
+		var foreignKey = new ForeignKey(this, other_file, this);
 		foreignKey.addKeyPair(from, to);
 		foreignKeys.Add(foreignKey);
 	}
@@ -494,11 +494,6 @@ class DataFile {
 			foreignKeys[0].setLinkedFKey(foreignKeys[1]);
 			foreignKeys[1].setLinkedFKey(foreignKeys[0]);
 			
-			for (var fkey in foreignKeys) {
-				fkey.linking = true;
-				fkey.source_file = this;
-			}
-				
 			//TODO: make n-way connections.
 
 			if (matches.Count == 2){
