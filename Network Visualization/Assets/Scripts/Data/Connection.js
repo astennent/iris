@@ -26,7 +26,13 @@ class Connection extends TimeObject {
 		lineRenderer.material.color = color;
 		networkController = nC;
 		graphController = networkController.GetComponent(GraphController);
-		CopyData(data);
+		
+		if (data != null) { 
+			CopyData(data); //Duplicate data for linking connections
+		} else {
+			this.setDataSource(f); //Use the from node for data in non-linking connections
+		}
+
 		this.source =  source;
 		
 		initialized = true;

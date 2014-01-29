@@ -117,8 +117,14 @@ class SelectionMenu extends BaseMenu {
 			var source_attrs = node.source.attributes;
 			
 			for (var index : int ; index < source_attrs.Count ; index++) {
-
 				var attribute = source_attrs[index];
+
+				var attr_numeric_value = node.GetNumeric(index);
+				var attr_max = attribute.getMaxValue();
+
+				GUI.color = ColorController.GenFractionalColor(attr_numeric_value, attr_max);
+				GUI.Box(new Rect(5, data_scroll_y, contentWidth, data_height), "");
+				//GUI.color = Color.white;
 
 				var attr_name = attribute.getRestrictedName(width/2-10);	
 				var attr_rect = new Rect(5, data_scroll_y, contentWidth/2, data_height);

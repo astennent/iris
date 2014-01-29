@@ -2,6 +2,7 @@
 
 class ColorRuleColorMenu extends BaseMenu {
 	private var schemeScrollPosition : Vector2 = Vector2.zero;
+	private var attributeScrollPosition : Vector2 = Vector2.zero;
 	private var rule : ColorRule;
 	function Start(){
 		parent = GetComponent(DisplayMenu);
@@ -25,8 +26,10 @@ class ColorRuleColorMenu extends BaseMenu {
 				y = DrawColorCustom(y);
 			} else if (method == 1) {
 				y = DrawColorScheme(y);
-			} else {
+			} else if (method == 2) {
 				y = DrawCentrality(y);
+			} else {
+				y = DrawContinuousAttribute(y);
 			}
 			y = DrawHaloOptions(y);
 			DrawSizingOptions(y);				
@@ -34,7 +37,8 @@ class ColorRuleColorMenu extends BaseMenu {
 	}
 
 	function DrawMethod(cur_y : int) {
-		GUI.Box(Rect(x+5, cur_y, width-10, 80), "");
+		var boxHeight = (rule.is_fallback) ? 80 : 100;
+		GUI.Box(Rect(x+5, cur_y, width-10, boxHeight), "");
 		var toggle_rect = new Rect(x+20, cur_y+10, width, 20);
 		var method = rule.getMethod();
 		if (GUI.Toggle(toggle_rect, method==0, "Custom Color") && method != 0){
@@ -48,8 +52,13 @@ class ColorRuleColorMenu extends BaseMenu {
 		if (GUI.Toggle(toggle_rect, method==2, "Centrality") && method != 2){
 			rule.setMethod(2);
 		} 
-
-		return cur_y+80;
+		toggle_rect.y+=20;
+		if (!rule.is_fallback) {
+			if (GUI.Toggle(toggle_rect, method==3, "Continuous Attribute") && method != 3){
+				rule.setMethod(3);
+			} 
+		}
+		return cur_y+boxHeight;
 	}
 
 	function DrawColorCustom(cur_y : int) {
@@ -149,6 +158,42 @@ class ColorRuleColorMenu extends BaseMenu {
 		GUI.color = Color.white;
 		cur_y += 5;
 		return cur_y;
+	}
+
+	function DrawContinuousAttribute(cur_y : int) {
+		cur_y += 5;
+		var scrollBoxHeight = 200;
+		var outerBox = new Rect(x+5, cur_y, width-10, scrollBoxHeight);
+
+		GUI.Box(outerBox, "");
+		var line_count = 0;
+
+		for (var file : DataFile in fileManager.files){
+			line_count += file.attributes.Count + 2;
+		}
+
+		var innerBoxWidth = (line_count*20 + 20 < scrollBoxHeight) ? outerBox.width-5 : outerBox.width-23;
+		var innerBox = new Rect(0, 0, innerBoxWidth, 20*line_count);
+
+		attributeScrollPosition = GUI.BeginScrollView (outerBox, attributeScrollPosition, innerBox);
+			var scroll_y = 0;
+			for (var file : DataFile in fileManager.files){
+				GUI.Label(Rect (5, scroll_y, width-5, 20), file.shortName() + ":");
+				scroll_y += 20;
+
+				for (var attribute in file.attributes){
+					if (GUI.Toggle (Rect (5, scroll_y, width-5, 20), (attribute == rule.getContinuousAttribute()), attribute.getColumnName())){
+						if (rule.getContinuousAttribute() != attribute) {
+							rule.setContinuousAttribute(attribute);
+						}
+					}
+					scroll_y += 20;
+				}
+				scroll_y += 20;
+			}
+
+		GUI.EndScrollView();
+		return cur_y + scrollBoxHeight;
 	}
 
 	function DrawHaloOptions (cur_y : int) {

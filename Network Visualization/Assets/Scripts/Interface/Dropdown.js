@@ -208,7 +208,7 @@ class Dropdown extends MonoBehaviour {
 			var position : Rect;
 			var open : boolean = false;
 
-			public function OptionBox(position) {
+			public function OptionBox(position : Rect) {
 				this.position = position;
 			}
 		}

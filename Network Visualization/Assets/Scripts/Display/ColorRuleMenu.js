@@ -19,7 +19,7 @@ class ColorRuleMenu extends BaseMenu {
 		parent = GetComponent(ColorRuleColorMenu);
 		super.Start();
 		width = 200;
-		title = "Coloring Rules";
+		title = "Filter Affected Nodes";
 	}
 
 
@@ -34,9 +34,7 @@ class ColorRuleMenu extends BaseMenu {
 
 		var rule : ColorRule = colorController.rules[rule_index];
 
-		title = rule.getDisplayName();
-
-		var y = 40;
+		var y = 25;
 		for (var i : int = 0 ; i < colorController.rule_types.length ; i++){
 			var type_name : String = colorController.rule_types[i];
 			var selected_current = GUI.Toggle(Rect (x+5, y, width-5, 20), (i == rule.getRuleType()), type_name);
@@ -146,7 +144,7 @@ class ColorRuleMenu extends BaseMenu {
 			}
 
 			GUI.EndScrollView();*/
-		} else if (rule_type == 3){
+		} else if (rule_type == 3) {
 			var line_count = 0;
 			for (var file : DataFile in fileManager.files){
 				line_count += file.attributes.Count + 1;
@@ -173,8 +171,8 @@ class ColorRuleMenu extends BaseMenu {
 
 			GUI.EndScrollView();
 			y+=200;
-			scrollBox = new Rect(x, y, width, 120);
 
+			scrollBox = new Rect(x, y, width, 120);
 			GUI.Box(scrollBox, "Available Values");
 
 			var searchRect = new Rect(x, y+20, width-10, 20);

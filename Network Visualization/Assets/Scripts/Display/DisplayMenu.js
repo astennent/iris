@@ -13,9 +13,11 @@ class DisplayMenu extends BaseMenu {
 
 	function OnGUI(){
 		super.OnGUI();	
-		
-		var y = 35;
+		var y = DrawFallback(35);
+		y = DrawRules(y);
+	}
 
+	function DrawFallback(y : int) {
 		var fallbackRule : ColorRule = colorController.rules[0];
 		if (GUI.Button(new Rect(x+5, y, width-10, 30), "Change Fallback Colors")){
 			if (rule_index == 0) {
@@ -27,8 +29,7 @@ class DisplayMenu extends BaseMenu {
 
 		y+=30;
 
-		var rules = colorController.rules;
-		var rule : ColorRule = rules[0];
+		var rule : ColorRule = colorController.rules[0];
 		var rule_type_index = rule.getRuleType();
 
 		//Draw radio buttons for the fallback rule
@@ -45,9 +46,13 @@ class DisplayMenu extends BaseMenu {
 
 		
 		
-		y+=25;
+		return y+25;
+	}
 
-		var ruleRect = new Rect(x, y, width, 200);
+	function DrawRules(y : int) {
+		var rules = colorController.rules;
+
+		var ruleRect = new Rect(x, y, width, menuController.getScreenHeight() - y);
 		GUI.Box(ruleRect, "Rules");
 
 		y+=25;
@@ -63,15 +68,15 @@ class DisplayMenu extends BaseMenu {
 
 
 		ruleRect.y += 55;
-		ruleRect.height -= 60;
+		ruleRect.height = menuController.getScreenHeight() - ruleRect.y;
 
 		scrollPosition = GUI.BeginScrollView (ruleRect, 
 			scrollPosition, Rect (0, 0, width-20, 30*rules.Count+20));
 
 		var temp_y = 0;
-		for (i = 1 ; i < rules.Count ; i++){
+		for (var i = 1 ; i < rules.Count ; i++){
 
-			rule = colorController.rules[i];
+			var rule = colorController.rules[i];
 			var rule_color = rule.color; rule_color.a = 1;
 			GUI.color = rule_color;
 
@@ -120,9 +125,10 @@ class DisplayMenu extends BaseMenu {
 		}
 
 		GUI.EndScrollView();
+		return y+temp_y;
 
 	}
-	
+
 	function setRuleIndex(index : int) {
 		if (rule_index != index) {
 			rule_index = index;

@@ -164,10 +164,16 @@ function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_c
 
 	var variation : float = getAdjustedVariation(rule);
 
-	//Override color in the case of coloring by centrality.
+	//Override color in the case of coloring by centrality or continuous variable.
 	var adjusted_variation = variation;
 	if (rule.getMethod() == 2) {
 		color = GenCentralityColor(rule, node);
+		adjusted_variation = 0;
+	} else if (rule.getMethod() == 3) {
+		var continuousAttribute = rule.getContinuousAttribute();
+		var numerator : float = node.GetNumeric(continuousAttribute);
+		var denominator : float = continuousAttribute.getMaxValue();
+		color = GenFractionalColor(numerator, denominator);
 		adjusted_variation = 0;
 	}
 	
@@ -229,7 +235,6 @@ function GenCentralityColor(rule : ColorRule, node : Node) {
 
 	//scale centrality from red to cyan.	
 	var fraction : float = centralityController.getCentralityFraction(node, rule);
-	var adjusted_frac : float;
 
 	if (!fraction) {
 		return Color.black;
@@ -244,6 +249,17 @@ function GenCentralityColor(rule : ColorRule, node : Node) {
 		fraction = 1-fraction;
 	}
 	
+	return GenFractionalColor(fraction, 1.0);
+}
+
+static function GenFractionalColor(numerator : float, denominator : float) {
+
+	if (denominator == 0) {
+		return Color.white;
+	}
+
+	var fraction : float = numerator / denominator;
+	var adjusted_frac : float;
 	if (fraction > 2.0/3) { //red down to yellow
 		adjusted_frac = (fraction - 2.0/3)*3;
 		return new Color(1, 1-adjusted_frac, 0, .75);
@@ -310,7 +326,7 @@ function randBinary(){ //true or false
 function handleDateChange() {
 	for (var rule in rules) {
 		
-		if (rule.getMethod() == 2) {		//centrality
+		if (rule.getMethod() == 2) { //centrality
 			ApplyRule(rule, true, true);
 		} else { //Don't recolor if it's not centrality.
 			ApplyRule(rule, false, true);

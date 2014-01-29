@@ -119,10 +119,6 @@ class ForeignKey {
 		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {
 			linkedFKey.setWeightAttributeIndex(weightAttributeIndex);
 		} 
-
-		if (weightAttribute != null) {
-			weightAttribute.updateMinMax();
-		}
 	}
 
 	function setLinkedFKey(linkedFKey : ForeignKey) {

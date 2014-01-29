@@ -37,7 +37,7 @@ private var maxValue : float = 0;
 private var averageValue : float = 0;
 private var sum : float = 0;
 private var countValue : int = 0;
-private var minMaxValid = false;
+private var valuesValid = false;
 
 
 class Attribute {
@@ -185,11 +185,11 @@ class Attribute {
 		return output;
 	}
 
-	function updateMinMax() {
-		updateMinMax(false);
+	function updateValues() {
+		updateValues(false);
 	}
-	function updateMinMax(force : boolean) {
-		if (minMaxValid && !force) {
+	function updateValues(force : boolean) {
+		if (valuesValid && !force) {
 			return;
 		}
 		minValue = 0;
@@ -217,7 +217,7 @@ class Attribute {
 					for (var connection in node.getConnections(true)) {
 						//check that the connection's data source is this file.
 						if (connection.source == file) {
-							updateMinMax(connection);
+							updateValues(connection);
 						}
 					}
 				}
@@ -227,15 +227,15 @@ class Attribute {
 		} else {
 			var nodes = file.getNodes();
 			for (var node in nodes) {
-				updateMinMax(node);
+				updateValues(node);
 			}
 		}
 		averageValue = sum / countValue;
-		minMaxValid = true;
+		valuesValid = true;
 	}
 
 	//helper function called by the public one, uses connections or nodes.
-	private function updateMinMax(data : Data) {
+	private function updateValues(data : Data) {
 		var val = data.GetNumeric(this);
 		if (val > maxValue) {
 			maxValue = val;
@@ -247,28 +247,31 @@ class Attribute {
 		countValue += 1;
 	}
 
-	function getMinValue() {
-		if (!minMaxValid) {
-			updateMinMax();
+	function validateValues() {
+		if (!valuesValid) {
+			updateValues();
 		}
+	}
+	function getMinValue() {
+		validateValues();
 		return minValue;
 	}
 	function getMaxValue() {
-		if (!minMaxValid) {
-			updateMinMax();
-		}
+		validateValues();
 		return maxValue;
 	}
 	function getAverageValue() {
-		if (!minMaxValid) {
-			updateMinMax();
-		}
+		validateValues();
 		return averageValue;
+	}
+	function getMiddleValue() {
+		validateValues();
+		return (maxValue + minValue)/2;
 	}
 
 	//TODO: make this called by time series changes and removing and adding nodes and connections.
 	function invalidateMinMax() {
-		minMaxValid = false;
+		valuesValid = false;
 	}
 
 }

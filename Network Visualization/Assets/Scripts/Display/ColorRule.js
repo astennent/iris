@@ -13,6 +13,8 @@ private var node_pkey : Array;
 private var attribute : Attribute; //stores which attribute you're looking at
 private var attribute_value : String = "";
 
+private var continuous_attribute : Attribute;
+
 var is_fallback : boolean; //is this the "default" rule?
 
 var color : Color;
@@ -120,8 +122,6 @@ function getInterCluster() {
 	return inter_cluster;
 }
 
-
-
 function getDisplayName() : String {
 	if (rule_type == 0){ //SOURCE
 		var count = sources.Count;
@@ -211,3 +211,15 @@ function setAttributeValue(input : String) {
 	attribute_value = input;
 }
 
+function getContinuousAttribute() {
+	return continuous_attribute;
+}
+
+function setContinuousAttribute(input : Attribute) {
+	this.continuous_attribute = input;
+
+	//Automatically switch to coloring the file of the selected attribute.
+	sources = new HashSet.<DataFile>();
+	sources.Add(input.file); 
+	this.setRuleType(0); //switch to coloring by source
+}

@@ -125,6 +125,60 @@ class Node extends TimeObject {
 	
 	}
 
+	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, connection : Connection) {
+
+		if (networkController.isPaused()){
+			return;
+		}
+
+		//Calculate the desired distance.
+		var foreignKey = connection.foreignKey;
+		var fkeyWeightAttribute = foreignKey.getWeightAttribute();
+		var connectionAttributeWeight : float;
+		var averageValue : float;
+
+		if (fkeyWeightAttribute != null) {
+			connectionAttributeWeight = connection.GetNumeric(fkeyWeightAttribute);
+			averageValue = fkeyWeightAttribute.getAverageValue();
+		} else {
+			connectionAttributeWeight = 1;
+			averageValue = 1;
+		}
+
+		//Ratio of the connection weight to the middle weight of the attribute.
+		var weightRatio : float;
+		if (averageValue <= 0) { //Don't deal with non-numbers or negatives. TODO: Reconsider ignoring negatives.
+			weightRatio = 1;
+		} else {
+			weightRatio = connectionAttributeWeight / averageValue;
+			if (weightRatio == 0) {
+				weightRatio = 1;
+			}
+		}
+
+		//modifier for the foreign key that scales the distance across all nodes.
+		var fkeyStrength = foreignKey.getWeightModifier();
+
+		//Combine the attribute modifier and the weight ratio
+		var distanceModifier = fkeyStrength * weightRatio;
+
+		var desiredDistance : float;
+		if (foreignKey.weightInverted) { //high values = far apart.
+			desiredDistance = BASE_DESIRED_DISTANCE * distanceModifier;
+		} else { //high values = close together (default)
+			desiredDistance = BASE_DESIRED_DISTANCE / distanceModifier;
+		}
+		
+		var target = other_node.transform.position;
+		var sizeCompensation = (size+other_size)/10;
+
+		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
+		
+		transform.LookAt(target);
+		var motion : Vector3 = transform.forward*speed*networkController.gameSpeed;		
+		transform.position += motion;
+	}
+
 	//called every frame, based on graphing.
 	function setRender(enable : boolean){
 		renderer.enabled = enable;
@@ -195,66 +249,7 @@ class Node extends TimeObject {
 		return new Color(color.r, color.g, color.b);
 	}
 
-	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, connection : Connection) {
 
-		if (networkController.isPaused()){
-			return;
-		}
-
-		//Calculate the desired distance.
-		var foreignKey = connection.foreignKey;
-		var fkeyWeightAttribute = foreignKey.getWeightAttribute();
-		var connectionAttributeWeight : float;
-		var averageValue : float;
-
-		if (fkeyWeightAttribute != null) {
-			var dataSource : Data;
-			if (foreignKey.isLinking()) {
-				dataSource = connection;
-			} else {
-				dataSource = this;
-			}
-			connectionAttributeWeight = dataSource.GetNumeric(fkeyWeightAttribute);
-
-			averageValue = fkeyWeightAttribute.getAverageValue();
-		} else {
-			connectionAttributeWeight = 1;
-			averageValue = 1;
-		}
-
-		//Ratio of the connection weight to the middle weight of the attribute.
-		var weightRatio : float;
-		if (averageValue <= 0) { //Don't deal with non-numbers or negatives. TODO: Reconsider ignoring negatives.
-			weightRatio = 1;
-		} else {
-			weightRatio = connectionAttributeWeight / averageValue;
-			if (weightRatio == 0) {
-				weightRatio = 1;
-			}
-		}
-
-		//modifier for the foreign key that scales the distance across all nodes.
-		var fkeyStrength = foreignKey.getWeightModifier();
-
-		//Combine the attribute modifier and the weight ratio
-		var distanceModifier = fkeyStrength * weightRatio;
-
-		var desiredDistance : float;
-		if (foreignKey.weightInverted) { //high values = far apart.
-			desiredDistance = BASE_DESIRED_DISTANCE * distanceModifier;
-		} else { //high values = close together (default)
-			desiredDistance = BASE_DESIRED_DISTANCE / distanceModifier;
-		}
-		
-		var target = other_node.transform.position;
-		var sizeCompensation = (size+other_size)/10;
-
-		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
-		
-		transform.LookAt(target);
-		var motion : Vector3 = transform.forward*speed*networkController.gameSpeed;		
-		transform.position += motion;
-	}
 
 	function OnMouseOver() {
 		if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
