@@ -2,6 +2,7 @@
 
 class DisplayMenu extends BaseMenu {
 	private var scrollPosition : Vector2 = Vector2.zero;
+	private var ruleRects = new Dictionary.<ColorRule, Rect>();
 
 	var rule_index : int = -1;
 	
@@ -58,8 +59,11 @@ class DisplayMenu extends BaseMenu {
 		y+=25;
 
 		if (GUI.Button(new Rect(x+5, y, 100, 25), "Add Rule")){
-			colorController.createRule();
+			var createdRule = colorController.createRule();
 			setRuleIndex(colorController.rules.Count-1);
+			var createdRuleRect = new Rect(35, 0, width-85, 30);
+			ruleRects[createdRule] = createdRuleRect;
+
 		}
 
 		if (GUI.Button(new Rect(x+120, y, 120, 25), "Apply All Rules")){
@@ -81,7 +85,11 @@ class DisplayMenu extends BaseMenu {
 			GUI.color = rule_color;
 
 
-			var buttonRect = new Rect(35, temp_y, width-85, 30);
+			//ar buttonRect = new Rect(35, temp_y, width-85, 30);
+			var buttonRect = ruleRects[rule];
+			buttonRect.y = Mathf.Lerp(buttonRect.y, temp_y, .3);
+			ruleRects[rule] = buttonRect;
+
 			if (GUI.Button(buttonRect, rule.getDisplayName())){
 				if (rule_index == i) {
 					setRuleIndex(-1);
@@ -95,11 +103,25 @@ class DisplayMenu extends BaseMenu {
 				var upRect = new Rect(5, temp_y, 30, 15);
 				var downRect = new Rect(5, temp_y+15, 30, 15);
 
-				if (GUI.Button(upRect, "")){ //TODO make graphics for these.
-					colorController.moveRuleUp(i);
+				if (GUI.Button(upRect, "")) { //TODO make graphics for these.
+					if (i > 1) {
+						colorController.moveRuleUp(i);
+						if (rule_index == i) {
+							setRuleIndex(rule_index - 1);
+						} else if (rule_index == i-1) {
+							setRuleIndex(rule_index + 1);
+						}
+					}
 				}
-				if (GUI.Button(downRect, "")){
-					colorController.moveRuleDown(i);
+				if (GUI.Button(downRect, "")) {
+					if (i < rules.Count - 1) {
+						colorController.moveRuleDown(i);
+						if (rule_index == i) {
+							setRuleIndex(rule_index + 1);
+						} else if (rule_index == i+1) {
+							setRuleIndex(rule_index - 1);
+						}
+					}
 				}
 	
 				//only color the Xs if it's selected.

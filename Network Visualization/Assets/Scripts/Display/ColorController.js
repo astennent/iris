@@ -31,10 +31,11 @@ function Start(){
 	rule_types = ["Source", "Cluster", "Node", "Attribute"]; 
 }
 
-function createRule(){
+function createRule() : ColorRule {
 	var new_rule : ColorRule = GameObject.Instantiate(colorRulePrefab).GetComponent(ColorRule);
 	new_rule.Init();
 	rules.Add(new_rule);
+	return new_rule;
 }
 
 function removeRule(i : int){

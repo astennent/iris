@@ -3,12 +3,9 @@
 
 public class Datum {
 
-	//TODO: Don't save attribute here, but make sure you have a way of updating defaultNumeric
-
 	private var attribute : Attribute;
 	private var value : String;
 	private var numericValue : float;
-	//TODO: Date, Coordinates, anything else?
 
 	//Constructor
 	public function Datum(attribute : Attribute, value : String) {
