@@ -1,106 +1,99 @@
 #pragma strict
 
-private var graphing = false;
-private var file : DataFile;
-private var file_index : int = -1;
+private static var graphing = false;
+private static var file : DataFile;
+private static var file_index : int = -1;
 
-private var axes : Attribute[];
-private var fileManager : FileManager;
-private var axisController : AxisController;
-private var networkController : NetworkController;
+private static var axes : Attribute[];
 
-private var minMaxCache = new List.<List.<float> >();
-private var uniqueValueCounts = new List.<int>();
+private static var minMaxCache = new List.<List.<float> >();
+private static var uniqueValueCounts = new List.<int>();
 
-private var scale : float = 200;
+private static var scale : float = 200;
 
-private var forcingNodeSize : boolean = true;
-private var forcedNodeSize : float = 2.5;
+private static var forcingNodeSize : boolean = true;
+private static var forcedNodeSize : float = 2.5;
 
 function Start() {
-	fileManager = GetComponent(FileManager);
-	axisController = GetComponent(AxisController);
-	networkController = GetComponent(NetworkController);
 	resetAxes();
-	forcingNodeSize = true;
 }
 
 //called by Node to decide if it should ignore its rules.
-function isForcingNodeSize() {
+static function isForcingNodeSize() {
 	return forcingNodeSize;
 }
 
-function setForcingNodeSize(forcingNodeSize : boolean){
+static function setForcingNodeSize(forcingNodeSize : boolean){
 	this.forcingNodeSize = forcingNodeSize;
-	fileManager.UpdateNodeSizes();
+	FileManager.UpdateNodeSizes();
 }
 
-function getForcedNodeSize() {
+static function getForcedNodeSize() {
 	return forcedNodeSize;
 }
 
-function setForcedNodeSize(forcedNodeSize : float) {
+static function setForcedNodeSize(forcedNodeSize : float) {
 	this.forcedNodeSize = forcedNodeSize;
-	fileManager.UpdateNodeSizes();
+	FileManager.UpdateNodeSizes();
 }
 
-function resetAxes(){
+static function resetAxes(){
 	axes = new Attribute[3];
 	for (var i = 0 ; i < 3 ; i++) {
 		minMaxCache.Add(new List.<float>());
 		uniqueValueCounts.Add(0);
 	}
-	if (axisController.initialized) {
-		axisController.Redraw();
+	if (AxisController.initialized) {
+		AxisController.Redraw();
 	}
 }
 
-function isGraphing(){
+static function isGraphing(){
 	return graphing;
 }
 
-function toggleGraphing(){
+static function toggleGraphing(){
 	setGraphing(!graphing);
 }
-function setGraphing(graphing : boolean) {
+static function setGraphing(graphing : boolean) {
 	this.graphing = graphing;
-	fileManager.UpdateNodeSizes();
-	axisController.Redraw();
+	FileManager.UpdateNodeSizes();
+	AxisController.Redraw();
 }
 
-function setFileIndex(file_index : int) {
+static function setFileIndex(file_index : int) {
 	this.file_index = file_index;
-	if (file_index >= 0 && file_index < fileManager.files.Count) {
-		this.file = fileManager.files[file_index];
+	if (file_index >= 0 && file_index < FileManager.files.Count) {
+		this.file = FileManager.files[file_index];
 	} else {
 		this.file = null;
 	}
 	resetAxes();
 }
-function getFile() {
+static function getFile() {
 	return file;
 }
-function getFileIndex() {
+static function getFileIndex() {
 	return file_index;
 }
 
-function getAxes() {
+static function getAxes() {
 	return axes;
 }
 
-function getUniqueValueCount(index : int) {
+static function getUniqueValueCount(index : int) {
 	return uniqueValueCounts[index];
 }
 
-function getScale(){
+static function getScale(){
 	return scale;
 }
 
-function setScale(scale : float){
+static function setScale(scale : float){
 	this.scale = scale;
 }
 
-function setAxis(axis_index : int, attribute : Attribute) {
+static function setAxis(axis_index : int, attribute : Attribute) {
 	for (var i = 0 ; i < 3 ; i++){
 		if (attribute != null && axes[i] == attribute) {
 			setAxis(i, null);
@@ -134,7 +127,7 @@ function setAxis(axis_index : int, attribute : Attribute) {
 	minMaxCache[axis_index] = minMax;
 
 	//Send a message to the axis controller to update the number of ticks.
-	axisController.updateAxis(axis_index);
+	AxisController.updateAxis(axis_index);
 }
 
 function Update(){
@@ -150,16 +143,16 @@ function Update(){
 					var value = node.GetNumeric(attribute);
 
 
-				var coordinate = makeFraction(value, i);
+					var coordinate = makeFraction(value, i);
 
-				//adjust the desired position
-				if (i == 0) {
-					desired_position.x = coordinate;
-				} else if (i == 1){
-					desired_position.y = coordinate;
-				} else {
-					desired_position.z = coordinate;
-				}
+					//adjust the desired position
+					if (i == 0) {
+						desired_position.x = coordinate;
+					} else if (i == 1){
+						desired_position.y = coordinate;
+					} else {
+						desired_position.z = coordinate;
+					}
 				}
 			}
 			node.transform.position = Vector3.Lerp(node.transform.position, desired_position, .3);
@@ -169,7 +162,7 @@ function Update(){
 
 
 //Given a val between min and max, returns the position for positioning
-function makeFraction(val : float, i : int) {
+static function makeFraction(val : float, i : int) {
 	if (minMaxCache[i].Count > 0) {
 		var min = minMaxCache[i][0];
 		var max = minMaxCache[i][1];
@@ -185,7 +178,7 @@ function makeFraction(val : float, i : int) {
 }
 
 //Given a val between 0 and 1, returns the fraction between min and max
-function getFractionalValue(val : float, i : int) {
+static function getFractionalValue(val : float, i : int) {
 	if (minMaxCache[i].Count > 0) {
 		var min = minMaxCache[i][0];
 		var max = minMaxCache[i][1];

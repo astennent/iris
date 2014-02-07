@@ -2,17 +2,14 @@ import System.IO;
 
 #pragma strict
 
-var files = new List.<DataFile>(); //holds File objects.
+static var files = new List.<DataFile>(); //holds File objects.
 
-var dest_directories = new List.<DirectoryInfo>();
-var dest_files = new List.<FileInfo>();
+static var dest_directories = new List.<DirectoryInfo>();
+static var dest_files = new List.<FileInfo>();
 
-var demoMode = true;
-
-private var fileMenu : FileMenu;
+static var demoMode = true;
 
 function Start(){
-	fileMenu = GetComponent(FileMenu);
 	if (demoMode){
 		Load("Full Group Attributes", true);
 		Load("Alliance Edge List - Names", true);
@@ -60,7 +57,7 @@ function Start(){
 	}
 }
 
-function getFileNames() : String[]{
+static function getFileNames() : String[]{
 	var output = new String[files.Count];
 	for (var i = 0 ; i < files.Count ; i++) {
 		output[i] = files[i].shortName();
@@ -68,10 +65,10 @@ function getFileNames() : String[]{
 	return output;
 }
 
-function UpdateDirectoryData(dest : String){
+static function UpdateDirectoryData(dest : String){
 	UpdateDirectoryData(dest, true, "");
 }
-function UpdateDirectoryData(dest : String, can_recurse : boolean, ending : String){
+static function UpdateDirectoryData(dest : String, can_recurse : boolean, ending : String){
 	dest_directories = new List.<DirectoryInfo>();
 	dest_files = new List.<FileInfo>();
 	try {
@@ -113,14 +110,14 @@ function UpdateDirectoryData(dest : String, can_recurse : boolean, ending : Stri
 }
 
 //returns the index of the file created, or -2 if nothing is made.
-function Load(fname : String){
+static function Load(fname : String) : int {
     return Load(fname, false);
 }
-function Load(fname : String, isDemo : boolean){
+static function Load(fname : String, isDemo : boolean) : int {
 	if (isDemo || File.Exists(fname)){
 		for (var file : DataFile in files){
 			if (file.fname == fname){
-				fileMenu.error_message = "You've already loaded that file.";
+				FileMenu.error_message = "You've already loaded that file.";
 				return -2;
 			}
 		}
@@ -139,23 +136,23 @@ function Load(fname : String, isDemo : boolean){
 		return files.Count-1;
 
 	} else if (Directory.Exists(fname)){
-		fileMenu.error_message = "That's a directory. Select a file.";
+		FileMenu.error_message = "That's a directory. Select a file.";
 		return -2;
 	} else {
-		fileMenu.error_message = "File not found.";
+		FileMenu.error_message = "File not found.";
 		return -2;
 	}
 }
 
-function DeactivateFile(index : int){
+static function DeactivateFile(index : int){
 	files[index].Deactivate();
 }
 
-function ActivateFile(index : int){
+static function ActivateFile(index : int){
 	files[index].Activate();
 }
 
-function UpdateNodeSizes(){
+static function UpdateNodeSizes(){
 	for (var file in files){
 		var nodes = file.nodes;
 		for (var entry in nodes){
@@ -165,7 +162,7 @@ function UpdateNodeSizes(){
 	}
 }
 
-function getFileIndex(file : DataFile) {
+static function getFileIndex(file : DataFile) {
 	for (var i = 0 ; i < files.Count ; i++) {
 		if (files[i] == file) {
 			return i;

@@ -16,6 +16,7 @@ class MainMenu extends BaseMenu {
 	var clock : Texture;
 
 	function Start() {
+		parent = null;
 		super.Start();
 		width = 45;
 		Time.timeScale = 4;
@@ -24,7 +25,7 @@ class MainMenu extends BaseMenu {
 
 	function OnGUI() {
 		var menuRect = new Rect(x, 0, width, Screen.height);
-		guiplus.Box(menuRect, title);
+		GuiPlus.Box(menuRect, title);
 		
 		var centeredStyle = GUI.skin.GetStyle("Label");
 		centeredStyle.alignment = TextAnchor.MiddleLeft;
@@ -37,8 +38,8 @@ class MainMenu extends BaseMenu {
 		GUI.color = Color.white;
 		var button_position : Rect = new Rect(5, 5, 35, 35);
 		if (GUI.Button(button_position, more)){
-			timeSeriesMenu.DisableDisplay();
-			ToggleDisplay();
+			DisableDisplay(TimeSeriesMenu);
+			ToggleDisplay(MainMenu);
 		}	
 			
 		if (displaying) {
@@ -96,7 +97,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(0, 1, 1);
-			if (networkController.isPaused()){
+			if (NetworkController.isPaused()){
 				var playpause = play;
 				tooltip = "Play";
 			}	else {
@@ -104,7 +105,7 @@ class MainMenu extends BaseMenu {
 				tooltip = "Pause";
 			}
 			if (GUI.Button(button_position, playpause)){
-				this.GetComponent(NetworkController).TogglePause();
+				NetworkController.TogglePause();
 			}
 
 			
@@ -112,14 +113,14 @@ class MainMenu extends BaseMenu {
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(0, 1, 0);
 			var next_speed : int; 
-			tooltip = "Fast Forward (x" + networkController.gameSpeed + ")";		
-			if (networkController.gameSpeed >= 16){
+			tooltip = "Fast Forward (x" + NetworkController.gameSpeed + ")";		
+			if (NetworkController.gameSpeed >= 16){
 				next_speed = 1;
 			} else {
-				next_speed = networkController.gameSpeed*2;
+				next_speed = NetworkController.gameSpeed*2;
 			}	
 			if (GUI.Button(button_position, ff)){
-				networkController.gameSpeed=next_speed;
+				NetworkController.gameSpeed=next_speed;
 			}
 				
 			cur_y += 40;
@@ -133,23 +134,37 @@ class MainMenu extends BaseMenu {
 			button_position = new Rect(x+5, Screen.height-50, 35, 35);
 			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 			if (GUI.Button(button_position, clock)){
-				timeSeriesMenu.ToggleDisplay();
+				TimeSeriesMenu.ToggleDisplay(TimeSeriesMenu);
 			}
 
 		}
 		
 	}
 
-	function chooseMenu(chosenMenu : System.Type){
-		var menus : BaseMenu[] = [GetComponent(SearchMenu), GetComponent(DisplayMenu),
-				GetComponent(FileMenu), GetComponent(GraphMenu)];
-
-		for (var menu : BaseMenu in menus) {
-			if (typeof(menu) == chosenMenu) {
-				menu.ToggleDisplay();
-			} else {
-				menu.DisableDisplay();
-			}
+	static function chooseMenu(chosenMenu : System.Type){
+		if (chosenMenu == SearchMenu) {
+			ToggleDisplay(SearchMenu);
+		} else {
+			DisableDisplay(SearchMenu);
 		}
+
+		if (chosenMenu == DisplayMenu) {
+			ToggleDisplay(DisplayMenu);
+		} else {
+			DisableDisplay(DisplayMenu);
+		}
+
+		if (chosenMenu == FileMenu) {
+			ToggleDisplay(FileMenu);
+		} else {
+			DisableDisplay(FileMenu);
+		}
+
+		if (chosenMenu == GraphMenu) {
+			ToggleDisplay(GraphMenu);
+		} else {
+			DisableDisplay(GraphMenu);
+		}
+
 	}
 }

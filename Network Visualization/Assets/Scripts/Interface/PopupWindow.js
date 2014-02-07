@@ -2,18 +2,18 @@
 
 class PopupWindow extends MonoBehaviour {
 	
-	private var height = 140;
-	private var width = 350;
-	private var displaying : boolean = false;
+	private static var height = 140;
+	private static var width = 350;
+	private static var displaying : boolean = false;
 
-	private var message : String;
-	private var options : List.<PopupOption>;
+	private static var message : String;
+	private static var options : List.<PopupOption>;
 
-	function createWindow(message : String) {
+	static function createWindow(message : String) {
 		createWindow(message);
 	}
 
-	function createWindow(message : String, option : PopupOption) {
+	static function createWindow(message : String, option : PopupOption) {
 		options = new List.<PopupOption>();
 		if (option != null) {
 			options.Add(option);
@@ -21,7 +21,7 @@ class PopupWindow extends MonoBehaviour {
 		createWindow(message, options);
 	}
 
-	function createWindow(message : String, options : List.<PopupOption>) {
+	static function createWindow(message : String, options : List.<PopupOption>) {
 		this.message = message;
 		displaying = true;
 		this.options = options;
@@ -29,7 +29,7 @@ class PopupWindow extends MonoBehaviour {
 
 
 
-	function isDisplaying(){
+	static function isDisplaying(){
 		return displaying;
 	}
 
@@ -60,7 +60,7 @@ class PopupWindow extends MonoBehaviour {
 		}
 	}
 
-	function DisableDisplay() {
+	static function DisableDisplay() {
 		this.displaying = false;
 	}
 

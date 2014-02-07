@@ -3,7 +3,7 @@
 public class TimeSeriesMenu extends BaseMenu {
 
 	static var height = 65;	
-	private var sliding : boolean = false;
+	private static var sliding : boolean = false;
 
 	var play : Texture;
 	var pause : Texture;
@@ -22,14 +22,14 @@ public class TimeSeriesMenu extends BaseMenu {
 		//Modified from BaseMenu to stay at bottom, next to MainMenu.
 		var y = Screen.height - height;
 		var menuRect = new Rect(x, y, width, height);
-		guiplus.Box(menuRect, "");
+		GuiPlus.Box(menuRect, "");
 
 		if (!displaying) {
 			return;
 		}
 
 		//Draw the enable button
-		var enabled = timeSeriesController.getEnabled();
+		var enabled = TimeSeriesController.getEnabled();
 		var enableRect = new Rect(x+10, y+10, width*.1-20, height-20);
 		var enableText : String;
 		if (enabled) {
@@ -40,7 +40,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		}
 
 		if (GUI.Button(enableRect, enableText)){
-			timeSeriesController.toggleEnabled();
+			TimeSeriesController.toggleEnabled();
 		}
 		GUI.color = Color.white;
 
@@ -69,7 +69,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		GUI.Box(timeLineBox, "");
 		GUI.color = Color.white;
 
-		var dates = timeSeriesController.getDates(lineWidth);
+		var dates = TimeSeriesController.getDates(lineWidth);
 		
 		//Stop if there are less than two dates.
 		if (dates.Count == 0) {
@@ -91,14 +91,14 @@ public class TimeSeriesMenu extends BaseMenu {
 			var rect = new Rect(date_x-5, timeLineBox.y, 10, timeLineBox.height);
 			if (GUI.Button(rect, "")) {
 				locked = true;
-				timeSeriesController.setCurrentDate(dateRatio.date);
+				TimeSeriesController.setCurrentDate(dateRatio.date);
 			}
 		}
 
 		DrawSlider(timeLineBox, locked);
 
 		//Draw Current Date
-		var current_date_text = getDateText(timeSeriesController.getCurrentDate());
+		var current_date_text = getDateText(TimeSeriesController.getCurrentDate());
 		GUI.Label(timeLineBox, current_date_text, centeredStyle);
 
 		//Restore Alignment.
@@ -116,14 +116,14 @@ public class TimeSeriesMenu extends BaseMenu {
 		if (sliding) {
 			sliderX = Mathf.Clamp(mousePosition.x, timeLineBox.x, timeLineBox.x+timeLineBox.width);
 			var ratio : float = (sliderX - timeLineBox.x) / timeLineBox.width;
-			timeSeriesController.setCurrentDate(timeSeriesController.ratioToDate(ratio));
+			TimeSeriesController.setCurrentDate(TimeSeriesController.ratioToDate(ratio));
 		} else {
-			ratio = timeSeriesController.dateToRatio(timeSeriesController.getCurrentDate());
+			ratio = TimeSeriesController.dateToRatio(TimeSeriesController.getCurrentDate());
 			sliderX = timeLineBox.x+ratio*timeLineBox.width;
 		}
 
 		var sliderRect = new Rect(sliderX-5, timeLineBox.y+5, 10, timeLineBox.height-10);
-		if (timeSeriesController.getEnabled()) {
+		if (TimeSeriesController.getEnabled()) {
 			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 		}
 		GUI.Button(sliderRect, ""); 
@@ -140,7 +140,7 @@ public class TimeSeriesMenu extends BaseMenu {
 
 	}
 
-	function getDateText(current_date : Date) {
+	static function getDateText(current_date : Date) {
 		//TODO: Respect options for what to show.
 		return "" + current_date;
 	}
@@ -151,22 +151,22 @@ public class TimeSeriesMenu extends BaseMenu {
 		var buttonRect = new Rect(buttonLeft+5, y+(Screen.height - y - buttonSide)/2 , buttonSide, buttonSide);
 		//BackButton
 		if (GUI.Button(buttonRect, prev)) {
-			timeSeriesController.skipToPrev();
+			TimeSeriesController.skipToPrev();
 		}
 
 		buttonRect.x+=buttonSide+5;
-		if (timeSeriesController.isPlaying()) {
+		if (TimeSeriesController.isPlaying()) {
 			var image = pause;
 		} else {
 			image = play;
 		}
 		if (GUI.Button(buttonRect, image)) {
-			timeSeriesController.togglePlaying();
+			TimeSeriesController.togglePlaying();
 		}
 
 		buttonRect.x+=buttonSide+5;
 		if (GUI.Button(buttonRect, next)) {
-			timeSeriesController.skipToNext();
+			TimeSeriesController.skipToNext();
 		}
 	}
 

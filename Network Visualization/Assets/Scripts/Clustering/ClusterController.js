@@ -2,26 +2,16 @@
 
 #pragma strict
 
-var preferred_distance : float = 200;
+static var preferred_distance : float = 200;
 
-private var networkController : NetworkController;
-var leaders : Node[];
-var group_dict =  new Dictionary.<int, List.<Node> >(); //2d dict of keys points to arrays of nodes
-
-private var fileManager : FileManager;
-private var centralityController : CentralityController;
-
-function Start(){
-	networkController = GetComponent(NetworkController);
-	fileManager = GetComponent(FileManager);
-	centralityController = GetComponent(CentralityController);
-}
+static var leaders : Node[];
+static var group_dict =  new Dictionary.<int, List.<Node> >(); //2d dict of keys points to arrays of nodes
 
 //Identify groups and store them in the group leader array.
-function ReInit(){
+static function ReInit(){
 	
 	//Reset group ids
-	for (var file in fileManager.files){
+	for (var file in FileManager.files){
 		var nodes = file.nodes;
 		for (var entry in nodes){
 			var node : Node = entry.Value;
@@ -32,7 +22,7 @@ function ReInit(){
 	var current_id = 0;
 	group_dict.Clear();
 
-	for (var file in fileManager.files){
+	for (var file in FileManager.files){
 		nodes = file.nodes;
 		for (entry in nodes){ //loop over the node names
 			node = entry.Value;		
@@ -65,7 +55,7 @@ function ReInit(){
 	
 	//At this point, all nodes' group_ids have been initialized. All that's left is to put them in a dictionary.
 	var index : int = 0;
-	for (var file in fileManager.files){
+	for (var file in FileManager.files){
 		nodes = file.nodes;		
 		for (var entry in nodes){ //loop over the node names
 			node = entry.Value;
@@ -79,12 +69,12 @@ function ReInit(){
 		}
 	}
 
-	centralityController.ReInit();
+	CentralityController.ReInit();
 }
 
 //Disabled until a faster algorithm can be found.
 function Update() {
-	if (false && !networkController.isPaused){
+	if (false && !NetworkController.isPaused){
 		
 		var index = 0; 
 		for (var leader in leaders){
@@ -117,7 +107,7 @@ function Update() {
 				
 				//loop over them again to move all nodes the same distance
 				for (var node in group_dict[this_group_id]){
-					node.transform.position += direction*average_dist/100*networkController.gameSpeed;
+					node.transform.position += direction*average_dist/100*NetworkController.gameSpeed;
 				}
 			}
 			index++;

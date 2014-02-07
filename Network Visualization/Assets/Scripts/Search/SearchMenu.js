@@ -2,12 +2,12 @@
 
 class SearchMenu extends BaseMenu {
 
-	private var searchString : String = "";
-	private var oldSearchString : String = "";
-	var match_index : int = 0;
+	private static var searchString : String = "";
+	private static var oldSearchString : String = "";
+	static var match_index : int = 0;
 
-	private var scrollPosition : Vector2 = Vector2.zero;
-	private var lastScrollTime : float = 0;
+	private static var scrollPosition : Vector2 = Vector2.zero;
+	private static var lastScrollTime : float = 0;
 
 	function Start(){
 		parent = GetComponent(MainMenu);
@@ -23,10 +23,10 @@ class SearchMenu extends BaseMenu {
 
 		if (searchString != oldSearchString){
 			oldSearchString = searchString;
-			searchController.UpdateMatches(searchString);
+			SearchController.UpdateMatches(searchString);
 		}
 
-		var matches = searchController.matches;
+		var matches = SearchController.matches;
 		
 		if (matches != null && matches.Count > 0){
 			title = matches.Count + " matches.";
@@ -38,7 +38,7 @@ class SearchMenu extends BaseMenu {
 			}
 		}
 		var top_display = GUIContent(title);		
-		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,menuController.getScreenHeight()-60),
+		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,MenuController.getScreenHeight()-60),
 	    scrollPosition, Rect (0, 0, 400, matches.Count*30));
 	    
 	    var count = 0;
@@ -74,15 +74,15 @@ class SearchMenu extends BaseMenu {
 	       	} else if (e.keyCode == KeyCode.Return && matches.Count > 0){
 				Camera.main.GetComponent(NetworkCamera).JumpTo(matches[match_index].name);     		
 	       	} else if (e.keyCode == KeyCode.Escape){
-	       		DisableDisplay();
+	       		DisableDisplay(SearchMenu);
 	       	}
 	       	
 	   	}
 		
 	}
 
-	function EnableDisplay(){
-		super.EnableDisplay();
+	static function EnableDisplay(){
+		super.EnableDisplay(SearchMenu);
 		GUI.FocusControl("searchbar");	
 	}
 }

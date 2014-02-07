@@ -5,8 +5,7 @@ private var primary : boolean;
 
 function Init (n : Node){
 	node = n;
-	renderer.material = new Material(GameObject.FindGameObjectWithTag("GameController").
-			GetComponent(NetworkController).reticleTexture);
+	renderer.material = NetworkController.getReticleTexture();
 }
 
 function Update (){

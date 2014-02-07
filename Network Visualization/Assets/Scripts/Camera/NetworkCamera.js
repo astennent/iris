@@ -1,7 +1,5 @@
 #pragma strict
 
-private var selectionController : SelectionController;
-private var guiplus : GuiPlus;
 var target: Transform;
 
 
@@ -20,15 +18,13 @@ private var allowedToSpin : boolean = true;
 
 function Start () {
 	target = GameObject.FindGameObjectWithTag("GameController").transform;
-	selectionController = GameObject.FindGameObjectWithTag("GameController").GetComponent(SelectionController);
-	guiplus = selectionController.GetComponent(GuiPlus);
 	transform.parent = target;
 }
 
 function Update () {
 
 	if (Input.GetMouseButtonDown(0)) {
-		allowedToSpin = !guiplus.isBlocked();
+		allowedToSpin = !GuiPlus.isBlocked();
 	}
 
 	if (target == null){
@@ -166,7 +162,7 @@ function ToggleLocked(){
 }
 
 function CalculateSelectionCenter() {
-	var selected_nodes = selectionController.nodes;
+	var selected_nodes = SelectionController.nodes;
 	var selectionCenter : Vector3;
 	if (selected_nodes.Count < 2) {
 		selectionCenter = target.position;

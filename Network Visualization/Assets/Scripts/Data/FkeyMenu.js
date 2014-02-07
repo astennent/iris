@@ -4,13 +4,13 @@
 
 class FkeyMenu extends BaseMenu {
 
-	private var adding_index : int = -1;
-	private var adding_from_attr : Attribute;
+	private static var adding_index : int = -1;
+	private static var adding_from_attr : Attribute;
 
-	private var creating = false;
-	private var cFileScrollPosition : Vector2 = Vector2.zero;
+	private static var creating = false;
+	private static var cFileScrollPosition : Vector2 = Vector2.zero;
 
-	private var tempFileScrollPosition : Vector2 = Vector2.zero;
+	private static var tempFileScrollPosition : Vector2 = Vector2.zero;
 
 	function Start(){
 		parent = GetComponent(FileMenu);
@@ -23,7 +23,7 @@ class FkeyMenu extends BaseMenu {
 		super.OnGUI();
 		GUI.color = Color.white;
 
-		var file = fileMenu.getSelectedFile();
+		var file = FileMenu.getSelectedFile();
 		if (file == null) {
 			return;
 		}		
@@ -43,9 +43,9 @@ class FkeyMenu extends BaseMenu {
 			reference_box.height -= 30;
 			reference_box.y+= 30;
 			cFileScrollPosition = GUI.BeginScrollView (reference_box, 
-				cFileScrollPosition, Rect (0, 0, width-10, 25*fileManager.files.Count));			
+				cFileScrollPosition, Rect (0, 0, width-10, 25*FileManager.files.Count));			
 			var file_box = new Rect(0, 0, width-20, 25);
-			for (var ref_file : DataFile in fileManager.files){
+			for (var ref_file : DataFile in FileManager.files){
 				if (GUI.Button(file_box, ref_file.shortName())){
 					file.createEmptyFkey(ref_file);
 					creating = false;
@@ -108,7 +108,7 @@ class FkeyMenu extends BaseMenu {
 			var weightAttribute = foreignKey.getWeightAttribute();
 			var selectedIndex = (weightAttribute == null) ? -1 : weightAttribute.column_index;
 			var newSelectedIndex = Dropdown.Select(weightRect, dropdownHeight, 
-					weightDropdownOptions, selectedIndex, attributeMenu.getFkeyDropdownId(foreignKey), "None");
+					weightDropdownOptions, selectedIndex, AttributeMenu.getFkeyDropdownId(foreignKey), "None");
 
 			//Change the weight attribute if necessary.
 			if (selectedIndex != newSelectedIndex) {
@@ -230,27 +230,12 @@ class FkeyMenu extends BaseMenu {
 		}
 	}
 
-	function resetCreation(){
+	static function resetCreation(){
 		adding_index = -1;
 		adding_from_attr = null;
 	}
 
-	function ToggleDisplay(){
-		super.ToggleDisplay();
-		if (displaying){
-			EnableDisplay();
-		} else {
-			DisableDisplay();
-		}
-	}
-
-	function EnableDisplay(){
-		super.EnableDisplay();
-		resetCreation();
-	}
-
-	function DisableDisplay(){
-		super.DisableDisplay();
+	static function OnDisableDisplay(){
 		resetCreation();
 	}
 }

@@ -2,21 +2,16 @@
 
 public class GuiPlus extends MonoBehaviour {
 
-	private var boxes = new List.<Rect>();
-	private static var popupWindow : PopupWindow;
-
-	function Start(){
-		popupWindow = GetComponent(PopupWindow);
-	}
+	private static var boxes = new List.<Rect>();
 
 	// Draw a GuiBox which prevents the Selection
 	// Controller from interacting with nodes
-	function Box(r : Rect, text:String){
+	static function Box(r : Rect, text:String){
 		GUI.Box(r, text);
 		boxes.Add(r);
 	}
 
-	function isBlocked() {
+	static function isBlocked() {
 		for (var box in boxes) {
 			var mousePosition = Input.mousePosition;
 			mousePosition.y = Screen.height - mousePosition.y; //Stupid unity.
@@ -34,7 +29,7 @@ public class GuiPlus extends MonoBehaviour {
 	//Respects the popup blocker, still displays the button but always returns false.
 	//TODO: Switch all buttons over to this.
 	static function Button(r : Rect, text : String) {
-		if (popupWindow.isDisplaying()) {
+		if (PopupWindow.isDisplaying()) {
 			GUI.Button(r, text);
 			return false; //always return false; button is just for show.
 		} else {

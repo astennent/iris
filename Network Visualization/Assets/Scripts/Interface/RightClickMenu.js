@@ -2,28 +2,17 @@
 
 class RightClickMenu extends MonoBehaviour {
 
-	var lastClickTime : float = 0; //Used for timing the disabling of the menu.
-	var x : float = 0;
-	var y : float = 0;
-	private var width : float = 150;
+	static var lastClickTime : float = 0; //Used for timing the disabling of the menu.
+	static var x : float = 0;
+	static var y : float = 0;
+	private static var width : float = 150;
 
-	private var desired_height : float; 
-	private var height : float; 
-	private var max_height : float = 250;
+	private static var desired_height : float; 
+	private static var height : float; 
+	private static var max_height : float = 250;
 
-	var networkController : NetworkController;
-	var rightClickController : RightClickController;
-	var selectionController : SelectionController;
-	var guiplus : GuiPlus;
 
-	function Start() {
-		networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
-		rightClickController = networkController.GetComponent(RightClickController);
-		selectionController = networkController.GetComponent(SelectionController);
-		guiplus = GetComponent(GuiPlus);
-	}
-
-	function ProcessClick(){
+	static function ProcessClick(){
 		lastClickTime = Time.time;
 		
 		x = Mathf.Clamp(Input.mousePosition.x, 0, Screen.width-width);
@@ -34,7 +23,7 @@ class RightClickMenu extends MonoBehaviour {
 	}
 
 	function Update(){
-		var node = rightClickController.getNode();
+		var node = RightClickController.getNode();
 		if (node != null) {
 			var speed : float;
 			if (desired_height < height) {
@@ -54,18 +43,18 @@ class RightClickMenu extends MonoBehaviour {
 		    } 
 
 		    if (height < 10) {
-				rightClickController.setNode(null);
+				RightClickController.setNode(null);
 			} 
 		}
 	}
 
 	function OnGUI () {
-		var node = rightClickController.getNode();
+		var node = RightClickController.getNode();
 		if (node != null) {
 			var menuRect = new Rect(x, y, width, height);
 			
 			//GUI.color = node.color;
-			guiplus.Box(menuRect, node.getDisplayName()/*, "button"*/);
+			GuiPlus.Box(menuRect, node.getDisplayName()/*, "button"*/);
 			//GUI.color = Color.white;
 
 			var cur_y = y+25;
@@ -74,26 +63,26 @@ class RightClickMenu extends MonoBehaviour {
 			if (height < cur_y+30-y) return; //break early.
 			if (node.isSelected()) {
 				if (GUI.Button(button_rect, "Unselect Node")){
-					selectionController.deselectNode(node);
+					SelectionController.deselectNode(node);
 				}
 			} else {
 				if (GUI.Button(button_rect, "Select Node")){
-					selectionController.selectNode(node);
+					SelectionController.selectNode(node);
 				}
 			}
 
 			cur_y+=30; button_rect.y+=30;
 			if (height < cur_y+30-y) return; //break early.
 
-			var clusterSize = rightClickController.getCurrentClusterSize();
+			var clusterSize = RightClickController.getCurrentClusterSize();
 			if (GUI.Button(button_rect, "Select Cluster (" + clusterSize + ")")){
-				selectionController.selectAllInGroup(node.group_id, true);
+				SelectionController.selectAllInGroup(node.group_id, true);
 			}
 		}
 	}
 
 	//relies on the Update method to actually disable the menu.
-	function DisableDisplay() {
+	static function DisableDisplay() {
 		desired_height = 0;
 	}
 

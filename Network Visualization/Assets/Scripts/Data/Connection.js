@@ -10,11 +10,8 @@ class Connection extends TimeObject {
 	var foreignKey : ForeignKey; //the foreign key that gave rise to this connection.
 
 	private var lineRenderer : LineRenderer;
-	private var networkController : NetworkController;
-	private var graphController : GraphController;
 
-
-	function Init (source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
+	function Init (source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, fkey : ForeignKey) {
 		mat = m;
 		color = c;
 		isOutgoing = o;
@@ -24,16 +21,8 @@ class Connection extends TimeObject {
 		lineRenderer = GetComponent(LineRenderer);
 		lineRenderer.material = mat;
 		lineRenderer.material.color = color;
-		networkController = nC;
-		graphController = networkController.GetComponent(GraphController);
-		
-		// if (data != null) { 
-		// 	CopyData(data); //Duplicate data for linking connections
-		// } else {
-		// 	this.setDataSource(f); //Use the from node for data in non-linking connections
-		// }
 
-		this.source =  source;
+		this.source = source;
 		
 		initialized = true;
 		UpdateDate();
@@ -47,7 +36,7 @@ class Connection extends TimeObject {
 
 		//Logic for hiding the lines. Currently only responds to graphing and timeSeries,
 		//TODO: more options for hiding based on rules or one-way connections
-		if (graphController.isGraphing() || !hasValidTime() ||
+		if (GraphController.isGraphing() || !hasValidTime() ||
 				!from.hasValidTime() || !to.hasValidTime()) {
 			lineRenderer.enabled = false;
 			return;

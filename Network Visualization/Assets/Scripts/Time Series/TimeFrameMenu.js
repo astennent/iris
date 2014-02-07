@@ -2,12 +2,12 @@
 
 class TimeFrameMenu extends BaseMenu {
 
-	private var creatingStart : boolean = false;
-	private var creatingEnd : boolean = false;
+	private static var creatingStart : boolean = false;
+	private static var creatingEnd : boolean = false;
 
-	private var cur_file : DataFile;
+	private static var cur_file : DataFile;
 
-	private var attrScrollPosition : Vector2 = Vector2.zero;
+	private static var attrScrollPosition : Vector2 = Vector2.zero;
 
 	function Start(){
 		parent = GetComponent(FileMenu);
@@ -21,11 +21,11 @@ class TimeFrameMenu extends BaseMenu {
 		super.OnGUI();
 
 		// if (GuiPlus.Button(new Rect(200, 200, 300, 300), "Popup?")){
-		// 	popupWindow.createWindow("messsage!", new PopupOption("test", testFunction));
+		// 	PopupWindow.createWindow("messsage!", new PopupOption("test", testFunction));
 		// }
 
 		//get the currently selected file
-		cur_file = fileMenu.getSelectedFile();
+		cur_file = FileMenu.getSelectedFile();
 		if (cur_file == null || !displaying) {
 			return;
 		}		
@@ -36,16 +36,12 @@ class TimeFrameMenu extends BaseMenu {
 		
 	}
 
-	function setFile(cur_file : DataFile) {
+	static function setFile(cur_file : DataFile) {
 		for (var key in Dropdown.getIDs()) {
 			if (key.StartsWith("2") || key.StartsWith("3")) {
 				Dropdown.reset(key);
 			}
 		}
-	}
-
-	function testFunction(){
-		Debug.Log("Test" + this);
 	}
 
 	function DrawColumns(cur_y : int, isStart : boolean, timeFrame : TimeFrame) {
@@ -108,7 +104,7 @@ class TimeFrameMenu extends BaseMenu {
 			var column = columns[column_index];
 			var column_rect = new Rect(x+12, cur_y, 80, 20);
 
-			var DROPDOWN_ID = attributeMenu.getDropdownId(column);
+			var DROPDOWN_ID = AttributeMenu.getDropdownId(column);
 
 			//Use the aspect color.
 			GUI.color = column.getAspectColor();
@@ -215,8 +211,7 @@ class TimeFrameMenu extends BaseMenu {
 		return cur_y;
 	}
 
-	function DisableDisplay(){
-		super.DisableDisplay();
+	static function OnDisableDisplay(){
 		creatingStart = false;
 		creatingEnd = false;
 	}

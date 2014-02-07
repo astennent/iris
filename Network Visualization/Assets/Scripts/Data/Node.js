@@ -20,16 +20,11 @@ class Node extends TimeObject {
 	var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
 	private var activated = true;
 
-	private var networkController : NetworkController;
-
 	var sizing_types = ["By Connections", "Manual", "By Attribute"];
 	private var sizing_type = 0;
 	private var manual_size : float = 10.0;
 	private var size : float = 2.5; //2.5 is the minimum
 
-	private var selectionController : SelectionController;
-	private var rightClickController : RightClickController;
-	private var graphController : GraphController;
 
 	private var haloColor : Color;
 
@@ -44,11 +39,6 @@ class Node extends TimeObject {
 		this.color = color;
 		this.source = source;
 
-		networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
-		selectionController = networkController.GetComponent(SelectionController);
-		rightClickController = networkController.GetComponent(RightClickController);
-		graphController = networkController.GetComponent(GraphController);
-
 		label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
 		label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
 		label.transform.parent = this.transform;
@@ -58,8 +48,8 @@ class Node extends TimeObject {
 		
 		sizing_type = 0; //by # connections
 			
-		renderer.material = new Material(networkController.nodeTexture);
-		lineMat = new Material(networkController.lineTexture);
+		renderer.material = new Material(NetworkController.getNodeTexture());
+		lineMat = new Material(NetworkController.getLineTexture());
 		renderer.material.color = color;	
 		resetHaloColor();	
 
@@ -85,7 +75,7 @@ class Node extends TimeObject {
 			}
 		}
 		var newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
-		newConn.Init(connectionSource, lineMat, color, isOutgoing, this, other, networkController, foreignKey);
+		newConn.Init(connectionSource, lineMat, color, isOutgoing, this, other, foreignKey);
 		connections.Add( newConn );
 		UpdateSize();
 		return newConn;
@@ -95,7 +85,7 @@ class Node extends TimeObject {
 	function Update() {
 		super.Update();
 
-		if (graphController.isGraphing() && graphController.getFile() != source || 
+		if (GraphController.isGraphing() && GraphController.getFile() != source || 
 				!hasValidTime()) {
 			setRender(false);
 			return;
@@ -120,7 +110,7 @@ class Node extends TimeObject {
 	    
 	    transform.rotation = oldRotation;
 	    
-	    if (networkController.flatten){
+	    if (NetworkController.flatten){
 	    	transform.position.z/=1.1;
 	    } 
 	
@@ -128,7 +118,7 @@ class Node extends TimeObject {
 
 	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, connection : Connection) {
 
-		if (networkController.isPaused()){
+		if (NetworkController.isPaused()){
 			return;
 		}
 
@@ -178,7 +168,7 @@ class Node extends TimeObject {
 		speed = Mathf.Clamp(speed, -1, 1);
 		
 		transform.LookAt(target);
-		var motion : Vector3 = transform.forward*speed*networkController.gameSpeed;		
+		var motion : Vector3 = transform.forward*speed*NetworkController.gameSpeed;		
 		transform.position += motion;
 	}
 
@@ -198,8 +188,8 @@ class Node extends TimeObject {
 	function UpdateSize(){
 
 		//override other rules when graphing.
-		if (graphController.isGraphing() && graphController.isForcingNodeSize()) {
-			size = graphController.getForcedNodeSize();
+		if (GraphController.isGraphing() && GraphController.isForcingNodeSize()) {
+			size = GraphController.getForcedNodeSize();
 		} else {
 			if (sizing_type == 0){ //by # connections
 				//Only count connections in the current time.
@@ -256,15 +246,15 @@ class Node extends TimeObject {
 
 	function OnMouseOver() {
 		if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
-			selectionController.NodeClick(this);
+			SelectionController.NodeClick(this);
 	    } 
 	    if (Input.GetMouseButton(1) || Input.GetMouseButtonUp(1)) { //rightclick
-	    	rightClickController.NodeClick(this);
+	    	RightClickController.NodeClick(this);
 	    }
 	}
 
 	function LateUpdate () {
-		if (renderer.isVisible && !graphController.isGraphing()){
+		if (renderer.isVisible && !GraphController.isGraphing()){
 			label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
 			var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*size/10;
 			label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 3.0, 20.0);
@@ -325,7 +315,7 @@ class Node extends TimeObject {
 			Camera.main.transform.parent = null;
 		}
 
-		selectionController.deselectNode(this);
+		SelectionController.deselectNode(this);
 		Destroy(gameObject);
 	}
 

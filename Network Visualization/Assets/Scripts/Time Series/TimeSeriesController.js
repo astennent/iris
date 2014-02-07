@@ -1,26 +1,19 @@
 #pragma strict
 
-private var timeSeriesEnabled = false;
-private var dates = new SortedDictionary.<Date, int>();
+private static var timeSeriesEnabled = false;
+private static var dates = new SortedDictionary.<Date, int>();
 
-private var datesList : List.<DateRatio>;
-private var lastWidth : int = 1;
+private static var datesList : List.<DateRatio>;
+private static var lastWidth : int = 1;
 
-private var first_date : Date;
-private var last_date : Date;
+private static var first_date : Date;
+private static var last_date : Date;
 
-private var current_date : Date;
+private static var current_date : Date;
 
-private var playing = false;
-private var playTimeSeconds : float = 60;
+private static var playing = false;
+private static var playTimeSeconds : float = 60;
 
-
-function isPlaying() {
-	return playing;
-}
-function togglePlaying() {
-	playing = !playing;
-}
 
 function Update() {
 	if (playing) {
@@ -38,25 +31,31 @@ function Update() {
 			var nextDate = ratioToDate(nextRatio);
 			setCurrentDate(nextDate);
 		}
-	}
-	
+	}	
 }
 
-function getEnabled() {
+static function isPlaying() {
+	return playing;
+}
+static function togglePlaying() {
+	playing = !playing;
+}
+
+static function getEnabled() {
 	return timeSeriesEnabled;
 }
-function toggleEnabled() {
+static function toggleEnabled() {
 	setEnabled(!timeSeriesEnabled);
 }
-function setEnabled(timeSeriesEnabled : boolean) {
+static function setEnabled(timeSeriesEnabled : boolean) {
 	this.timeSeriesEnabled = timeSeriesEnabled;
 	validateAllTimeObjects();
 }
 
-function getCurrentDate() {
+static function getCurrentDate() {
 	return current_date;
 }
-function setCurrentDate(date : Date) {
+static function setCurrentDate(date : Date) {
 	var dates_equivalent = datesAreEquivalent(current_date, date);
 	current_date = date;
 	if (!dates_equivalent) {
@@ -65,7 +64,7 @@ function setCurrentDate(date : Date) {
 }
 
 //Checks whether there are any changes in the timeline between the two dates.
-function datesAreEquivalent(date1 : Date, date2 : Date) {
+static function datesAreEquivalent(date1 : Date, date2 : Date) {
 	//Determine which date is earlier.
 	if (date1 == date2) {
 		return true;
@@ -86,7 +85,7 @@ function datesAreEquivalent(date1 : Date, date2 : Date) {
 }
 
 
-function addDate(date : Date) {
+static function addDate(date : Date) {
 	if (dates.ContainsKey(date)) {
 		dates[date] = dates[date]+1;
 	} else {
@@ -95,7 +94,7 @@ function addDate(date : Date) {
 	}
 }
 
-function removeDate(date : Date) {
+static function removeDate(date : Date) {
 	if (dates.ContainsKey(date)) {
 		var count = dates[date];
 		if (count > 1) {
@@ -108,7 +107,7 @@ function removeDate(date : Date) {
 }
 
 //Returns an ordered list of unique dates with their x coordinates.
-function getDates(width : int) {
+static function getDates(width : int) {
 	if (datesList == null || width != lastWidth) {
 		lastWidth = width;
 		updateDates(width);
@@ -116,40 +115,40 @@ function getDates(width : int) {
 	return datesList;
 }
 
-function getFirstDate() : Date {
+static function getFirstDate() : Date {
 	if (datesList == null) {
 		updateDates(lastWidth);
 	}
 	return first_date;
 }
 
-function getLastDate() : Date {
+static function getLastDate() : Date {
 	if (datesList == null) {
 		updateDates(lastWidth);
 	}
 	return last_date;
 }
 
-function getTotalSeconds() : float {
+static function getTotalSeconds() : float {
 	var first_date = getFirstDate();
 	var last_date = getLastDate();
 	return (last_date - first_date).TotalSeconds;
 }
 
 //Get the date that is ratio% of the way between the first and last dates.
-function ratioToDate(ratio : float) {
+static function ratioToDate(ratio : float) {
 	var timeDiff = getTotalSeconds();
 	var secondsAfterStart = (ratio * timeDiff);
 	return first_date.AddSeconds(secondsAfterStart);
 }
 
-function dateToRatio(date : Date) : float{
+static function dateToRatio(date : Date) : float{
 	var timeDiff = getTotalSeconds();
 	var thisDiff = (date - getFirstDate()).TotalSeconds;
 	return thisDiff/timeDiff;
 }
 
-function updateDates(width : int) {
+static function updateDates(width : int) {
 	datesList = new List.<DateRatio>();
 
 	//Calculate the first and last dates and find the difference in seconds.
@@ -177,18 +176,18 @@ function updateDates(width : int) {
 
 }
 
-function validateAllTimeObjects() {
-	for (var file in GetComponent(FileManager).files) {
+static function validateAllTimeObjects() {
+	for (var file in FileManager.files) {
 		for (var node in file.nodes.Values) {
 			node.validateDate();
 		}
 	}
-	GetComponent(ClusterController).ReInit();
-	GetComponent(CentralityController).ReInit();
-	GetComponent(ColorController).handleDateChange();
+	ClusterController.ReInit();
+	CentralityController.ReInit();
+	ColorController.handleDateChange();
 }
 
-function skipToNext() {
+static function skipToNext() {
 	for (var date in dates.Keys) {
 		if (date > current_date) {
 			setCurrentDate(date);
@@ -197,7 +196,7 @@ function skipToNext() {
 	}
 }
 
-function skipToPrev() {
+static function skipToPrev() {
 	var on_first = true;
 	var prev_date : Date;
 	for (var date in dates.Keys) {

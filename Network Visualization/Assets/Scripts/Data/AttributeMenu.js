@@ -2,11 +2,11 @@
 
 class AttributeMenu extends BaseMenu {
 
-	private var selected_index : int = -1;
-	private var attribute : Attribute;
-	private var file : DataFile;
+	private static var selected_index : int = -1;
+	private static var attribute : Attribute;
+	private static var file : DataFile;
 
-	private var fkeyScrollPosition : Vector2 = Vector2.zero;
+	private static var fkeyScrollPosition : Vector2 = Vector2.zero;
 
 	function Start() {
 		parent = GetComponent(FileMenu);
@@ -15,12 +15,12 @@ class AttributeMenu extends BaseMenu {
 		width = 280;
 	}
 
-	function setSelectedIndex(index : int){
+	static function setSelectedIndex(index : int){
 		if (index < 0 || index == selected_index){
-			DisableDisplay();
+			DisableDisplay(AttributeMenu);
 		} else {
-			EnableDisplay();
-			file = fileManager.files[fileMenu.selected_file_index];
+			super.EnableDisplay(AttributeMenu);
+			file = FileManager.files[FileMenu.selected_file_index];
 			selected_index = index;
 			attribute = file.attributes[selected_index];
 			Dropdown.reset(getDropdownId(attribute));
@@ -33,7 +33,7 @@ class AttributeMenu extends BaseMenu {
 		if (displaying) {
 			//don't draw if you don't have anything to look at.
 			if (selected_index == -1){
-				DisableDisplay();
+				DisableDisplay(AttributeMenu);
 				return;
 			}
 
@@ -188,7 +188,7 @@ class AttributeMenu extends BaseMenu {
 	function DrawForeignKeyEditing(cur_y : int) {
 		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
 
-		var outerBoxHeight = menuController.getScreenHeight()-cur_y;
+		var outerBoxHeight = MenuController.getScreenHeight()-cur_y;
 		var outerBox = new Rect(x+5, cur_y, width-10, outerBoxHeight);
 
 		//get the attributes that are pointed to by simple fkeys
@@ -295,11 +295,11 @@ class AttributeMenu extends BaseMenu {
 		return cur_y+fkeyRect.y;
 	}
 
-	function getDropdownId(attribute : Attribute) {
+	static function getDropdownId(attribute : Attribute) {
 		return "3" + attribute.file.shortName()+attribute.column_index;
 	}
 
-	function getFkeyDropdownId(fkey : ForeignKey) {
+	static function getFkeyDropdownId(fkey : ForeignKey) {
 		if (fkey.isLinking()) {
 			return "4" + fkey.source_file.shortName();
 		}
@@ -310,8 +310,7 @@ class AttributeMenu extends BaseMenu {
 		return id;
 	}
 
-	function DisableDisplay(){
-		super.DisableDisplay();
+	static function OnDisableDisplay(){
 		selected_index = -1;
 	}
 

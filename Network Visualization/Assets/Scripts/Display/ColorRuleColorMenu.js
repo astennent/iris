@@ -1,9 +1,9 @@
 #pragma strict
 
 class ColorRuleColorMenu extends BaseMenu {
-	private var schemeScrollPosition : Vector2 = Vector2.zero;
-	private var attributeScrollPosition : Vector2 = Vector2.zero;
-	private var rule : ColorRule;
+	private static var schemeScrollPosition : Vector2 = Vector2.zero;
+	private static var attributeScrollPosition : Vector2 = Vector2.zero;
+	private static var rule : ColorRule;
 	function Start(){
 		parent = GetComponent(DisplayMenu);
 		super.Start();
@@ -17,8 +17,8 @@ class ColorRuleColorMenu extends BaseMenu {
 			var button_text : String;
 			var label_text : String;
 
-			var rule_index = displayMenu.rule_index;
-			rule = colorController.rules[displayMenu.rule_index];
+			var rule_index = DisplayMenu.rule_index;
+			rule = ColorController.rules[DisplayMenu.rule_index];
 
 			var y = DrawMethod(35);
 			var method = rule.getMethod();
@@ -62,9 +62,9 @@ class ColorRuleColorMenu extends BaseMenu {
 	}
 
 	function DrawColorCustom(cur_y : int) {
-		colorPicker.Init(x, cur_y, false);
+		ColorPicker.Init(x, cur_y, false);
 		var original_color = rule.color;
-		rule.color = colorPicker.getColor();
+		rule.color = ColorPicker.getColor();
 
 		cur_y += 190;
 		var original_variation = rule.variation;
@@ -72,7 +72,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		rule.variation = GUI.HorizontalSlider(Rect(x+130, cur_y+5, width-140, 20), rule.variation, 0.0, 1.0);
 
 		if (rule.color != original_color || rule.variation != original_variation){
-			colorController.ApplyRule(rule);
+			ColorController.ApplyRule(rule);
 		}
 		cur_y += 30;
 		return cur_y;
@@ -81,9 +81,9 @@ class ColorRuleColorMenu extends BaseMenu {
 	function DrawColorScheme(y : int) {
 		GUI.color = Color.white;
 
-		var schemeNames = colorController.getSchemeNames();
+		var schemeNames = ColorController.getSchemeNames();
 
-		schemeScrollPosition = GUI.BeginScrollView (Rect (x,y,width,menuController.getScreenHeight()-33), 
+		schemeScrollPosition = GUI.BeginScrollView (Rect (x,y,width,MenuController.getScreenHeight()-33), 
 			schemeScrollPosition, Rect (0, 0, width, 30*schemeNames.length+20));
 
 		var cur_y = 0;
@@ -113,7 +113,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		cur_y += 5;
 
 		GUI.Box(Rect(x+5, cur_y, width-10, 155), "");
-		var centrality_types = centralityController.centrality_types;
+		var centrality_types = CentralityController.centrality_types;
 
 		var wasInverted = rule.getInvertCentrality();
 		if (wasInverted) {
@@ -168,7 +168,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		GUI.Box(outerBox, "");
 		var line_count = 0;
 
-		for (var file : DataFile in fileManager.files){
+		for (var file : DataFile in FileManager.files){
 			line_count += file.attributes.Count + 2;
 		}
 
@@ -177,7 +177,7 @@ class ColorRuleColorMenu extends BaseMenu {
 
 		attributeScrollPosition = GUI.BeginScrollView (outerBox, attributeScrollPosition, innerBox);
 			var scroll_y = 0;
-			for (var file : DataFile in fileManager.files){
+			for (var file : DataFile in FileManager.files){
 				GUI.Label(Rect (5, scroll_y, width-5, 20), file.shortName() + ":");
 				scroll_y += 20;
 
@@ -207,7 +207,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		rule.coloring_halo = GUI.Toggle (Rect (x+10, cur_y, width/2-10, 20), rule.coloring_halo, " Color Halo");
 		
 		if (rule.coloring_halo != original_halo || rule.coloring_node != original_node){
-			colorController.ApplyRule(rule);
+			ColorController.ApplyRule(rule);
 		}
 
 		return cur_y + 35;	
@@ -232,12 +232,11 @@ class ColorRuleColorMenu extends BaseMenu {
 		}
 
 		if (rule.uses_manual_size != original_uses_size || rule.manual_size != original_manual_size){
-			colorController.ApplyRule(rule, false, true);
+			ColorController.ApplyRule(rule, false, true);
 		}
 	}
 
-	function DisableDisplay(){
-		displayMenu.setRuleIndex(-1);
-		super.DisableDisplay();
+	static function OnDisableDisplay(){
+		DisplayMenu.setRuleIndex(-1);
 	}
 }

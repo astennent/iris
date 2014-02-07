@@ -14,15 +14,13 @@ class TimeObject extends Data {
 
 	//Called when the current date changes in the TimeLine or when the TimeObject's date is changed.
 	function validateDate() {
-		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
-		var current_date = timeSeriesController.getCurrentDate();
+		var current_date = TimeSeriesController.getCurrentDate();
 		validTime = ((startDate <= current_date || startDate == DEFAULT_DATE) && 
 				 (endDate > current_date || endDate == DEFAULT_DATE)); 
 	}
 
 	function hasValidTime() : boolean {
-		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
-		return (validTime || !source.timeFrame.isUsed() || !timeSeriesController.getEnabled());
+		return (validTime || !source.timeFrame.isUsed() || !TimeSeriesController.getEnabled());
 	}
 
 	function UpdateDate() {
@@ -66,10 +64,9 @@ class TimeObject extends Data {
 	}
 
 	private function resetDate(isStart : boolean) {
-		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
 		var date = getDate(isStart);
 		if (date != DEFAULT_DATE) {
-			timeSeriesController.removeDate(date);
+			TimeSeriesController.removeDate(date);
 		}
 		if (isStart) {
 			startDate = date;
@@ -79,7 +76,6 @@ class TimeObject extends Data {
 	}
 
 	function setDate(isStart : boolean, date : Date) {
-		var timeSeriesController = GameObject.FindGameObjectWithTag("GameController").GetComponent(TimeSeriesController);
 		resetDate(isStart); //Remove for TimeSeriesController bookkeeping
 		if (isStart) {
 			startDate = date;
@@ -87,7 +83,7 @@ class TimeObject extends Data {
 			endDate = date;
 		}
 		if (date != DEFAULT_DATE) {
-			timeSeriesController.addDate(startDate);
+			TimeSeriesController.addDate(startDate);
 		}
 	}
 

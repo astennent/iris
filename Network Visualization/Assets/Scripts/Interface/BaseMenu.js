@@ -8,36 +8,6 @@ class BaseMenu extends MonoBehaviour {
 	var x : float; //the current left side of the menu
 	var width : float; 
 
-	/* List of all classes attached to the NetworkController,
-		used for easy referencing between menus*/
-	protected var clusterController : ClusterController;
-	protected var fileManager : FileManager;
-	protected var fileMenu : FileMenu;
-    protected var attributeMenu : AttributeMenu;
-    protected var fkeyMenu : FkeyMenu;
-    protected var colorController : ColorController;
-    protected var searchController : SearchController;
-    protected var selectionController : SelectionController;
-    protected var colorRuleMenu : ColorRuleMenu;
-    protected var colorRuleColorMenu : ColorRuleColorMenu;
-    protected var colorPicker : ColorPicker;
-    protected var searchMenu : SearchMenu;
-    protected var displayMenu : DisplayMenu;
-    protected var networkController : NetworkController;
-    protected var centralityController : CentralityController;
-    protected var graphController : GraphController;
-    protected var axisController : AxisController;
-    protected var graphMenu : GraphMenu;
-    protected var mainMenu : MainMenu;
-    protected var guiplus : GuiPlus;
-    protected var timeFrameMenu : TimeFrameMenu;
-    protected var timeSeriesController : TimeSeriesController;
-    protected var popupWindow : PopupWindow;
-    protected var menuController : MenuController;
-    protected var timeSeriesMenu : TimeSeriesMenu;
-    
-
-
     /* The text displayed at the top of the menu */
     var title : String = ""; //must be set separately in each menu.
 	
@@ -45,7 +15,7 @@ class BaseMenu extends MonoBehaviour {
     var children : List.<BaseMenu>;
 
     /* The single menu immediately to the left of the current menu */
-    var parent : BaseMenu;
+    var parent : BaseMenu = null;
 
 	function Start(){
 		if (parent != null) {
@@ -57,31 +27,6 @@ class BaseMenu extends MonoBehaviour {
 		}
 		width = 320; //default width for left-most menus. All others should specify width manually.
 		x =  -width;
-		clusterController = GetComponent(ClusterController);
-		fileManager = GetComponent(FileManager);
-		fileMenu = GetComponent(FileMenu);
-		attributeMenu = GetComponent(AttributeMenu);	
-		fkeyMenu = GetComponent(FkeyMenu);
-		colorController = GetComponent(ColorController);	
-		searchController = GetComponent(SearchController);
-		selectionController = GetComponent(SelectionController);
-		colorRuleMenu = GetComponent(ColorRuleMenu);
-		colorRuleColorMenu = GetComponent(ColorRuleColorMenu);
-		colorPicker = GetComponent(ColorPicker);
-		searchMenu = GetComponent(SearchMenu);
-		displayMenu = GetComponent(DisplayMenu);
-		networkController = GetComponent(NetworkController);
-		centralityController = GetComponent(CentralityController);
-		graphMenu = GetComponent(GraphMenu);
-		graphController = GetComponent(GraphController);
-		axisController = GetComponent(AxisController);
-		mainMenu = GetComponent(MainMenu);
-		guiplus = GetComponent(GuiPlus);
-		timeFrameMenu = GetComponent(TimeFrameMenu);
-		timeSeriesController = GetComponent(TimeSeriesController);
-		popupWindow = GetComponent(PopupWindow);
-		menuController = GetComponent(MenuController);
-		timeSeriesMenu = GetComponent(TimeSeriesMenu);
 	}
 
 	function Update () {	
@@ -94,8 +39,8 @@ class BaseMenu extends MonoBehaviour {
 	}
 
 	function OnGUI() {
-		var menuRect = new Rect(x, 0, width, menuController.getScreenHeight());
-		guiplus.Box(menuRect, title);
+		var menuRect = new Rect(x, 0, width, MenuController.getScreenHeight());
+		GuiPlus.Box(menuRect, title);
 
 		var box = new Rect(x+width-30, 4, 26, 26);
 		if (GUI.Button(box, "X")){
@@ -111,7 +56,26 @@ class BaseMenu extends MonoBehaviour {
 		desired_x += diff;
 	}
 
-	function ToggleDisplay(){
+	//////////// Exposed static functions //////////////
+	static function ToggleDisplay(menuClass : System.Type) {
+		var menu = MenuController.getInstance(menuClass);
+		menu.ToggleDisplay();
+	}
+	static function EnableDisplay(menuClass : System.Type) {
+		var menu = MenuController.getInstance(menuClass);
+		menu.EnableDisplay();
+	}
+	static function DisableDisplay(menuClass : System.Type) {
+		var menu = MenuController.getInstance(menuClass);
+		menu.DisableDisplay();
+	}
+	static function DisableDisplay(menuClass : System.Type, passItOn : boolean) {
+		var menu = MenuController.getInstance(menuClass);
+		menu.DisableDisplay(passItOn);
+	}
+
+	/////////// Hidden instance functions //////////////
+	private function ToggleDisplay(){
 		if (displaying) {
 			DisableDisplay();
 		} else {
@@ -119,7 +83,7 @@ class BaseMenu extends MonoBehaviour {
 		}
 	}
 
-	function EnableDisplay(){
+	private function EnableDisplay(){
 		if (parent != null) {
 
 			//Enable the display of the parent menu, if necessary
@@ -135,29 +99,27 @@ class BaseMenu extends MonoBehaviour {
 		displaying = true;
 	}
 
-	function DisableDisplay() {
+	private function DisableDisplay() {
 		DisableDisplay(false);
 	}
 
 	//if passItOn, only close the lowest-level children. (ex. User presses escape)
 	//otherwise, close self and all children.
-	function DisableDisplay(passItOn : boolean) {
+	private function DisableDisplay(passItOn : boolean) {
 		if (displaying) {
 			var closedChild = false;
-			print("check: " + typeof(this));
 			for (var subMenu in children) {
 				if (subMenu.displaying){
-					subMenu.DisableDisplay(passItOn);
+					DisableDisplay(typeof(subMenu), passItOn);
 					closedChild = true;
-					print("check3: Called from " + typeof(this) + ", child is " + typeof(subMenu));
 				}
 			}
 			if ( (passItOn && !closedChild) || !passItOn) {
-				print("check2: " + typeof(this) + " CloseChild: " + closedChild + " passItOn" + passItOn);
 				displaying = false;
 			}
 			GUI.FocusControl("");
 		}
+		OnDisableDisplay();
 	}
 
 	function isDisplayingChild() {
@@ -168,5 +130,8 @@ class BaseMenu extends MonoBehaviour {
 		}
 		return false;
 	}
+
+	//Overwritten by derived classes if they need to do something special
+	static function OnDisableDisplay() {}
 
 }

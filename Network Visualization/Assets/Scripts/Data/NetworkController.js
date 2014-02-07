@@ -1,21 +1,17 @@
 #pragma strict
 import System.IO;
 
-var nodePrefab : GameObject;
+static var nodePrefab : GameObject;
+var instanceNodePrefab : GameObject;
 
-private var edgeFile : String = "C:\\Users\\Alan\\Desktop\\Dictionaries\\AllianceData\\Alliance Edge List - Names.csv";
-private var delimiter : char = ','[0];
-private var idColumnIndex : int = 1;
-private var fkeyColumnIndex : int = 0;
+static var flatten = false;
 
-var flatten = true;
+static var gameSpeed : float = 1;
+private static var paused : boolean = false;
 
-var gameSpeed : float = 1;
-private var paused : boolean = false;
-
-var seeding = true;
-var seeds : String[];
-var currentSeedIndex : int = 0;
+static var seeding = true;
+static var seeds : String[];
+static var currentSeedIndex : int = 0;
 
 //used to clone the node texture material so you can control the color at runtime.
 var nodeTexture : Material;
@@ -24,41 +20,37 @@ var reticleTexture : Material;
 var axisTexture : Material;
 var gridTexture : Material;
 
-private var fileManager : FileManager;
-private var graphController : GraphController;
+static function getNodeTexture() {
+	return getInstance().nodeTexture;
+}
+static function getLineTexture() {
+	return getInstance().lineTexture;
+}
+static function getGridTexture() {
+	return getInstance().gridTexture;
+}
+static function getReticleTexture() {
+	return getInstance().reticleTexture;
+}
 
+function Start() {
+	nodePrefab = instanceNodePrefab;
+}
 
-function SetSpeed(speed : float){
+static function SetSpeed(speed : float){
 	gameSpeed = speed;
 }
 
-function TogglePause(){
+static function TogglePause(){
 	paused = !paused;
 }
-function isPaused() {
-	return (paused || graphController.isGraphing());
-}
-
-function Start(){
-	fileManager = GetComponent(FileManager);
-	graphController = GetComponent(GraphController);
-}
-
-function escapeQuotedDelimiters(line : String){
-	var escaped : boolean = false;
-	for (var x :int =0 ; x < line.Length ; x++){
-		if (line[x] == "\""[0]){ //match on quotes
-			escaped = !escaped;
-		} else if (escaped && line[x] == delimiter){
-			line = line.Substring(0,x) + "\\" + line.Substring(x);
-		}
-	}
-	return line;
+static function isPaused() : boolean {
+	return (paused || GraphController.isGraphing());
 }
 
 function Update(){
 	if (Input.GetButtonDown("Scatter")){
-		for (var file in fileManager.files){
+		for (var file in FileManager.files){
 			var nodes = file.nodes;
 			for (entry in nodes){ //loop over the node names
 				var node = entry.Value;
@@ -72,4 +64,8 @@ function Update(){
 		flatten = !flatten;
 	}
 
+}
+
+static function getInstance() {
+	return GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
 }

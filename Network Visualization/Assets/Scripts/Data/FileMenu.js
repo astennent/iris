@@ -8,11 +8,11 @@ class FileMenu extends BaseMenu {
 	var plus : Texture;
 	var cross : Texture;
 
-	private var cur_y : float;
-	private var directoryScrollPosition : Vector2 = Vector2.zero;
-	private var attributeScrollPosition : Vector2 = Vector2.zero;
-	private var fileString : String = "";
-	var error_message : String = "";
+	private static var cur_y : float;
+	private static var directoryScrollPosition : Vector2 = Vector2.zero;
+	private static var attributeScrollPosition : Vector2 = Vector2.zero;
+	private static var fileString : String = "";
+	static var error_message : String = "";
 
 	static var DROPDOWN_ID = "0";
 
@@ -20,8 +20,8 @@ class FileMenu extends BaseMenu {
 	/*	Used to decide what to display below the line.
 		-1 : nothing
 		0+ : index in FileManager.files */
-	var selected_file_index : int = -1; //used to decide what to display below the line.
-	var creating_file : boolean = false;
+	static var selected_file_index : int = -1; //used to decide what to display below the line.
+	static var creating_file : boolean = false;
 
 	function Start(){
 		parent = GetComponent(MainMenu);
@@ -29,27 +29,27 @@ class FileMenu extends BaseMenu {
 		title = "File Manager";
 	}
 
-	function getSelectedFile() {
+	static function getSelectedFile() {
 		if (selected_file_index >= 0) {
-			return fileManager.files[selected_file_index];
+			return FileManager.files[selected_file_index];
 		} else {
 			return null;
 		}
 	}
 
-	function setSelectedFile(index : int) {
+	static function setSelectedFile(index : int) {
 		if (selected_file_index != index) {
 			selected_file_index = index;
-			attributeMenu.setSelectedIndex(-1);
-			fkeyMenu.resetCreation();
+			AttributeMenu.setSelectedIndex(-1);
+			FkeyMenu.resetCreation();
 			creating_file = false;
 		}
 	}
 
-	function toggleCreatingFile() {
+	static function toggleCreatingFile() {
 		creating_file = !creating_file;
-		attributeMenu.setSelectedIndex(-1);
-		fkeyMenu.resetCreation();
+		AttributeMenu.setSelectedIndex(-1);
+		FkeyMenu.resetCreation();
 	}
 
 	function OnGUI(){
@@ -59,9 +59,9 @@ class FileMenu extends BaseMenu {
 		//Draw the file selection dropdown
 		var selection_rect = new Rect(x+10, cur_y, width-50, 30);
 		var dropHeight = 120;
-		var filesList = new String[fileManager.files.Count];
-		for (var i = 0 ; i < fileManager.files.Count ; i++) {
-			filesList[i] = fileManager.files[i].shortName();
+		var filesList = new String[FileManager.files.Count];
+		for (var i = 0 ; i < FileManager.files.Count ; i++) {
+			filesList[i] = FileManager.files[i].shortName();
 		}
 		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, filesList, selected_file_index, DROPDOWN_ID, "Select a File");
 		if (new_selected_index != selected_file_index) {
@@ -94,9 +94,9 @@ class FileMenu extends BaseMenu {
 
 	//displays information / actions for imported files.
 	function DrawLoadedFileDetails(){
-		var file = fileManager.files[selected_file_index];
+		var file = FileManager.files[selected_file_index];
 
-		var menuRect = new Rect(x, cur_y, width, menuController.getScreenHeight()-cur_y);
+		var menuRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);
 		if (file.imported){
 			var title = "Imported File";
 		} else {
@@ -117,12 +117,12 @@ class FileMenu extends BaseMenu {
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
 		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
 		if (GUI.Button(fkey_box, "Foreign Keys")){
-			fkeyMenu.ToggleDisplay();
+			FkeyMenu.ToggleDisplay(FkeyMenu);
 		}
 		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);
 		GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 		if (GUI.Button(details_box, "Time Series")){
-			timeFrameMenu.ToggleDisplay();
+			TimeFrameMenu.ToggleDisplay(TimeFrameMenu);
 		}
 		
 		GUI.color = Color.white;	
@@ -139,7 +139,7 @@ class FileMenu extends BaseMenu {
 		cur_y += 25;
 
 		//File Attributes (columns)
-		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,menuController.getScreenHeight()-cur_y-50), 
+		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,MenuController.getScreenHeight()-cur_y-50), 
 			attributeScrollPosition, Rect (0, 0, width-30, 20*file.attributes.Count+20));
 		
 		
@@ -170,8 +170,8 @@ class FileMenu extends BaseMenu {
 			GUI.color = attribute.getAspectColor();			
 			var display_string :String = attribute.getRestrictedName(140);
 	   		if (GUI.Button(new Rect(100, attribute_y, 180, 20), display_string)){
-	   			fkeyMenu.DisableDisplay();
-	   			attributeMenu.setSelectedIndex(i);
+	   			DisableDisplay(FkeyMenu);
+	   			AttributeMenu.setSelectedIndex(i);
 	   		}
 		
 			attribute_y += 20;
@@ -184,27 +184,27 @@ class FileMenu extends BaseMenu {
 			//Disable button
 			GUI.color = new Color(1, .7, 0);
 			cur_y += 30;
-			import_button = new Rect(x+10, menuController.getScreenHeight()-40, width/2-10, 30);
+			import_button = new Rect(x+10, MenuController.getScreenHeight()-40, width/2-10, 30);
 			if (GUI.Button(import_button, "Deavtivate File")){
-				fileManager.DeactivateFile(selected_file_index);
+				FileManager.DeactivateFile(selected_file_index);
 			}
 		} else {
 			//Import button
 			GUI.color = new Color(0, 1, 0);
 			cur_y += 30;
-			import_button = new Rect(x+10, menuController.getScreenHeight()-40, width/2-10, 30);
+			import_button = new Rect(x+10, MenuController.getScreenHeight()-40, width/2-10, 30);
 			if (GUI.Button(import_button, "Activate File")){
-				fileManager.ActivateFile(selected_file_index);
+				FileManager.ActivateFile(selected_file_index);
 			}
 		}
 		
 		//Remove button
 		GUI.color = Color.red;
 		cur_y += 30;
-		var remove_button = new Rect(x+width/2+5, menuController.getScreenHeight()-40, width/2-12.5, 30);
+		var remove_button = new Rect(x+width/2+5, MenuController.getScreenHeight()-40, width/2-12.5, 30);
 		if (GUI.Button(remove_button, "Remove File")){
 			//TODO: Removing files from workspace
-			//fileManager.removeFile(selected_file_index);
+			//FileManager.removeFile(selected_file_index);
 			//selected_file_index = -1;
 		}
 		
@@ -212,7 +212,7 @@ class FileMenu extends BaseMenu {
 
 	//displays information / actions for a new file.
 	function DrawNewFileDetails(){
-		var menuRect = new Rect(x, cur_y, width, menuController.getScreenHeight()-cur_y);
+		var menuRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);
 		GUI.Box(menuRect, "New File");
 		
 		cur_y+=30;
@@ -246,8 +246,8 @@ class FileMenu extends BaseMenu {
 			GUI.color = Color.white;
 		}
 		if (GUI.Button(loadRect, "Load")){
-			selected_file_index = fileManager.Load(fileString); //switches to loaded menu if successful.
-			attributeMenu.setSelectedIndex(-1);
+			selected_file_index = FileManager.Load(fileString); //switches to loaded menu if successful.
+			AttributeMenu.setSelectedIndex(-1);
 		}
 		GUI.color = Color.white;
 		
@@ -258,8 +258,8 @@ class FileMenu extends BaseMenu {
 
 	function DrawDirectoryData(){
 		//loop over directories
-		directoryScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,menuController.getScreenHeight()-cur_y), 
-			directoryScrollPosition, Rect (0, 0, width, 20*fileManager.dest_directories.Count + 20*fileManager.dest_files.Count));
+		directoryScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), 
+			directoryScrollPosition, Rect (0, 0, width, 20*FileManager.dest_directories.Count + 20*FileManager.dest_files.Count));
 		cur_y = 0;
 		
 		GUI.color = new Color(0, .8, .8);
@@ -276,7 +276,7 @@ class FileMenu extends BaseMenu {
 		}
 		GUI.color = Color.cyan;
 		cur_y+=20;
-		for (var di:DirectoryInfo in fileManager.dest_directories){
+		for (var di:DirectoryInfo in FileManager.dest_directories){
 			buttonRect = new Rect(10, cur_y, width-20, 20);
 			if (GUI.Button(buttonRect, di.Name)){
 				fileString = di.FullName;
@@ -285,7 +285,7 @@ class FileMenu extends BaseMenu {
 			cur_y += 20;
 		}
 		//loop over files
-		for (var fi:FileInfo in fileManager.dest_files){
+		for (var fi:FileInfo in FileManager.dest_files){
 			if (fi.Name.EndsWith(".csv")){
 				GUI.color = Color.green;
 			} else {
@@ -303,8 +303,8 @@ class FileMenu extends BaseMenu {
 
 
 
-	function UpdateDirectoryData(){
-		fileManager.UpdateDirectoryData(fileString);
+	static function UpdateDirectoryData(){
+		FileManager.UpdateDirectoryData(fileString);
 		error_message = "";
 	}
 

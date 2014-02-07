@@ -1,19 +1,19 @@
 #pragma strict
 
 class ColorRuleMenu extends BaseMenu {
-	private var sourceScrollPosition : Vector2 = Vector2.zero;
-	private var clusterScrollPosition : Vector2 = Vector2.zero;
-	private var nodeScrollPosition : Vector2 = Vector2.zero;
-	private var attributeScrollPosition : Vector2 = Vector2.zero;
-	private var attributeScrollPosition2 : Vector2 = Vector2.zero;
+	private static var sourceScrollPosition : Vector2 = Vector2.zero;
+	private static var clusterScrollPosition : Vector2 = Vector2.zero;
+	private static var nodeScrollPosition : Vector2 = Vector2.zero;
+	private static var attributeScrollPosition : Vector2 = Vector2.zero;
+	private static var attributeScrollPosition2 : Vector2 = Vector2.zero;
 
-	private var hiding_unconnected_clusters : boolean = false;
-	private var found_unconnected_cluster : boolean = false;
+	private static var hiding_unconnected_clusters : boolean = false;
+	private static var found_unconnected_cluster : boolean = false;
 
-	private var attributeValueCache : HashSet.<String>;
-	private var searchString : String = "";
-	private var oldSearchString : String = "";
-	private var attributeMatchCount : int = 0;
+	private static var attributeValueCache : HashSet.<String>;
+	private static var searchString : String = "";
+	private static var oldSearchString : String = "";
+	private static var attributeMatchCount : int = 0;
 
 	function Start(){
 		parent = GetComponent(ColorRuleColorMenu);
@@ -26,17 +26,17 @@ class ColorRuleMenu extends BaseMenu {
 	function OnGUI(){
 		super.OnGUI();
 
-		var rule_index = displayMenu.rule_index;
+		var rule_index = DisplayMenu.rule_index;
 
 		if (!displaying) {
 			return;
 		}
 
-		var rule : ColorRule = colorController.rules[rule_index];
+		var rule : ColorRule = ColorController.rules[rule_index];
 
 		var y = 25;
-		for (var i : int = 0 ; i < colorController.rule_types.length ; i++){
-			var type_name : String = colorController.rule_types[i];
+		for (var i : int = 0 ; i < ColorController.rule_types.length ; i++){
+			var type_name : String = ColorController.rule_types[i];
 			var selected_current = GUI.Toggle(Rect (x+5, y, width-5, 20), (i == rule.getRuleType()), type_name);
 
 			if (selected_current && ! (rule.getRuleType() == i)) {
@@ -56,7 +56,7 @@ class ColorRuleMenu extends BaseMenu {
 
 		var rule_type = rule.getRuleType(); 
 		if (rule_type == 0){
-			var files = fileManager.files;
+			var files = FileManager.files;
 
 			sourceScrollPosition = GUI.BeginScrollView (scrollBox, 
 				sourceScrollPosition, Rect (0, 0, width, 20*files.Count+20));
@@ -80,7 +80,7 @@ class ColorRuleMenu extends BaseMenu {
 			}	
 			
 			found_unconnected_cluster = false;
-			var cluster_dict = clusterController.group_dict;
+			var cluster_dict = ClusterController.group_dict;
 
 			clusterScrollPosition = GUI.BeginScrollView (scrollBox, 
 				clusterScrollPosition, Rect (0, 0, width, 20*cluster_dict.Count+20));
@@ -125,14 +125,14 @@ class ColorRuleMenu extends BaseMenu {
 			/* TODO
 
 			var line_count : int  = 0;
-			for (var file : DataFile in fileManager.files){
+			for (var file : DataFile in FileManager.files){
 				line_count += file.nodes.Count + 3;
 			}
 
 			clusterScrollPosition = GUI.BeginScrollView (scrollBox, 
 				clusterScrollPosition, Rect (0, 0, width, 20*line_count+20));
 
-			for (var file : DataFile in fileManager.files){
+			for (var file : DataFile in FileManager.files){
 				for (var node in file.nodes){
 					var node_pkey = node.Key;
 					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (node_pkey == rule.node_pkey), node_pkey+"")){
@@ -146,14 +146,14 @@ class ColorRuleMenu extends BaseMenu {
 			GUI.EndScrollView();*/
 		} else if (rule_type == 3) {
 			var line_count = 0;
-			for (var file : DataFile in fileManager.files){
+			for (var file : DataFile in FileManager.files){
 				line_count += file.attributes.Count + 1;
 			}
 
 			attributeScrollPosition = GUI.BeginScrollView (scrollBox, 
 				attributeScrollPosition, Rect (0, 0, width, 20*line_count+20));
 			temp_y -= 20;
-			for (var file : DataFile in fileManager.files){
+			for (var file : DataFile in FileManager.files){
 				temp_y += 20;
 				GUI.Label(Rect (5, temp_y, width-5, 20), file.shortName() + ":");
 				temp_y += 20;
@@ -213,7 +213,7 @@ class ColorRuleMenu extends BaseMenu {
 
 	}
 
-	function updateCachedAttributeValues(attribute : Attribute){
+	static function updateCachedAttributeValues(attribute : Attribute){
 		if (attribute == null){
 			return;
 		}
@@ -240,11 +240,10 @@ class ColorRuleMenu extends BaseMenu {
 		}	
 	}
 
-	function DisableDisplay(){
+	static function OnDisableDisplay(){
 		//special case: when you're on the fallback rule, don't reset the rule when you close.
-		if (displayMenu.rule_index != 0) {
-			displayMenu.setRuleIndex(-1);
+		if (DisplayMenu.rule_index != 0) {
+			DisplayMenu.setRuleIndex(-1);
 		}
-		super.DisableDisplay();
 	}
 }

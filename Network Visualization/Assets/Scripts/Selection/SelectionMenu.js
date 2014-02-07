@@ -22,23 +22,23 @@ class SelectionMenu extends BaseMenu {
 	}
 
 	function OnGUI(){
-		var numNodes = selectionController.getNumSelected();
+		var numNodes = SelectionController.getNumSelected();
 		if (numNodes > 0) {
 			if (numNodes > 1) {
 				title = numNodes + " nodes selected.";
 			} else {
-				var enumerator = selectionController.nodes.GetEnumerator();
+				var enumerator = SelectionController.nodes.GetEnumerator();
 				enumerator.MoveNext();
 				title = enumerator.Current.getDisplayName() + "";
 			}
-			var menuRect = new Rect(x, 0, width, menuController.getScreenHeight());
-			guiplus.Box(menuRect, title);
+			var menuRect = new Rect(x, 0, width, MenuController.getScreenHeight());
+			GuiPlus.Box(menuRect, title);
 			
 			//"More" button
 			//var button_position : Rect = new Rect(Screen.width, 5, 35, 35);
-			var button_position : Rect = new Rect(x-15, 0, 15, menuController.getScreenHeight());
+			var button_position : Rect = new Rect(x-15, 0, 15, MenuController.getScreenHeight());
 			if (GUI.Button(button_position, more)){
-				ToggleDisplay();
+				ToggleDisplay(SelectionMenu);
 			}	
 
 			var cur_y = 30;
@@ -49,40 +49,40 @@ class SelectionMenu extends BaseMenu {
 
 	function DrawNodeList(cur_y : int) {
 
-		var numNodes = selectionController.getNumSelected();
+		var numNodes = SelectionController.getNumSelected();
 
 		//decide how big the box should be. 
 		var data_rect_height : int;
 		if (numNodes == 1) {
-			data_rect_height = menuController.getScreenHeight()-cur_y;
+			data_rect_height = MenuController.getScreenHeight()-cur_y;
 		} else {
 			data_rect_height = 250;
 		}
 
 		//the width and height of the list of buttons
-		var contentHeight = (selectionController.nodes.Count-1)*30 + data_rect_height;
+		var contentHeight = (SelectionController.nodes.Count-1)*30 + data_rect_height;
 		var contentWidth : int;
-		if (contentHeight > menuController.getScreenHeight()-cur_y) {
+		if (contentHeight > MenuController.getScreenHeight()-cur_y) {
 			contentWidth = width-16; //make space for the scrollbar
 		} else {
 			contentWidth = width;
 		}
 
-		nodeScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,menuController.getScreenHeight()-cur_y), 
+		nodeScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), 
 				nodeScrollPosition, Rect (0, 0, contentWidth, contentHeight));
 
 			var node_scroll_y = 0;
 
-			for (var node : Node in selectionController.nodes) {
+			for (var node : Node in SelectionController.nodes) {
 				GUI.color = node.getMenuColor();
 
-				if (selectionController.primaryNode == node) {
+				if (SelectionController.primaryNode == node) {
 					DrawPrimaryNode(node_scroll_y, contentWidth, numNodes, data_rect_height);	    			
 					node_scroll_y += data_rect_height;
 				} else {
 					var button_rect = new Rect(0, node_scroll_y, contentWidth, 30);
 					if (GUI.Button(button_rect, node.getDisplayName())){
-						selectionController.selectPrimaryNode(node);
+						SelectionController.selectPrimaryNode(node);
 					}
 					node_scroll_y += 30;
 				}
@@ -95,7 +95,7 @@ class SelectionMenu extends BaseMenu {
 
 	function DrawPrimaryNode(node_scroll_y : int, contentWidth : int, numNodes : int, data_rect_height : int) {
 		var data_rect = new Rect(0, node_scroll_y, width, data_rect_height);
-		var node = selectionController.primaryNode;
+		var node = SelectionController.primaryNode;
 
 		var extra_vertical_space : int;
 		if (numNodes > 1) {

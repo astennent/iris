@@ -1,45 +1,38 @@
 #pragma strict
 
-private var timeSeriesMenu : TimeSeriesMenu;
-private var popupWindow : PopupWindow;
-private var mainMenu : MainMenu;
-private var selectionController : SelectionController;
-
-function Start() {
-	timeSeriesMenu = GetComponent(TimeSeriesMenu);
-	popupWindow = GetComponent(PopupWindow);
-	mainMenu = GetComponent(MainMenu);
-	selectionController = GetComponent(SelectionController);
-}
-
 function Update() {
 	handleEscapePress();
 }
 
-function handleEscapePress() {
+static function handleEscapePress() {
 
 	//Escape priority in order: Popup, MainMenu children, Selected Nodes, TimeSeries, MainMenu (Toggles)
 	if (Input.GetButtonDown("Escape")) {
-		if (popupWindow.isDisplaying()) {
-			popupWindow.DisableDisplay();
-		} else if (mainMenu.isDisplayingChild()) {
-    		mainMenu.DisableDisplay(true); //cascade disabling responsibility down the submenus
-	    } else if (timeSeriesMenu.displaying) {
-    		timeSeriesMenu.DisableDisplay();
-    	} else if (selectionController.nodes.Count > 0) {
-    		selectionController.clearSelectedNodes();
+		if (PopupWindow.isDisplaying()) {
+			BaseMenu.DisableDisplay(PopupWindow);
+		} else if (getInstance(MainMenu).isDisplayingChild()) {
+    		BaseMenu.DisableDisplay(MainMenu, true); //cascade disabling responsibility down the submenus
+	    } else if (getInstance(TimeSeriesMenu).displaying) {
+    		BaseMenu.DisableDisplay(TimeSeriesMenu);
+    	} else if (SelectionController.nodes.Count > 0) {
+    		SelectionController.clearSelectedNodes();
     	} else {
-    		mainMenu.ToggleDisplay();
+    		BaseMenu.ToggleDisplay(MainMenu);
 		}
 	}
 }
 
 //Should be respected by all menus except Main and TimeSeries
-function getScreenHeight() {
-	if (timeSeriesMenu.displaying) {
+static function getScreenHeight() {
+	if (getInstance(TimeSeriesMenu).displaying) {
 		return Screen.height - TimeSeriesMenu.height;
 	} else {
 		return Screen.height;
 	}
+}
+
+static function getInstance(menuClass : System.Type) : BaseMenu {
+	var instance = GameObject.FindGameObjectWithTag("GameController").GetComponent(menuClass);
+	return instance;
 }
 

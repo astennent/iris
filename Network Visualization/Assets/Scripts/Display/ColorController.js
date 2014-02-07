@@ -1,55 +1,42 @@
 #pragma strict
 
-private var networkController : NetworkController;
-private var clusterController : ClusterController;
-private var fileManager : FileManager;
-private var centralityController : CentralityController;
-
-var button_color : Color;
-private var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight", "Forest Glade", 
+private static var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight", "Forest Glade", 
 					"Aqua"];
 
-var rules : List.<ColorRule> = new List.<ColorRule>();
+static var rules : List.<ColorRule> = new List.<ColorRule>();
 
-var rule_types : String[]; //Determines which nodes to apply a rule to.
+//Determines which nodes to apply a rule to.
+static var rule_types = ["Source", "Cluster", "Node", "Attribute"];; 
 
-var colorRulePrefab : ColorRule;
-
-function getSchemeNames() {
+static function getSchemeNames() {
 	return schemes;
 }
 
-function Start(){
-	networkController = this.GetComponent(NetworkController);
-	clusterController = this.GetComponent(ClusterController);
-	fileManager = this.GetComponent(FileManager);
-	centralityController = this.GetComponent(CentralityController);
-
+//Called by Display Menu or Axis Controller.
+static function Init(){
 	createRule();
 	rules[0].is_fallback = true;
 	rules[0].setMethod(1);
-	rule_types = ["Source", "Cluster", "Node", "Attribute"]; 
 }
 
-function createRule() : ColorRule {
-	var new_rule : ColorRule = GameObject.Instantiate(colorRulePrefab).GetComponent(ColorRule);
-	new_rule.Init();
+static function createRule() : ColorRule {
+	var new_rule : ColorRule = new ColorRule();
 	rules.Add(new_rule);
 	return new_rule;
 }
 
-function removeRule(i : int){
+static function removeRule(i : int){
 	rules.RemoveAt(i);
 }
 
-function moveRuleUp(i : int){
+static function moveRuleUp(i : int){
 	if (i > 1){
 		var temp = rules[i];
 		rules[i] = rules[i-1];
 		rules[i-1] = temp;
 	}
 }
-function moveRuleDown(i : int){
+static function moveRuleDown(i : int){
 	if (i < rules.Count -1) {
 		var temp = rules[i];
 		rules[i] = rules[i+1];
@@ -58,9 +45,9 @@ function moveRuleDown(i : int){
 }
 
 
-function ApplyAllRules(){
+static function ApplyAllRules(){
 	//reset all halos.
-	for (var file : DataFile in fileManager.files){
+	for (var file : DataFile in FileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value;
 			node.resetColorRules();
@@ -73,19 +60,19 @@ function ApplyAllRules(){
 }
 
 
-function ApplyRule(rule: ColorRule) {
+static function ApplyRule(rule: ColorRule) {
 	//Note that change_color and change_size are for small changes in the menu.
 	ApplyRule(rule, true, true);
 }
 
 
-function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
+static function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
 	var rule_type = rule.getRuleType();
 	if (rule_type == 0) {  //source
 
 		//the fallback rule transparently applies itself to all files.
 		if (rule.is_fallback) {
-			for (var source : DataFile in fileManager.files) {
+			for (var source : DataFile in FileManager.files) {
 				ColorBySource(source, rule, change_color, change_size);
 			}
 		} else { //seperate loops because dataManager stores DataFiles in a List, rather than a HashSet.
@@ -99,7 +86,7 @@ function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boole
 
 		//the fallback rule transparently applies itself to all groups.
 		if (rule.is_fallback) {
-			for (var entry in clusterController.group_dict){ //loop over the cluster ids
+			for (var entry in ClusterController.group_dict){ //loop over the cluster ids
 				//color = rule.getColor();
 				ColorByCluster(entry.Key, rule, change_color, change_size);
 			}
@@ -113,7 +100,7 @@ function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boole
 
 		//the fallback rule transparently applies itself to all groups.
 		if (rule.is_fallback) {
-			for (var file in fileManager.files){
+			for (var file in FileManager.files){
 				var nodes = file.nodes;
 				for (var entry in nodes){
 					var node : Node = entry.Value;
@@ -132,22 +119,22 @@ function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boole
 	}
 }
 
-function ColorByCluster(cluster_id : int, rule  : ColorRule, change_color : boolean , change_size : boolean){
+static function ColorByCluster(cluster_id : int, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
-	var nodes = clusterController.group_dict[cluster_id];	
+	var nodes = ClusterController.group_dict[cluster_id];	
 	for (var node in nodes){
 		ColorNodeForRule(node, rule, color, change_color, change_size);
 	}
 }
 
-function ColorBySource(file : DataFile, rule  : ColorRule, change_color : boolean , change_size : boolean){
+static function ColorBySource(file : DataFile, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
 	for (var node in file.nodes){
 		ColorNodeForRule(node.Value, rule, color, change_color, change_size);
 	}
 }
 //color nodes based on a certain attribute value.
-function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRule, change_color : boolean , change_size : boolean){
+static function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
 	var file : DataFile = attribute.file;
 	var attr_index : int = file.attributes.IndexOf(attribute);
@@ -159,7 +146,7 @@ function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRu
 	}
 }
 
-function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean){
+static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean){
 	var coloring_halo = rule.coloring_halo;
 	var coloring_node = rule.coloring_node;
 
@@ -172,9 +159,13 @@ function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_c
 		adjusted_variation = 0;
 	} else if (rule.getMethod() == 3) {
 		var continuousAttribute = rule.getContinuousAttribute();
-		var numerator : float = node.GetNumeric(continuousAttribute);
-		var denominator : float = continuousAttribute.getMaxValue();
-		color = GenFractionalColor(numerator, denominator);
+		if (continuousAttribute != null) {
+			var numerator : float = node.GetNumeric(continuousAttribute);
+			var denominator : float = continuousAttribute.getMaxValue();
+			color = GenFractionalColor(numerator, denominator);
+		} else {
+			color = Color.white;
+		}
 		adjusted_variation = 0;
 	}
 	
@@ -192,7 +183,7 @@ function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_c
 	}
 }
 
-function getAdjustedVariation(rule : ColorRule){
+static function getAdjustedVariation(rule : ColorRule){
 	if (rule.getMethod() == 2 || rule.getMethod() == 1  && rule.getScheme() == 2){
 		return 0;
 	}
@@ -200,18 +191,18 @@ function getAdjustedVariation(rule : ColorRule){
 }
 
 //Alters the color a small amount for variety.
-function NudgeColor(c : Color){
+static function NudgeColor(c : Color){
 	return NudgeColor(c, 0.3);
 }
 
-function NudgeColor(c : Color, dist : float){
+static function NudgeColor(c : Color, dist : float){
 	c.r += Random.Range(-dist, dist);
 	c.g += Random.Range(-dist, dist);
 	c.b += Random.Range(-dist, dist);
 	return c;	
 }
 
-function GenRandomColor(scheme_index : int){
+static function GenRandomColor(scheme_index : int){
 	if (scheme_index == 0){ //bright
 		return GenScaledColor(false);
 	} else if (scheme_index == 1){ //pastel
@@ -231,11 +222,11 @@ function GenRandomColor(scheme_index : int){
 	}
 }
 
-function GenCentralityColor(rule : ColorRule, node : Node) {
+static function GenCentralityColor(rule : ColorRule, node : Node) {
 	var centrality_type = rule.getCentralityType();
 
 	//scale centrality from red to cyan.	
-	var fraction : float = centralityController.getCentralityFraction(node, rule);
+	var fraction : float = CentralityController.getCentralityFraction(node, rule);
 
 	if (!fraction) {
 		return Color.black;
@@ -274,12 +265,12 @@ static function GenFractionalColor(numerator : float, denominator : float) {
 }
 
 
-function GenGrayscale(){
+static function GenGrayscale(){
 	var scale_number = Random.Range(0.0,1.0);
 	return new Color(scale_number, scale_number, scale_number, .75);
 }
 
-function GenScaledColor(pastel: boolean){
+static function GenScaledColor(pastel: boolean){
 	if (pastel){
 		var base = 0.5;
 	} else {
@@ -317,14 +308,14 @@ function GenScaledColor(pastel: boolean){
 	return new Color(r, g, b, .5);
 }
 
-function randBinary(){ //true or false
+static function randBinary(){ //true or false
 	if (Random.Range(0,2) == 0){
 		return true;
 	} 
 	return false;
 }
 
-function handleDateChange() {
+static function handleDateChange() {
 	for (var rule in rules) {
 		
 		if (rule.getMethod() == 2) { //centrality

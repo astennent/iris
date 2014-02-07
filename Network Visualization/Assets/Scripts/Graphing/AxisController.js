@@ -1,62 +1,73 @@
 #pragma strict
 
-var axisPrefab : GameObject;
-var labelPrefab : GameObject;
+var instanceAxisPrefab : GameObject;
+var instanceLabelPrefab : GameObject;
 
-var initialized = false;
+static var axisPrefab : GameObject;
+static var labelPrefab : GameObject;
 
-private var networkController : NetworkController;
-private var graphController : GraphController;
+static var initialized = false;
 
-private var axes : LineRenderer[];
-private var ticks : LineRenderer[];
-private var gridlines : LineRenderer[];
+private static var axes : LineRenderer[];
+private static var ticks : LineRenderer[];
+private static var gridlines : LineRenderer[];
 
-private var tickCounts : int[];
-private var tickLabels : List.<List.<GUIText> >;
-private var TICK_HEIGHT_SCALE : float = .05;
+private static var tickCounts : int[];
+private static var tickLabels : List.<List.<GUIText> >;
+private static var TICK_HEIGHT_SCALE : float = .05;
 
-private var directions = [Vector3.right, Vector3.up, Vector3.forward];
+private static var directions = [Vector3.right, Vector3.up, Vector3.forward];
 
-private var draw_axes : boolean = true;
-private var draw_gridlines : boolean = true;
-private var draw_tick_labels : boolean = true;
+private static var draw_axes : boolean = true;
+private static var draw_gridlines : boolean = true;
+private static var draw_tick_labels : boolean = true;
 
-var redAxis : Material;
-var blueAxis : Material;
-var greenAxis : Material;
+static var redAxis : Material;
+static var greenAxis : Material;
+static var blueAxis : Material;
 
-function isDrawingAxes(){
+var redAxisInstance : Material;
+var greenAxisInstance : Material;
+var blueAxisInstance : Material;
+
+//Used for instantiating objects.
+private static var defaultPosition = Vector3.zero;
+private static var defaultRotation = new Quaternion();
+
+static function isDrawingAxes(){
 	return draw_axes;
 }
 
-function setDrawingAxes(draw_axes : boolean) {
+static function setDrawingAxes(draw_axes : boolean) {
 	this.draw_axes = draw_axes;
 	Redraw();
 }
 
-function isDrawingGrid(){
+static function isDrawingGrid(){
 	return draw_gridlines;
 }
 
-function setDrawingGrid(draw_gridlines : boolean) {
+static function setDrawingGrid(draw_gridlines : boolean) {
 	this.draw_gridlines = draw_gridlines;
 	Redraw();
 }
 
-function isDrawingLabels(){
+static function isDrawingLabels(){
 	return draw_tick_labels;
 }
 
-function setDrawingLabels(draw_tick_labels : boolean) {
+static function setDrawingLabels(draw_tick_labels : boolean) {
 	this.draw_tick_labels = draw_tick_labels;
 	Redraw();
 }
 
-function Start () {
-	networkController = GetComponent(NetworkController);
-	graphController = GetComponent(GraphController);
 
+function Start () {
+	redAxis = redAxisInstance;
+	greenAxis = greenAxisInstance;
+	blueAxis = blueAxisInstance;
+	axisPrefab = instanceAxisPrefab;
+	labelPrefab = instanceLabelPrefab;
 	axes = new LineRenderer[3];
 	gridlines = new LineRenderer[3];
 	tickCounts = new int[3];
@@ -65,19 +76,19 @@ function Start () {
 
 	for (var i = 0 ; i < 3 ; i++) {
 		//create the axis
-		var axis = GameObject.Instantiate(axisPrefab, transform.position, 
-				transform.rotation).GetComponent(LineRenderer);
+		var axis = GameObject.Instantiate(axisPrefab, defaultPosition, 
+				defaultRotation).GetComponent(LineRenderer);
 		axes[i] = axis;
 
 		//create the tick renderer
-		var tick = GameObject.Instantiate(axisPrefab, transform.position, 
-				transform.rotation).GetComponent(LineRenderer);
+		var tick = GameObject.Instantiate(axisPrefab, defaultPosition, 
+				defaultRotation).GetComponent(LineRenderer);
 		ticks[i] = tick;
 
 		//create the gridline renderer
-		var gridline = GameObject.Instantiate(axisPrefab, transform.position, 
-		transform.rotation).GetComponent(LineRenderer);
-		gridline.material = networkController.gridTexture;
+		var gridline = GameObject.Instantiate(axisPrefab, defaultPosition, 
+				defaultRotation).GetComponent(LineRenderer);
+		gridline.material = NetworkController.getGridTexture();
 		//gridline.SetWidth(0.2, 0.2);
 		gridlines[i] = gridline;
 
@@ -106,7 +117,7 @@ function Start () {
 
 function DrawAxes() {
 
-	var should_draw = graphController.isGraphing() && draw_axes;
+	var should_draw = GraphController.isGraphing() && draw_axes;
 
 	for (var i = 0 ; i < 3 ; i++) {
 		var	lineRenderer = axes[i];
@@ -118,7 +129,7 @@ function DrawAxes() {
 
 		if (should_draw) {
 
-			var scale : float = graphController.getScale();
+			var scale : float = GraphController.getScale();
 			var direction = directions[i];
 
 			//update the position of the main axis.
@@ -162,8 +173,7 @@ function DrawAxes() {
 }
 
 function DrawGridlines() {
-
-	var should_draw = graphController.isGraphing() && draw_axes && draw_gridlines;
+	var should_draw = GraphController.isGraphing() && draw_axes && draw_gridlines;
 	
 	for (var i = 0 ; i < 3 ; i++) {
 		var gridRenderer = gridlines[i];
@@ -171,7 +181,7 @@ function DrawGridlines() {
 
 		if (should_draw) {
 
-			var scale : float = graphController.getScale();
+			var scale : float = GraphController.getScale();
 
 			var direction1 = directions[i];
 			var direction2 = directions[(i+1)%3];
@@ -234,7 +244,6 @@ function DrawGridlines() {
 						gridRenderer.SetPosition(vertex++, planePivot+secondaryDirection*scale);
 					} 
 					gridRenderer.SetPosition(vertex++, planePivot);
-
 				}
 
 
@@ -249,15 +258,15 @@ function DrawGridlines() {
 
 function DrawTickLabels() {
 	//reposition labels for camera.
-	var scale : float = graphController.getScale();
-	var graphing = graphController.isGraphing() && draw_tick_labels && draw_axes;
+	var scale : float = GraphController.getScale();
+	var graphing = GraphController.isGraphing() && draw_tick_labels && draw_axes;
 	for (var axis_index = 0 ; axis_index < 3 ; axis_index++) { 
 		var labels = tickLabels[axis_index];
 		var count = labels.Count;
 		for (var index = 0 ; index < count ; index++) {
 			var label = labels[index];
 			if (graphing) {
-				label.text = ""+graphController.getFractionalValue((1.0*index)/count, axis_index);
+				label.text = ""+GraphController.getFractionalValue((1.0*index)/count, axis_index);
 			} else {
 				label.text = "";
 			}
@@ -270,8 +279,8 @@ function DrawTickLabels() {
 }
 
 //called by graph controller when a axis's attribute changes
-function updateAxis(axis_index : int ){
-	var originalCount = graphController.getUniqueValueCount(axis_index)-1;
+static function updateAxis(axis_index : int ){
+	var originalCount = GraphController.getUniqueValueCount(axis_index)-1;
 
 	var count = originalCount;
 	if (originalCount < 0 || originalCount > 10) {
@@ -290,8 +299,8 @@ function updateAxis(axis_index : int ){
 	var labels = new List.<GUIText>();
 	if (originalCount > 0) {
 		for (var index = 0 ; index <= count ; index++) {
-			var label = GameObject.Instantiate(labelPrefab, transform.position, 
-					transform.rotation).GetComponent(GUIText);
+			var label = GameObject.Instantiate(labelPrefab, defaultPosition, 
+					defaultRotation).GetComponent(GUIText);
 			labels.Add(label);
 		}
 	}
@@ -300,11 +309,16 @@ function updateAxis(axis_index : int ){
 	Redraw();
 }
 
-function Redraw() {
-	DrawAxes();	
-	DrawGridlines();	
+static function Redraw() {
+	var instance = getInstance();
+	instance.DrawAxes();	
+	instance.DrawGridlines();	
 }
 
 function LateUpdate(){
 	DrawTickLabels();
+}
+
+static function getInstance() : AxisController {
+	return GameObject.FindGameObjectWithTag("GameController").GetComponent(AxisController);
 }

@@ -1,26 +1,26 @@
 #pragma strict
 
-var displaying = false;
-var drawBox = true;
+static var displaying = false;
+static var drawBox = true;
 
-var left : float = 100;
-var top : float = 100;
-private var width : float = 200;
-private var height : float = 220;
+static var left : float = 100;
+static var top : float = 100;
+private static var width : float = 200;
+private static var height : float = 220;
 
-var hueValue : int = 0;
-var hueValues : Color[];
-private var hueTexture : Texture2D;
-private var maxHue : int = 360;
+static var hueValue : int = 0;
+static var hueValues : Color[];
+private static var hueTexture : Texture2D;
+private static var maxHue : int = 360;
 
-var brightnessValue : int = 50;
-var brightnessValues : Color[];
-private var maxBrightness : int = 100;
+static var brightnessValue : int = 50;
+static var brightnessValues : Color[];
+private static var maxBrightness : int = 100;
 
-private var alphaValue : int = 100;
+private static var alphaValue : int = 100;
 
-var initialColor : Color;
-var chosenColor : Color;
+static var initialColor : Color;
+static var chosenColor : Color;
 
 function Start(){
 	genHueTexture();
@@ -29,11 +29,11 @@ function Start(){
 }
 
 
-function getColor(){
+static function getColor(){
 	return chosenColor;
 }
 
-function Init(left : float, top : float, drawBox : boolean){
+static function Init(left : float, top : float, drawBox : boolean){
 	this.left = left;
 	this.top = top;
 	this.drawBox = drawBox;
@@ -141,7 +141,7 @@ function OnGUI(){
 	}
 }
 
-function genBrightnessTexture(){
+static function genBrightnessTexture(){
 	var baseColor = hueValues[hueValue];
 	var brightnessTexture = new Texture2D(1, maxBrightness);
 	for (var i = 0 ; i < maxBrightness ; i++){
@@ -163,7 +163,7 @@ function genBrightnessTexture(){
 	return brightnessTexture;
 }
 
-function genAlphaTexture(){
+static function genAlphaTexture(){
 	var baseColor = brightnessValues[brightnessValue];
 	var alphaTexture = new Texture2D(1, 100);
 	for (var i = 0 ; i < 100 ; i++){
@@ -175,7 +175,7 @@ function genAlphaTexture(){
 	return alphaTexture;
 }
 
-function genHueTexture(){
+static function genHueTexture(){
 	hueTexture = new Texture2D(maxHue, 1);
 	hueValues = new Color[maxHue];
 	for (var i = 0 ; i < maxHue ; i++){
@@ -186,7 +186,7 @@ function genHueTexture(){
 	hueTexture.Apply();
 }
 
-function getHueColor(i : int){
+static function getHueColor(i : int){
 	var sector = Mathf.Floor(i*6/maxHue);
 	var position_in_sector = i/(maxHue/6.0)-sector;
 	var reverse_position_in_sector = 1 - position_in_sector;
@@ -228,7 +228,7 @@ function getHueColor(i : int){
 	return new Color(r, g, b);
 }
 
-function setColor(c : Color){
+static function setColor(c : Color){
 	//determine the sector you're looking at.
 	var r_largest = c.r >= c.g && c.r >= c.b;
 	var r_smallest = c.r <= c.g && c.r <= c.b;

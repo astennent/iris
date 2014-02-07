@@ -31,7 +31,6 @@ var isDemoFile : boolean = false;
 
 var timeFrame : TimeFrame;
 
-var foreignKeyPrefab : ForeignKey;
 private var foreignKeys = new List.<ForeignKey>();
 private var inactiveKeys = new List.<ForeignKey>();
 
@@ -44,23 +43,12 @@ private var inactiveKeys = new List.<ForeignKey>();
 		continuous coloring by attribute (vs. discrete colors)
 */	
 
-private var fileManager : FileManager;
-private var colorController : ColorController;
-private var networkController : NetworkController;
-private var searchController : SearchController;
-private var clusterController : ClusterController;
-
 private var cachedFileContents : List.<List.<String> >; //Contents are stored after load.
 
 class DataFile {
 
 	//Constructor
 	public function DataFile(fname : String, isDemo : boolean){
-		networkController = GameObject.FindGameObjectWithTag("GameController").GetComponent(NetworkController);
-		colorController = networkController.GetComponent(ColorController);
-		fileManager = networkController.GetComponent(FileManager);
-		searchController = networkController.GetComponent(SearchController);
-		clusterController = networkController.GetComponent(ClusterController);
 		this.fname = fname; 
 		this.isDemoFile = isDemo;
 		ScanForMetadata();
@@ -328,8 +316,8 @@ class DataFile {
 			required_file.GenerateConnections();
 		}
 		
-		searchController.ReInit();
-		clusterController.ReInit();
+		SearchController.ReInit();
+		ClusterController.ReInit();
 
 		imported = true;
 	}
@@ -353,7 +341,7 @@ class DataFile {
 	    for (var row in fileContents) {
 	    	
 		    var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-			var node : Node = GameObject.Instantiate(networkController.nodePrefab, randPos, networkController.transform.rotation).GetComponent(Node);
+			var node : Node = GameObject.Instantiate(NetworkController.nodePrefab, randPos, new Quaternion(0,0,0,0)).GetComponent(Node);
 
 	    	for (var i : int = 0 ; i < row.Count ; i++){
 	    		if (i < attributes.Count){ //in case there are stray commas or whatever
@@ -363,7 +351,7 @@ class DataFile {
 	    		}
 	    	}
 
-			var randColor : Color = colorController.GenRandomColor(0); //random bright color
+			var randColor : Color = ColorController.GenRandomColor(0); //random bright color
 			node.Init(randColor, this);
 	    	
 	    	//Add the node to the dict as a key/value pair of pkeys/node.
@@ -568,8 +556,8 @@ class DataFile {
 		 	node.Value.Deactivate();
 		}
 		nodes = new Dictionary.<String, Node>();
-		searchController.ReInit();
-		clusterController.ReInit();
+		SearchController.ReInit();
+		ClusterController.ReInit();
 		imported = false;
 	}
 

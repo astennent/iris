@@ -1,8 +1,8 @@
 #pragma strict
 
 class GraphMenu extends BaseMenu {
-	private var fileScrollPosition : Vector2 = Vector2.zero;
-	private var axesScrollPosition : Vector2 = Vector2.zero;
+	private static var fileScrollPosition : Vector2 = Vector2.zero;
+	private static var axesScrollPosition : Vector2 = Vector2.zero;
 
 	static var DROPDOWN_ID = "1";
 
@@ -25,7 +25,7 @@ class GraphMenu extends BaseMenu {
 	}
 
 	function DrawEnableButton(cur_y : int) {
-		if (graphController.isGraphing()){
+		if (GraphController.isGraphing()){
 			GUI.color = new Color(1, .3, .3);
 			var button_text = "Disable Graphing";
 		} else {
@@ -33,7 +33,7 @@ class GraphMenu extends BaseMenu {
 			button_text = "Enable Graphing";
 		}
 		if (GUI.Button(new Rect(x+10, cur_y, width-20, 30), button_text)) {
-			graphController.toggleGraphing();
+			GraphController.toggleGraphing();
 		}
 
 		GUI.color = Color.white;
@@ -46,13 +46,13 @@ class GraphMenu extends BaseMenu {
 		//Draw the file selection dropdown
 		var selection_rect = new Rect(x+5, cur_y, width-10, 30);
 		var dropHeight = 120;
-		var fileNames = fileManager.getFileNames();
-		var selected_file_index = graphController.getFileIndex();
+		var fileNames = FileManager.getFileNames();
+		var selected_file_index = GraphController.getFileIndex();
 		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, fileNames, selected_file_index, DROPDOWN_ID, "Select a File");
 		
 		//Update file if necessary
 		if (new_selected_index != selected_file_index) {
-			graphController.setFileIndex(new_selected_index);
+			GraphController.setFileIndex(new_selected_index);
 		}
 
 		return cur_y+30;
@@ -61,7 +61,7 @@ class GraphMenu extends BaseMenu {
 	function DrawOptions(cur_y : int) {
 
 		//Don't draw options if it's a linking table or you're graphing.
-		var file = graphController.getFile();
+		var file = GraphController.getFile();
 		if (file == null || file.linking_table) {
 			return cur_y;
 		}
@@ -72,27 +72,27 @@ class GraphMenu extends BaseMenu {
 		GUI.Box(optionsRect, "");
 
 		var sizeRect = new Rect(x+10, cur_y+5, width/2-10, 20);
-		var isForcingNodeSize = graphController.isForcingNodeSize();
+		var isForcingNodeSize = GraphController.isForcingNodeSize();
 		if (GUI.Toggle(sizeRect, isForcingNodeSize, "Fix Node Size") != isForcingNodeSize) {
-			graphController.setForcingNodeSize(!isForcingNodeSize);
+			GraphController.setForcingNodeSize(!isForcingNodeSize);
 		}
 
 		if (!isForcingNodeSize) {
 			GUI.color = Color.gray;
 		} 
 
-		var original_size = graphController.getForcedNodeSize();
+		var original_size = GraphController.getForcedNodeSize();
 		var new_size = GUI.HorizontalSlider(Rect(x+20, cur_y+25, width/2-50, 20), original_size, 1.0, 15.0);
 		if (original_size != new_size) {
-			graphController.setForcedNodeSize(new_size);
+			GraphController.setForcedNodeSize(new_size);
 		}
 
 		GUI.color = Color.white;
 
 		var axesRect = new Rect(x+width/2, cur_y+5, width/2, 20);
-		var isDrawingAxes = axisController.isDrawingAxes();
+		var isDrawingAxes = AxisController.isDrawingAxes();
 		if (GUI.Toggle(axesRect, isDrawingAxes, "Draw Axes") != isDrawingAxes) {
-			axisController.setDrawingAxes(!isDrawingAxes);
+			AxisController.setDrawingAxes(!isDrawingAxes);
 		}
 
 		if (!isDrawingAxes) {
@@ -102,15 +102,15 @@ class GraphMenu extends BaseMenu {
 		}
 
 		var gridRect = new Rect(x+width/2+30, cur_y+25, width/2-30, 20);
-		var isDrawingGrid = axisController.isDrawingGrid();
+		var isDrawingGrid = AxisController.isDrawingGrid();
 		if (GUI.Toggle(gridRect, isDrawingGrid, "Draw Grid") != isDrawingGrid && isDrawingAxes) {
-			axisController.setDrawingGrid(!isDrawingGrid);
+			AxisController.setDrawingGrid(!isDrawingGrid);
 		}
 
 		var labelsRect = new Rect(x+width/2+30, cur_y+45, width/2-30, 20);
-		var isDrawingLabels = axisController.isDrawingLabels();
+		var isDrawingLabels = AxisController.isDrawingLabels();
 		if (GUI.Toggle(labelsRect, isDrawingLabels, "Draw Labels") != isDrawingLabels && isDrawingAxes) {
-			axisController.setDrawingLabels(!isDrawingLabels);
+			AxisController.setDrawingLabels(!isDrawingLabels);
 		}
 
 		GUI.color = Color.white;
@@ -120,7 +120,7 @@ class GraphMenu extends BaseMenu {
 	function DrawAxesSelection(cur_y : int) {
 		cur_y +=5;
 
-		var file = graphController.getFile();
+		var file = GraphController.getFile();
 		if (file == null) {
 			return -1;
 		} else if (file.linking_table) {
@@ -137,14 +137,14 @@ class GraphMenu extends BaseMenu {
 
 		var attrs = file.attributes;
 
-		var axesRect = new Rect(x+5, cur_y, width-10, menuController.getScreenHeight()-cur_y-5);
+		var axesRect = new Rect(x+5, cur_y, width-10, MenuController.getScreenHeight()-cur_y-5);
 		GUI.Box(axesRect, "Select Axes");
 
 		
 
 		cur_y+=20;
 		var axis_spacing = 25; //horizontal space between radio buttons
-		var axes = graphController.getAxes();
+		var axes = GraphController.getAxes();
 
 		if (axes[0] != null) {GUI.color = Color.red;} else {GUI.color = Color.white;}
 		GUI.Label(new Rect(x+width/2+18, cur_y, axis_spacing, 20), "X");
@@ -184,9 +184,9 @@ class GraphMenu extends BaseMenu {
 				var newlySelected = GUI.Toggle (attrRect, alreadySelected, "");
 
 				if (newlySelected && !alreadySelected) {
-					graphController.setAxis(i, attribute);
+					GraphController.setAxis(i, attribute);
 				} else if (!newlySelected && alreadySelected) {
-					graphController.setAxis(i, null);
+					GraphController.setAxis(i, null);
 				}
 				
 				attrRect.x+=axis_spacing;

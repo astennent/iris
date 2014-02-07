@@ -1,32 +1,28 @@
 #pragma downcast
 
-private var BOX_RANGE : float = 1000;
+private static var BOX_RANGE : float = 1000;
 
-var dragging : boolean = false;
-var boxing : boolean = false;
+static var dragging : boolean = false;
+static var boxing : boolean = false;
 
 //used to gracefully clear selected nodes when boxing starts
-private var clearedSelectionSinceBoxStart = false; 
-private var startCoords : Vector2; //corner of selection box
+private static var clearedSelectionSinceBoxStart = false; 
+private static var startCoords : Vector2; //corner of selection box
 
 
-var nodes = new HashSet.<Node>(); //list of all selected nodes
-var primaryNode : Node; //the focused selected node
+static var nodes = new HashSet.<Node>(); //list of all selected nodes
+static var primaryNode : Node; //the focused selected node
 
-private var networkCamera : NetworkCamera;
-private var cameraTransform : Transform;
-private var guiplus : GuiPlus;
-private var fileManager : FileManager;
+private static var networkCamera : NetworkCamera;
+private static var cameraTransform : Transform;
 
 function Start(){
 	networkCamera = Camera.main.GetComponent(NetworkCamera);
 	cameraTransform = networkCamera.transform;
-	fileManager = GetComponent(FileManager);
-	guiplus = GetComponent(GuiPlus);
 }
 
-var last_click_time = 0.0;
-function NodeClick(node : Node){
+static var last_click_time = 0.0;
+static function NodeClick(node : Node){
 	last_click_time = Time.time;
 	var already_selected = nodes.Contains(node);
 	var ctrl = Input.GetButton("Ctrl");
@@ -46,7 +42,7 @@ function NodeClick(node : Node){
 	dragging = true;
 }
 
-var updated = false;
+static var updated = false;
 function Update () {
 	updated = true;
 	if (dragging){
@@ -65,7 +61,7 @@ function LateUpdate(){
 	updated = false;
 }
 
-function ProcessDrag(){
+static function ProcessDrag(){
 	if(!Input.GetMouseButton(0)  || !networkCamera.freeCamera){
 		dragging = false;
 		return;
@@ -106,26 +102,26 @@ function ProcessDrag(){
 	}
 }
 
-function ProcessBoxing(){
+private function ProcessBoxing(){
 	if (dragging || !networkCamera.freeCamera){
 		boxing = false;
 		return;
 	}
-	if (!boxing && Input.GetMouseButtonDown(0)  && !guiplus.isBlocked()){
+	if (!boxing && Input.GetMouseButtonDown(0)  && !GuiPlus.isBlocked()){
 		startBoxing();
 	} else if (boxing && Input.GetMouseButtonUp(0)){
 		stopBoxing();
 	}
 }
 
-function startBoxing() {
+private function startBoxing() {
 	boxing = true;
 	clearedSelectionSinceBoxStart = false;
 	startCoords = Input.mousePosition;
 	startCoords.y = Screen.height - startCoords.y; //stupid unity.
 }
 
-function stopBoxing(){
+private function stopBoxing(){
 	boxing = false;
 	selectBoxedItems();
 }
@@ -152,7 +148,7 @@ function OnGUI(){
 	} 
 }
 
-function selectBoxedItems(){
+private function selectBoxedItems(){
 	if (!Input.GetButton("Ctrl") && Time.time - last_click_time > 0.1){
 		clearSelectedNodes();
 	}
@@ -165,7 +161,7 @@ function selectBoxedItems(){
 	var top = Mathf.Min(mouseCoords.y, startCoords.y);
 	var bottom = Mathf.Max(mouseCoords.y, startCoords.y);
 
-	for (var file : DataFile in fileManager.files){
+	for (var file : DataFile in FileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);
 			if (Vector3.Distance(node.transform.position, Camera.main.transform.position) < BOX_RANGE) {
@@ -191,11 +187,11 @@ function selectBoxedItems(){
 	}
 }
 
-function selectAllInGroup(group_id : int, clear : boolean){
+static function selectAllInGroup(group_id : int, clear : boolean){
 	if (clear) {
 		clearSelectedNodes();
 	}
-	for (var file : DataFile in fileManager.files){
+	for (var file : DataFile in FileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);
 			if (node.group_id == group_id){
@@ -206,8 +202,8 @@ function selectAllInGroup(group_id : int, clear : boolean){
 	}
 }
 
-function selectAll(){
-	for (var file : DataFile in fileManager.files){
+static function selectAll(){
+	for (var file : DataFile in FileManager.files){
 		for (var entry in file.nodes){
 			var node : Node = entry.Value.GetComponent(Node);
 			nodes.Add(node);
@@ -216,28 +212,28 @@ function selectAll(){
 	}
 }
 
-function clearSelectedNodes(){
+static function clearSelectedNodes(){
 	for (node in nodes){
 		node.setSelected(false);
 	}
 	nodes.Clear();
 }
 
-function getNumSelected() {
+static function getNumSelected() {
 	return nodes.Count;
 }
 
-function deselectNode(node : Node){
+static function deselectNode(node : Node){
 	nodes.Remove(node);
 	node.setSelected(false);
 }
 
-function selectNode(node : Node){
+static function selectNode(node : Node){
 	nodes.Add(node);
 	node.setSelected(true);
 }
 
-function selectPrimaryNode(node : Node){
+static function selectPrimaryNode(node : Node){
 	networkCamera.setTarget(node);	
 	primaryNode = node;
 }

@@ -1,10 +1,10 @@
 #pragma strict
 
 class DisplayMenu extends BaseMenu {
-	private var scrollPosition : Vector2 = Vector2.zero;
-	private var ruleRects = new Dictionary.<ColorRule, Rect>();
+	private static var scrollPosition : Vector2 = Vector2.zero;
+	private static var ruleRects = new Dictionary.<ColorRule, Rect>();
 
-	var rule_index : int = -1;
+	static var rule_index : int = -1;
 	
 	function Start(){
 		parent = GetComponent(MainMenu);
@@ -19,7 +19,10 @@ class DisplayMenu extends BaseMenu {
 	}
 
 	function DrawFallback(y : int) {
-		var fallbackRule : ColorRule = colorController.rules[0];
+		if (ColorController.rules.Count == 0) {
+			ColorController.Init();
+		}
+		var fallbackRule : ColorRule = ColorController.rules[0];
 		if (GUI.Button(new Rect(x+5, y, width-10, 30), "Change Fallback Colors")){
 			if (rule_index == 0) {
 				setRuleIndex(-1);
@@ -30,13 +33,13 @@ class DisplayMenu extends BaseMenu {
 
 		y+=30;
 
-		var rule : ColorRule = colorController.rules[0];
+		var rule : ColorRule = ColorController.rules[0];
 		var rule_type_index = rule.getRuleType();
 
 		//Draw radio buttons for the fallback rule
 		var temp_x = 10;
 		for (var i : int = 0 ; i < 3 ; i++) {
-			var rule_type_name = colorController.rule_types[i];
+			var rule_type_name = ColorController.rule_types[i];
 			var selected = GUI.Toggle (Rect (x+temp_x, y, 100, 20), (rule_type_index == i), "By " + rule_type_name);
 			if (selected && rule_type_index != i) { //you just clicked it.
 				rule.setRuleType(i);
@@ -51,28 +54,28 @@ class DisplayMenu extends BaseMenu {
 	}
 
 	function DrawRules(y : int) {
-		var rules = colorController.rules;
+		var rules = ColorController.rules;
 
-		var ruleRect = new Rect(x, y, width, menuController.getScreenHeight() - y);
+		var ruleRect = new Rect(x, y, width, MenuController.getScreenHeight() - y);
 		GUI.Box(ruleRect, "Rules");
 
 		y+=25;
 
 		if (GUI.Button(new Rect(x+5, y, 100, 25), "Add Rule")){
-			var createdRule = colorController.createRule();
-			setRuleIndex(colorController.rules.Count-1);
+			var createdRule = ColorController.createRule();
+			setRuleIndex(ColorController.rules.Count-1);
 			var createdRuleRect = new Rect(35, 0, width-85, 30);
 			ruleRects[createdRule] = createdRuleRect;
 
 		}
 
 		if (GUI.Button(new Rect(x+120, y, 120, 25), "Apply All Rules")){
-			colorController.ApplyAllRules();
+			ColorController.ApplyAllRules();
 		}
 
 
 		ruleRect.y += 55;
-		ruleRect.height = menuController.getScreenHeight() - ruleRect.y;
+		ruleRect.height = MenuController.getScreenHeight() - ruleRect.y;
 
 		scrollPosition = GUI.BeginScrollView (ruleRect, 
 			scrollPosition, Rect (0, 0, width-20, 30*rules.Count+20));
@@ -80,7 +83,7 @@ class DisplayMenu extends BaseMenu {
 		var temp_y = 0;
 		for (var i = 1 ; i < rules.Count ; i++){
 
-			var rule = colorController.rules[i];
+			var rule = ColorController.rules[i];
 			var rule_color = rule.color; rule_color.a = 1;
 			GUI.color = rule_color;
 
@@ -105,7 +108,7 @@ class DisplayMenu extends BaseMenu {
 
 				if (GUI.Button(upRect, "")) { //TODO make graphics for these.
 					if (i > 1) {
-						colorController.moveRuleUp(i);
+						ColorController.moveRuleUp(i);
 						if (rule_index == i) {
 							setRuleIndex(rule_index - 1);
 						} else if (rule_index == i-1) {
@@ -115,7 +118,7 @@ class DisplayMenu extends BaseMenu {
 				}
 				if (GUI.Button(downRect, "")) {
 					if (i < rules.Count - 1) {
-						colorController.moveRuleDown(i);
+						ColorController.moveRuleDown(i);
 						if (rule_index == i) {
 							setRuleIndex(rule_index + 1);
 						} else if (rule_index == i+1) {
@@ -132,7 +135,7 @@ class DisplayMenu extends BaseMenu {
 				}
 
 				if (GUI.Button(new Rect(width-50, temp_y, 35, 30), "X")){
-					colorController.removeRule(i);
+					ColorController.removeRule(i);
 					if (i == rule_index){
 						setRuleIndex(-1);
 					} else if (i < rule_index) {
@@ -151,21 +154,21 @@ class DisplayMenu extends BaseMenu {
 
 	}
 
-	function setRuleIndex(index : int) {
+	static function setRuleIndex(index : int) {
 		if (rule_index != index) {
 			rule_index = index;
 			if (rule_index > -1){
-				var rule : ColorRule = colorController.rules[rule_index];
-				colorPicker.setColor(rule.color);
-				colorRuleColorMenu.EnableDisplay();
+				var rule : ColorRule = ColorController.rules[rule_index];
+				ColorPicker.setColor(rule.color);
+				EnableDisplay(ColorRuleColorMenu);
 				if (rule_index > 0) {
-					colorRuleMenu.EnableDisplay();
+					EnableDisplay(ColorRuleMenu);
 				} else {
-					colorRuleMenu.DisableDisplay();
+					DisableDisplay(ColorRuleMenu);
 				}
 			} else {
-				colorRuleColorMenu.DisableDisplay();
-				colorRuleMenu.DisableDisplay();
+				DisableDisplay(ColorRuleColorMenu);
+				DisableDisplay(ColorRuleMenu);
 			}
 		}
 	}
