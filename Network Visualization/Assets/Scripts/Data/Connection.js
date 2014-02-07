@@ -14,7 +14,7 @@ class Connection extends TimeObject {
 	private var graphController : GraphController;
 
 
-	function Init (data : Data, source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
+	function Init (source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, nC : NetworkController, fkey : ForeignKey) {
 		mat = m;
 		color = c;
 		isOutgoing = o;
@@ -27,11 +27,11 @@ class Connection extends TimeObject {
 		networkController = nC;
 		graphController = networkController.GetComponent(GraphController);
 		
-		if (data != null) { 
-			CopyData(data); //Duplicate data for linking connections
-		} else {
-			this.setDataSource(f); //Use the from node for data in non-linking connections
-		}
+		// if (data != null) { 
+		// 	CopyData(data); //Duplicate data for linking connections
+		// } else {
+		// 	this.setDataSource(f); //Use the from node for data in non-linking connections
+		// }
 
 		this.source =  source;
 		

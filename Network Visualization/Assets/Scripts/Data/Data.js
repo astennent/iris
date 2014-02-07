@@ -17,7 +17,7 @@ class Data extends MonoBehaviour {
 	//Default Constructor
 	public function Data(){}
 
-	//Used non-linking connections
+	//Used for whenever data should not be duplicated.
 	public function setDataSource(dataSource : Data) {
 		this.dataSource = dataSource;
 	}

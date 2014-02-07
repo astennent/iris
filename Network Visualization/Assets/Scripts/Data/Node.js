@@ -40,7 +40,7 @@ class Node extends TimeObject {
 	static var BASE_DESIRED_DISTANCE : float = 50.0;
 
 
-	function Init(color : Color, source : DataFile){
+	function Init(color : Color, source : DataFile) {
 		this.color = color;
 		this.source = source;
 
@@ -78,16 +78,17 @@ class Node extends TimeObject {
 		}
 	}
 
-	function AddConnection (data : Data, connectionSource : DataFile, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
+	function AddConnection (connectionSource : DataFile, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
 		for (var conn in connections){
 			if (conn == other){
 				return;
 			}
 		}
 		var newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
-		newConn.Init(data, connectionSource, lineMat, color, isOutgoing, this, other, networkController, foreignKey);
+		newConn.Init(connectionSource, lineMat, color, isOutgoing, this, other, networkController, foreignKey);
 		connections.Add( newConn );
 		UpdateSize();
+		return newConn;
 	}
 
 
@@ -173,6 +174,8 @@ class Node extends TimeObject {
 		var sizeCompensation = (size+other_size)/10;
 
 		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
+
+		speed = Mathf.Clamp(speed, -1, 1);
 		
 		transform.LookAt(target);
 		var motion : Vector3 = transform.forward*speed*networkController.gameSpeed;		

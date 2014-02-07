@@ -413,8 +413,9 @@ class DataFile {
 						
 						//You found a match. Generate a connection.
 						if (from_attribute_value == to_attribute_value){
-							//Data is null here because data should be stored in the node.
-							from_node.AddConnection(null, this, to_node, true, foreignKey); 
+							var newConn = from_node.AddConnection(this, to_node, true, foreignKey); 
+							//Data should be stored in the node.
+							newConn.setDataSource(from_node);
 						}
 						
 					}
@@ -499,8 +500,14 @@ class DataFile {
 			if (matches.Count == 2){
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
-						from_node.AddConnection(data, this, to_node, true, foreignKeys[0]);	
-						to_node.AddConnection(data, this, from_node, false, foreignKeys[1]);	
+
+						//The first (outgoing) connection is the one that gets a copy of the data.
+						var first_conn = from_node.AddConnection(this, to_node, true, foreignKeys[0]);
+						first_conn.CopyData(data);	
+						//The second (incoming) connection references the data of the first connection.
+						var second_conn = to_node.AddConnection(this, from_node, false, foreignKeys[1]);
+						second_conn.setDataSource(data);
+
 					}
 				}
 			}
