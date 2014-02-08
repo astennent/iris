@@ -98,11 +98,8 @@ function UpdateLocked(selectionCenter : Vector3){
 		y += Input.GetAxis("Mouse Y")*2;
 	}	
 	var z : float = Input.GetAxis("Mouse ScrollWheel");
-	desired_distance += z;
+	desired_distance -= z*desired_distance;
 	desired_distance = Mathf.Clamp(desired_distance, 1, 1000);
-	if (z > 0) {
-		print(z + " " + desired_distance);
-	}
 
 	//Save the original position and rotation for Lerping.
 	var originalRotation : Quaternion = transform.rotation;

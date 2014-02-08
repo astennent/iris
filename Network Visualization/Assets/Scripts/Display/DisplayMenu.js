@@ -87,8 +87,6 @@ class DisplayMenu extends BaseMenu {
 			var rule_color = rule.color; rule_color.a = 1;
 			GUI.color = rule_color;
 
-
-			//ar buttonRect = new Rect(35, temp_y, width-85, 30);
 			var buttonRect = ruleRects[rule];
 			buttonRect.y = Mathf.Lerp(buttonRect.y, temp_y, .3);
 			ruleRects[rule] = buttonRect;
@@ -103,8 +101,8 @@ class DisplayMenu extends BaseMenu {
 
 		
 			if (!rule.is_fallback) {
-				var upRect = new Rect(5, temp_y, 30, 15);
-				var downRect = new Rect(5, temp_y+15, 30, 15);
+				var upRect = new Rect(5, buttonRect.y, 30, 15);
+				var downRect = new Rect(5, buttonRect.y+15, 30, 15);
 
 				if (GUI.Button(upRect, "")) { //TODO make graphics for these.
 					if (i > 1) {
@@ -134,7 +132,7 @@ class DisplayMenu extends BaseMenu {
 					GUI.color = Color.white;
 				}
 
-				if (GUI.Button(new Rect(width-50, temp_y, 35, 30), "X")){
+				if (GUI.Button(new Rect(width-50, buttonRect.y, 35, 30), "X")){
 					ColorController.removeRule(i);
 					if (i == rule_index){
 						setRuleIndex(-1);
