@@ -22,10 +22,8 @@ class Connection extends TimeObject {
 		lineRenderer.material = mat;
 		lineRenderer.material.color = color;
 
-		this.source = source;
-		
+		this.source = source;		
 		initialized = true;
-		UpdateDate();
 	}
 
 	function LateUpdate () {

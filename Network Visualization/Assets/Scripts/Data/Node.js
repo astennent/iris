@@ -327,7 +327,6 @@ class Node extends TimeObject {
 			if (connection.to.source == file){
 				connection.Deactivate();
 				x--;
-				size-=2.5;
 			} else {
 				replacement_connections.Add(connection);
 			}
@@ -343,7 +342,6 @@ class Node extends TimeObject {
 			if (connection.foreignKey == foreignKey){
 				connection.Deactivate();
 				x--;
-				size-=2.5;
 			} else {
 				replacement_connections.Add(connection);
 			}

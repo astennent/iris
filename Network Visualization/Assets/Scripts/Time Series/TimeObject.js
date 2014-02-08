@@ -87,6 +87,17 @@ class TimeObject extends Data {
 		}
 	}
 
+	function CopyData(other_data : Data) {
+		super.CopyData(other_data);
+		UpdateDate();
+	}
+
+	function setDataSource(other_data : Data) {
+		super.setDataSource(other_data);
+		UpdateDate();
+	}
+
+	//Extends Data.js
 	function Set(attribute : Attribute, value : String) {
 		//Actually change the value
 		super.Set(attribute, value);
@@ -96,5 +107,6 @@ class TimeObject extends Data {
 			UpdateDate();
 		}
 	}
+
 
 }

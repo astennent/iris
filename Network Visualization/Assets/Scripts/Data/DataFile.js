@@ -305,16 +305,29 @@ class DataFile {
 		return foreignKeys;
 	}
 
-	function Activate(){
-		var required_files = determineDependencies(); //not implemented.
-		for (var required_file in required_files){
-			if (!required_file.linking_table){
-				required_file.GenerateNodes();
+	function Activate() {
+		Activate(true);
+	}
+
+	private function Activate(checkDependencies : boolean){
+		//Do nothing if the file has already been .
+		if (imported) {
+			return;
+		}
+
+		//Process dependencies 
+		if (checkDependencies) {
+			var required_files = determineDependencies(); 
+			for (var required_file in required_files){
+				required_file.Activate(false); //Do not recalculate dependencies.
 			}
 		}
-		for (var required_file in required_files){
-			required_file.GenerateConnections();
+
+		//Process self.
+		if (!linking_table) {
+			GenerateNodes();
 		}
+		GenerateConnections();
 		
 		SearchController.ReInit();
 		ClusterController.ReInit();
@@ -322,12 +335,105 @@ class DataFile {
 		imported = true;
 	}
 
-	//TODO
+	function Deactivate() {
+		Deactivate(true);
+	}
+
+	private function Deactivate(checkDependents : boolean) {
+		if (!imported) {
+			return;
+		}
+
+		//Process dependents
+		if (checkDependents) {
+			var dependent_files = determineDependents();
+			for (var dependent_file in dependent_files) {
+				dependent_file.Deactivate(false);
+			}
+		}
+
+		//Process self
+		if (linking_table) {
+			for (var foreignKey in foreignKeys) {
+				for (var node in foreignKey.to_file.nodes){
+					node.Value.DeactivateConnections(foreignKey);
+				}
+			}
+		} else {
+			for (var foreignKey in foreignKeys) {
+				var from_file = foreignKey.from_file;
+				var to_file = foreignKey.to_file;
+				from_file.DeactivateConnections(to_file);
+				to_file.DeactivateConnections(from_file);
+			}
+		}
+		for (var node in nodes) {
+		 	node.Value.Deactivate();
+		}
+		nodes = new Dictionary.<String, Node>();
+		SearchController.ReInit();
+		ClusterController.ReInit();
+		imported = false;
+	}
+
+	//called by linking table files, executed by non-linking tables.
+	function DeactivateConnections(file : DataFile){
+		for (var node in nodes){
+			node.Value.DeactivateConnections(file);
+		}
+	} 
+
+	//Returns a list of file dependencies based on Foreign Keys
+	//Guaranteed to return a topologically sorted list, which can be added in order safely.
 	function determineDependencies() {
+		return determineDependencies(new HashSet.<DataFile>());
+	}
+
+	//Helper function for determineDependencies();
+	private function determineDependencies(checked : HashSet.<DataFile>) : List.<DataFile> {
 		var output = new List.<DataFile>();
-		output.Add(this);
+		for (var fkey in foreignKeys) {
+			var to_file = fkey.to_file;
+			if (!checked.Contains(to_file)) {
+				checked.Add(to_file);
+				var innerList = to_file.determineDependencies(checked);
+				for (var innerFile in innerList) {
+					if (!checked.Contains(innerFile)) {
+						output.Add(innerFile);
+					}
+				}
+				output.Add(to_file);
+			}
+		}
 		return output;
 	}
+
+	//Returns a list of files that are dependent on this file.
+	//Guaranteed to return a topologically sorted list, which can be deleted in order safely.
+	function determineDependents() {
+		var checked = new HashSet.<DataFile>();
+		checked.Add(this);
+		return determineDependents(checked, new List.<DataFile>());
+	}
+
+	//Helper function.
+	private function determineDependents(checked : HashSet.<DataFile>, list : List.<DataFile>) : List.<DataFile> {
+		for (var file in FileManager.files) {
+			if (!checked.Contains(file)) {
+				//see if there's a direct connection to this file.
+				for (var fkey in file.foreignKeys) {
+					if (fkey.to_file == this) {
+						checked.Add(file);			
+						list.Insert(0, file);
+						list = determineDependents(checked, list);
+					}
+				}			
+			}
+		}
+		return list;
+	}
+
+
 
 	function GenerateNodes(){
 		//TODO: destroy nodes and connections.
@@ -536,39 +642,6 @@ class DataFile {
 		}	
 		pkey_indices = output;
 	}
-
-	function Deactivate() {
-		if (linking_table) {
-			for (var foreignKey in foreignKeys) {
-				for (var node in foreignKey.to_file.nodes){
-					node.Value.DeactivateConnections(foreignKey);
-				}
-			}
-		} else {
-			for (var foreignKey in foreignKeys) {
-				var from_file = foreignKey.from_file;
-				var to_file = foreignKey.to_file;
-				from_file.DeactivateConnections(to_file);
-				to_file.DeactivateConnections(from_file);
-			}
-		}
-		for (var node in nodes) {
-		 	node.Value.Deactivate();
-		}
-		nodes = new Dictionary.<String, Node>();
-		SearchController.ReInit();
-		ClusterController.ReInit();
-		imported = false;
-	}
-
-	//called by linking table files, executed by non-linking tables.
-	function DeactivateConnections(file : DataFile){
-		for (var node in nodes){
-			node.Value.DeactivateConnections(file);
-		}
-	} 
-
-
 
 	function getFirstRow() : String[] {
 		try {
