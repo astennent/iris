@@ -63,7 +63,7 @@ class MainMenu extends BaseMenu {
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.yellow;
 			if (GUI.Button(button_position, gear)){
-				print("clicked");
+				chooseMenu(TerminalMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
 
@@ -164,6 +164,12 @@ class MainMenu extends BaseMenu {
 			ToggleDisplay(GraphMenu);
 		} else {
 			DisableDisplay(GraphMenu);
+		}
+
+		if (chosenMenu == TerminalMenu) {
+			ToggleDisplay(TerminalMenu);
+		} else {
+			DisableDisplay(TerminalMenu);
 		}
 
 	}

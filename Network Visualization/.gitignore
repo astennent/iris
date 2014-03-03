@@ -4,3 +4,4 @@ WebBuilds/
 testbuild_data/
 Temp/
 Library/
+*.meta

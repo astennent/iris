@@ -10,7 +10,6 @@ class SelectionMenu extends BaseMenu {
 		super.Start();
 		displaying = true;
 		width = 250;
-		desired_x = Screen.width-width;
 	}
 
 	function Update () {
@@ -24,6 +23,7 @@ class SelectionMenu extends BaseMenu {
 
 	function OnGUI(){
 		var numNodes = SelectionController.getNumSelected();
+		desired_x = Screen.width-width;
 		if (numNodes > 0) {
 			if (numNodes > 1) {
 				title = numNodes + " nodes selected.";
@@ -94,7 +94,7 @@ class SelectionMenu extends BaseMenu {
 				//Draw the remove button
 				var remove_button_rect = new Rect(contentWidth-nodeButtonHeight, node_scroll_y, nodeButtonHeight, nodeButtonHeight);
 				if (GUI.Button(remove_button_rect, "")) {
-					removedNode = node; //queue removal, since yuo can't unselect while iterating
+					removedNode = node; //queue removal, since you can't unselect while iterating
 				}
 
 				node_scroll_y += nodeButtonHeight;

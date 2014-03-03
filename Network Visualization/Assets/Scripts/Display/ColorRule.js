@@ -10,7 +10,7 @@ class ColorRule {
 
 	private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
 	private var cluster_id : int; //stores id of cluster
-	private var node_pkey : Array;
+	private var node_pkey : String;
 
 	private var attribute : Attribute; //stores which attribute you're looking at
 	private var attribute_value : String = "";
@@ -191,7 +191,7 @@ class ColorRule {
 		return node_pkey;
 	}
 
-	function setNodePKey(input : Array){
+	function setNodePKey(input : String){
 		node_pkey = input;
 	}
 
