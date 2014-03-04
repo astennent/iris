@@ -121,15 +121,6 @@ static function Load(fname : String, isDemo : boolean) : int {
 				return -2;
 			}
 		}
-		// //Create the File and attempt to do interpret its contents
-		// var newfile = GameObject.Instantiate(filePrefab).GetComponent(DataFile);
-		// newfile.Init();
-		// newfile.fname = fname;
-		// newfile.isDemoFile = isDemo;
-		// newfile.gameObject.name = fname;
-		// files.Add(newfile);	
-		
-		// newfile.ScanForMetadata();
 
 		var new_file = new DataFile(fname, isDemo);
 		files.Add(new_file);	

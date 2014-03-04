@@ -122,8 +122,7 @@ class ColorRuleMenu extends BaseMenu {
 			}
 		
 		} else if (rule_type == 2) {
-			/* TODO
-
+			
 			var line_count : int  = 0;
 			for (var file : DataFile in FileManager.files){
 				line_count += file.nodes.Count + 3;
@@ -135,17 +134,18 @@ class ColorRuleMenu extends BaseMenu {
 			for (var file : DataFile in FileManager.files){
 				for (var node in file.nodes){
 					var node_pkey = node.Key;
-					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (node_pkey == rule.node_pkey), node_pkey+"")){
-						rule.node_pkey = node_pkey;
+					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (node_pkey == rule.getNodePKey()), node_pkey+"")){
+						rule.setNodePKey(node_pkey);
+						rule.setNodeFile(file);
 					}
 					temp_y += 20;
 				}
 				
 			}
 
-			GUI.EndScrollView();*/
+			GUI.EndScrollView();
 		} else if (rule_type == 3) {
-			var line_count = 0;
+			line_count = 0;
 			for (var file : DataFile in FileManager.files){
 				line_count += file.attributes.Count + 1;
 			}

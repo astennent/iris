@@ -10,7 +10,9 @@ class ColorRule {
 
 	private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
 	private var cluster_id : int; //stores id of cluster
+
 	private var node_pkey : String;
+	private var node_file : DataFile;
 
 	private var attribute : Attribute; //stores which attribute you're looking at
 	private var attribute_value : String = "";
@@ -44,7 +46,7 @@ class ColorRule {
 		cluster_id = -1;
 
 		color = ColorController.GenRandomColor(scheme_index); //BRIGHT
-		setScheme(0);  //bright
+		setScheme(0, false);  //bright
 		variation = 0.3;
 	}
 
@@ -75,12 +77,18 @@ class ColorRule {
 		}
 	}
 
+
 	function setScheme(index : int){
+		setScheme(index, true);
+	}
+	function setScheme(index : int, applyImmediately : boolean) {
 		scheme_index = index;
 		color = ColorController.GenRandomColor(scheme_index);
 		scheme_button_color = color;
 		scheme_button_color.a = 1;
-		ColorController.ApplyRule(this, true, false);
+		if (applyImmediately) {
+			ColorController.ApplyRule(this, true, false);
+		}
 	}
 
 	function getScheme() {
@@ -143,7 +151,9 @@ class ColorRule {
 		} else if (rule_type == 2){
 			if (node_pkey == null){
 				return "New Node Rule";
-			} 
+			} else {
+				return node_pkey;
+			}
 		} else if (rule_type == 3){
 			if (attribute == null){
 				return "New Attribute Rule";
@@ -187,12 +197,20 @@ class ColorRule {
 		cluster_id = input;
 	}
 
-	function getNodePkey(){
+	function getNodePKey(){
 		return node_pkey;
 	}
 
 	function setNodePKey(input : String){
 		node_pkey = input;
+	}
+
+	function getNodeFile() {
+		return node_file;
+	}
+
+	function setNodeFile(input : DataFile) {
+		node_file = input;
 	}
 
 	function getAttribute(){

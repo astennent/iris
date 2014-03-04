@@ -678,6 +678,7 @@ class DataFile {
 			while (  sr != null && sr.Peek() != -1  ) {
 				if (on_first_row) {
 					on_first_row = false;
+					sr.ReadLine(); //read and drop the first line.
 					continue;
 				}
 				var row = new List.<String>();

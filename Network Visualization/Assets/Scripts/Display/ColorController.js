@@ -98,7 +98,7 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 
 	} else if (rule_type == 2) { //node
 
-		//the fallback rule transparently applies itself to all groups.
+		//the fallback rule transparently applies itself to all nodes.
 		if (rule.is_fallback) {
 			for (var file in FileManager.files){
 				var nodes = file.nodes;
@@ -108,9 +108,19 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 					ColorNodeForRule(node, rule, color, change_color, change_size);
 				}
 			}
+		} else {
+			var node_file = rule.getNodeFile();
+			if (node_file != null) {
+				var node_key = rule.getNodePKey();
+				node = node_file.nodes[node_key];
+				if (node != null) {
+					color = rule.getColor();
+					ColorNodeForRule(node, rule, color, change_color, change_size);
+				}
+			}
 		}
 
-		//TODO non-fallback
+
 
 	} else if (rule_type == 3){ //attr
 		if (rule.getAttribute() != null) {
