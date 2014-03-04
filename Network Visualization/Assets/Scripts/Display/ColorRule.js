@@ -11,8 +11,7 @@ class ColorRule {
 	private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
 	private var cluster_id : int; //stores id of cluster
 
-	private var node_pkey : String;
-	private var node_file : DataFile;
+	private var node : Node;
 
 	private var attribute : Attribute; //stores which attribute you're looking at
 	private var attribute_value : String = "";
@@ -42,7 +41,6 @@ class ColorRule {
 
 		coloring_node = coloring_halo = true;
 
-		node_pkey = null;
 		cluster_id = -1;
 
 		color = ColorController.GenRandomColor(scheme_index); //BRIGHT
@@ -149,10 +147,10 @@ class ColorRule {
 				return "Cluster " + cluster_id;
 			}
 		} else if (rule_type == 2){
-			if (node_pkey == null){
+			if (node == null){
 				return "New Node Rule";
 			} else {
-				return node_pkey;
+				return node.getDisplayName();
 			}
 		} else if (rule_type == 3){
 			if (attribute == null){
@@ -197,20 +195,11 @@ class ColorRule {
 		cluster_id = input;
 	}
 
-	function getNodePKey(){
-		return node_pkey;
+	function setNode(input : Node) {
+		node = input;
 	}
-
-	function setNodePKey(input : String){
-		node_pkey = input;
-	}
-
-	function getNodeFile() {
-		return node_file;
-	}
-
-	function setNodeFile(input : DataFile) {
-		node_file = input;
+	function getNode() {
+		return node;
 	}
 
 	function getAttribute(){

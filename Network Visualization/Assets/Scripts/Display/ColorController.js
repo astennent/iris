@@ -108,16 +108,12 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 					ColorNodeForRule(node, rule, color, change_color, change_size);
 				}
 			}
-		} else {
-			var node_file = rule.getNodeFile();
-			if (node_file != null) {
-				var node_key = rule.getNodePKey();
-				node = node_file.nodes[node_key];
-				if (node != null) {
-					color = rule.getColor();
-					ColorNodeForRule(node, rule, color, change_color, change_size);
-				}
-			}
+		} else {				
+			node = rule.getNode();
+			if (node != null) {
+				color = rule.getColor();
+				ColorNodeForRule(node, rule, color, change_color, change_size);
+			}			
 		}
 
 

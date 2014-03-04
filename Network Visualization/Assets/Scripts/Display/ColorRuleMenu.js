@@ -132,11 +132,11 @@ class ColorRuleMenu extends BaseMenu {
 				clusterScrollPosition, Rect (0, 0, width, 20*line_count+20));
 
 			for (var file : DataFile in FileManager.files){
-				for (var node in file.nodes){
-					var node_pkey = node.Key;
-					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (node_pkey == rule.getNodePKey()), node_pkey+"")){
-						rule.setNodePKey(node_pkey);
-						rule.setNodeFile(file);
+				for (var entry in file.nodes){
+					var node = entry.Value;
+					var key = entry.Key;
+					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), ( node == rule.getNode() ), key)){
+						rule.setNode(node);
 					}
 					temp_y += 20;
 				}
