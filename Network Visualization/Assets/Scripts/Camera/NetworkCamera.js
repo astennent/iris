@@ -97,6 +97,13 @@ function UpdateLocked(selectionCenter : Vector3){
 		x += Input.GetAxis("Mouse X")*2;
 		y += Input.GetAxis("Mouse Y")*2;
 	}	
+
+	// Update spin values for keypresses
+	x -= Input.GetAxis("Horizontal")*1.6;
+	y -= Input.GetAxis("Vertical")*1.6;
+	r += Input.GetAxis("StrafeVertical")*.02;
+
+
 	var z : float = Input.GetAxis("Mouse ScrollWheel");
 	desired_distance -= z*desired_distance;
 	desired_distance = Mathf.Clamp(desired_distance, 1, 1000);

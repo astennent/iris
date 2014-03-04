@@ -155,7 +155,7 @@ class SelectionMenu extends BaseMenu {
 				var attr_max = attribute.getMaxValue();
 
 				GUI.color = ColorController.GenFractionalColor(attr_numeric_value, attr_max);
-				GUI.Box(new Rect(5, data_scroll_y, contentWidth, data_height), "");
+				GUI.Box(new Rect(0, data_scroll_y, contentWidth, data_height), "");
 				//GUI.color = Color.white;
 
 				var attr_name = attribute.getRestrictedName(width/2-10);	
