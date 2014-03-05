@@ -67,61 +67,54 @@ static function ApplyRule(rule: ColorRule) {
 
 
 static function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
+	if (rule.is_fallback) {
+		ApplyFallbackRule(rule, change_color, change_size);
+		return;
+	}
+
 	var rule_type = rule.getRuleType();
 	if (rule_type == 0) {  //source
-
-		//the fallback rule transparently applies itself to all files.
-		if (rule.is_fallback) {
-			for (var source : DataFile in FileManager.files) {
-				ColorBySource(source, rule, change_color, change_size);
-			}
-		} else { //seperate loops because dataManager stores DataFiles in a List, rather than a HashSet.
-			for (var source : DataFile in rule.getSources()) {
-				ColorBySource(source, rule, change_color, change_size);
-			}
+		for (var source : DataFile in rule.getSources()) {
+			ColorBySource(source, rule, change_color, change_size);
 		}
-
-
 	} else if (rule_type == 1) { //cluster
-
-		//the fallback rule transparently applies itself to all groups.
-		if (rule.is_fallback) {
-			for (var entry in ClusterController.group_dict){ //loop over the cluster ids
-				//color = rule.getColor();
-				ColorByCluster(entry.Key, rule, change_color, change_size);
-			}
-		} else {
-			var clusterList = rule.getClusters();
-			for (var cluster_id in clusterList) {
-				ColorByCluster(cluster_id, rule, change_color, change_size);
-			}
+		var clusterList = rule.getClusters();
+		for (var cluster_id in clusterList) {
+			ColorByCluster(cluster_id, rule, change_color, change_size);
 		}
-
-	} else if (rule_type == 2) { //node
-
-		//the fallback rule transparently applies itself to all nodes.
-		if (rule.is_fallback) {
-			for (var file in FileManager.files){
-				var nodes = file.nodes;
-				for (var entry in nodes){
-					var node : Node = entry.Value;
-					var color : Color = rule.getColor();
-					ColorNodeForRule(node, rule, color, change_color, change_size);
-				}
-			}
-		} else {				
-			var nodeList = rule.getNodes();
-			for (node in nodeList) {
-				color = rule.getColor();
-				ColorNodeForRule(node, rule, color, change_color, change_size);
-			}			
-		}
-
+	} else if (rule_type == 2) { //node			
+		var nodeList = rule.getNodes();
+		for (node in nodeList) {
+			var color = rule.getColor();
+			ColorNodeForRule(node, rule, color, change_color, change_size);
+		}			
 	} else if (rule_type == 3){ //attr
 		if (rule.getAttribute() != null) {
 			ColorByAttribute(rule.getAttribute(), rule.getAttributeValue(), rule, change_color, change_size);
 		}
 	}
+}
+
+private static function ApplyFallbackRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
+	var rule_type = rule.getRuleType();
+	if (rule_type == 0) {
+			for (var source : DataFile in FileManager.files) {
+				ColorBySource(source, rule, change_color, change_size);
+			}
+	} else if (rule_type == 1) {
+			for (var entry in ClusterController.group_dict){ //loop over the cluster ids
+				ColorByCluster(entry.Key, rule, change_color, change_size);
+			}
+	} else if (rule_type == 2) {
+		for (var file in FileManager.files){
+			var nodes = file.nodes;
+			for (var entry in nodes){
+				var node : Node = entry.Value;
+				var color : Color = rule.getColor();
+				ColorNodeForRule(node, rule, color, change_color, change_size);
+			}
+		}
+	} // Note that rule_type should not be 3 with a fallback rule.
 }
 
 static function ColorByCluster(cluster_id : int, rule  : ColorRule, change_color : boolean , change_size : boolean){
@@ -207,7 +200,7 @@ static function NudgeColor(c : Color, dist : float){
 	return c;	
 }
 
-static function GenRandomColor(scheme_index : int){
+static function GenRandomColor(scheme_index : int) {
 	if (scheme_index == 0){ //bright
 		return GenScaledColor(false);
 	} else if (scheme_index == 1){ //pastel
@@ -219,7 +212,7 @@ static function GenRandomColor(scheme_index : int){
 	} else if (scheme_index == 4) { //sunlight
 		return NudgeColor(new Color(1, .7, 0, .75));
 	} else if (scheme_index == 5) { //forest glade
-		return NudgeColor(new Color(.25, .75, .1, .75));
+		return NudgeColor(new Color(.25, .75, .1, .75), .2);
 	} else if (scheme_index == 6){ //aqua
 		return NudgeColor(new Color(.1, .4, .75, .75));
 	} else {
