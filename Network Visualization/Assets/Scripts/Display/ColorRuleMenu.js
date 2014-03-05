@@ -101,9 +101,10 @@ class ColorRuleMenu extends BaseMenu {
 					display_string = cluster_key+" ("+ cluster_size + " nodes)";
 				}
 
-				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (cluster_key == rule.getClusterId()),
-						display_string)) {
-					rule.setClusterId(cluster_key);
+				var usedClusterBefore = rule.usesCluster(cluster_key);
+				var usedClusterAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), rule.usesCluster(cluster_key), display_string);
+				if (usedClusterBefore != usedClusterAfter) {
+					rule.toggleCluster(cluster_key);
 				}
 			
 				temp_y+=20;
@@ -135,8 +136,10 @@ class ColorRuleMenu extends BaseMenu {
 				for (var entry in file.nodes){
 					var node = entry.Value;
 					var key = entry.Key;
-					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), ( node == rule.getNode() ), key)){
-						rule.setNode(node);
+					var usedNodeBefore = rule.usesNode(node);
+					var usedNodeAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), rule.usesNode(node), key);
+					if (usedNodeBefore != usedNodeAfter) {
+						rule.toggleNode(node);
 					}
 					temp_y += 20;
 				}

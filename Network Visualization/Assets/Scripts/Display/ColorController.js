@@ -91,8 +91,9 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 				ColorByCluster(entry.Key, rule, change_color, change_size);
 			}
 		} else {
-			if (rule.getClusterId() != -1) {
-				ColorByCluster(rule.getClusterId(), rule, change_color, change_size);
+			var clusterList = rule.getClusters();
+			for (var cluster_id in clusterList) {
+				ColorByCluster(cluster_id, rule, change_color, change_size);
 			}
 		}
 
@@ -109,14 +110,12 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 				}
 			}
 		} else {				
-			node = rule.getNode();
-			if (node != null) {
+			var nodeList = rule.getNodes();
+			for (node in nodeList) {
 				color = rule.getColor();
 				ColorNodeForRule(node, rule, color, change_color, change_size);
 			}			
 		}
-
-
 
 	} else if (rule_type == 3){ //attr
 		if (rule.getAttribute() != null) {

@@ -9,9 +9,9 @@ class ColorRule {
 	private var invert_centrality : boolean; //swap colors?
 
 	private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
-	private var cluster_id : int; //stores id of cluster
+	private var clusters : HashSet.<int> = new HashSet.<int>(); //stores id of cluster
 
-	private var node : Node;
+	private var nodes : HashSet.<Node> = new HashSet.<Node>();;
 
 	private var attribute : Attribute; //stores which attribute you're looking at
 	private var attribute_value : String = "";
@@ -40,8 +40,6 @@ class ColorRule {
 		centrality_type = 1; //CLOSENESS
 
 		coloring_node = coloring_halo = true;
-
-		cluster_id = -1;
 
 		color = ColorController.GenRandomColor(scheme_index); //BRIGHT
 		setScheme(0, false);  //bright
@@ -131,29 +129,39 @@ class ColorRule {
 	function getDisplayName() : String {
 		if (rule_type == 0){ //SOURCE
 			var count = sources.Count;
-			if (count == 0){
+			if (count == 0) {
 				return "New Source Rule";
 			} else if (count == 1) {
-				var enumerator = sources.GetEnumerator();
-				enumerator.MoveNext();
-				return enumerator.Current.shortName() + "";
+				var sourceEnumerator = sources.GetEnumerator();
+				sourceEnumerator.MoveNext();
+				return sourceEnumerator.Current.shortName() + "";
 			} else {
 				return sources.Count + " sources";
 			}
 		} else if (rule_type == 1){
-			if (cluster_id == -1){
+			count = clusters.Count;
+			if (count == 0){
 				return "New Cluster Rule";
+			} else if (count == 1) {
+				var clusterEnumerator = clusters.GetEnumerator();
+				clusterEnumerator.MoveNext();
+				return "Cluster " + sourceEnumerator.Current;
 			} else {
-				return "Cluster " + cluster_id;
+				return clusters.Count + " clusters";
 			}
-		} else if (rule_type == 2){
-			if (node == null){
+		} else if (rule_type == 2) {
+			count = nodes.Count;
+			if (count == 0){
 				return "New Node Rule";
+			} else if (count == 1) {
+				var nodeEnumerator = nodes.GetEnumerator();
+				nodeEnumerator.MoveNext();
+				return nodeEnumerator.Current.getDisplayName() + "";
 			} else {
-				return node.getDisplayName();
+				return nodes.Count + " nodes";
 			}
-		} else if (rule_type == 3){
-			if (attribute == null){
+		} else if (rule_type == 3) {
+			if (attribute == null) {
 				return "New Attribute Rule";
 			} else {
 				return attribute.getColumnName() + ": " + attribute_value;
@@ -163,60 +171,65 @@ class ColorRule {
 		return "New Rule";
 	}
 
+	//Sources
 	function usesSource(input : DataFile){
 		return sources.Contains(input);
 	}
-
-	function addSource(input : DataFile){
-		sources.Add(input);
-	}
-
-	function removeSource(input : DataFile){
-		sources.Remove(input);
-	}
-
 	function getSources(){
 		return sources;
 	}
-
 	function toggleSource(input : DataFile) {
 		if (usesSource(input)) {
-			removeSource(input);
+			sources.Remove(input);
 		} else {
-			addSource(input);
+			sources.Add(input);
 		}
 	}
 
-	function getClusterId(){
-		return cluster_id;
+	//Clusters
+	function usesCluster(input : int) {
+		return clusters.Contains(input);
+	}
+	function toggleCluster(input : int) {
+		if (usesCluster(input)) {
+			clusters.Remove(input);
+		} else {
+			clusters.Add(input);
+		}
+	}
+	function getClusters() {
+		return clusters;
 	}
 
-	function setClusterId(input : int){
-		cluster_id = input;
+	//Nodes
+	function usesNode(input : Node) {
+		return nodes.Contains(input);
+	}
+	function toggleNode(input : Node) {
+		if (usesNode(input)) {
+			nodes.Remove(input);
+		} else {
+			nodes.Add(input);
+		}
+	}
+	function getNodes() {
+		return nodes;
 	}
 
-	function setNode(input : Node) {
-		node = input;
-	}
-	function getNode() {
-		return node;
-	}
-
+	//Attributes
 	function getAttribute(){
 		return attribute;
 	}
-
 	function setAttribute(input : Attribute){
 		attribute = input;
 	}
-
 	function getAttributeValue(){
 		return attribute_value;
 	}
-
 	function setAttributeValue(input : String) {
 		attribute_value = input;
 	}
+	
 
 	function getContinuousAttribute() {
 		return continuous_attribute;
