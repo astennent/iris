@@ -103,7 +103,7 @@ static function ProcessDrag(){
 }
 
 private function ProcessBoxing(){
-	if (dragging || !networkCamera.freeCamera){
+	if (dragging || !networkCamera.freeCamera || GraphController.isGraphing()){
 		boxing = false;
 		return;
 	}

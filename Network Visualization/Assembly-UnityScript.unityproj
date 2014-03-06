@@ -69,6 +69,8 @@
      <Compile Include="Assets\Scripts\Display\DisplayMenu.js" />
      <Compile Include="Assets\Scripts\Display\Reticle.js" />
      <Compile Include="Assets\Scripts\Graphing\AxisController.js" />
+     <Compile Include="Assets\Scripts\Graphing\Bar.js" />
+     <Compile Include="Assets\Scripts\Graphing\BarController.js" />
      <Compile Include="Assets\Scripts\Graphing\GraphController.js" />
      <Compile Include="Assets\Scripts\Graphing\GraphMenu.js" />
      <Compile Include="Assets\Scripts\Interface\BaseMenu.js" />

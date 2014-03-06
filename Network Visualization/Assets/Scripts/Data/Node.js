@@ -85,7 +85,7 @@ class Node extends TimeObject {
 	function Update() {
 		super.Update();
 
-		if (GraphController.isGraphing() && GraphController.getFile() != source || 
+		if (GraphController.isGraphing() && (!GraphController.isUsingMethodWithNodes() || GraphController.getFile() != source) || 
 				!hasValidTime()) {
 			setRender(false);
 			return;
