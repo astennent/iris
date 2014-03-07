@@ -262,15 +262,15 @@ function DrawTickLabels() {
 	var graphing = GraphController.isGraphing() && draw_tick_labels && draw_axes;
 	for (var axis_index = 0 ; axis_index < 3 ; axis_index++) { 
 		var labels = tickLabels[axis_index];
-		var count = labels.Count;
-		for (var index = 0 ; index < count ; index++) {
+		var count = labels.Count-1;
+		for (var index = 0 ; index < count+1 ; index++) {
 			var label = labels[index];
 			if (graphing) {
 				label.text = ""+GraphController.getFractionalValue((1.0*index)/count, axis_index);
 			} else {
 				label.text = "";
 			}
-			var labelPosition = index*directions[axis_index]*scale/(count-1);
+			var labelPosition = index*directions[axis_index]*scale/(count);
 			label.transform.position = Camera.main.WorldToViewportPoint(labelPosition);
 			var fontSize : float = 1500/Vector3.Distance(Camera.main.transform.position, labelPosition);
 			label.fontSize = Mathf.Clamp(fontSize, 10, 25);

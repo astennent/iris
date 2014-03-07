@@ -17,6 +17,8 @@ class GraphController extends MonoBehaviour {
 	private static var forcedNodeSize : float = 2.5;
 
 	private static var methods = ["Scatterplot", "Histogram"];
+	static var SCATTERPLOT = 0;
+	static var HISTOGRAM = 1;
 	private static var method = 0;
 
 	//Used in the histogram method to determine if an extra axis should be used to scale vertically.
@@ -51,6 +53,9 @@ class GraphController extends MonoBehaviour {
 				setAxis(specialRowAxis, obstructingAttribute);
 			}
 		}
+
+		//TODO: Make this update all controllers when scatter is refactored out.
+		updateMethodController();
 	}
 
 	//called by Node to decide if it should ignore its rules.
@@ -215,6 +220,9 @@ class GraphController extends MonoBehaviour {
 
 		//Send a message to the axis controller to update the number of ticks.
 		AxisController.updateAxis(axis_index);
+		
+		//Update the appropriate controller.
+		updateMethodController();
 	}
 
 
@@ -252,6 +260,13 @@ class GraphController extends MonoBehaviour {
 		}
 	}
 
+	static function updateMethodController() {
+		// Note that these methods rely on axis controller so it must be 
+		// the case that axisController is notified of the change first.
+		if (method == HISTOGRAM) {
+			BarController.updateBars();
+		}
+	}
 
 	//Given a val between min and max, returns the position for positioning
 	static function makeFraction(val : float, i : int) {
