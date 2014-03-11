@@ -61,6 +61,10 @@ static function setDrawingLabels(draw_tick_labels : boolean) {
 	Redraw();
 }
 
+static function getTickCounts() {
+	return tickCounts;
+}
+
 
 function Start () {
 	redAxis = redAxisInstance;
@@ -250,10 +254,7 @@ function DrawGridlines() {
 			}
 
 		}
-
-
 	}
-
 }
 
 function DrawTickLabels() {

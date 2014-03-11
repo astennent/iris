@@ -55,7 +55,9 @@ class GraphController extends MonoBehaviour {
 		}
 
 		//TODO: Make this update all controllers when scatter is refactored out.
-		updateMethodController();
+		updateMethodController(0);
+		updateMethodController(1);
+		updateMethodController(2);
 	}
 
 	//called by Node to decide if it should ignore its rules.
@@ -222,7 +224,7 @@ class GraphController extends MonoBehaviour {
 		AxisController.updateAxis(axis_index);
 		
 		//Update the appropriate controller.
-		updateMethodController();
+		updateMethodController(axis_index);
 	}
 
 
@@ -260,19 +262,19 @@ class GraphController extends MonoBehaviour {
 		}
 	}
 
-	static function updateMethodController() {
+	static function updateMethodController(axis_index : int) {
 		// Note that these methods rely on axis controller so it must be 
 		// the case that axisController is notified of the change first.
 		if (method == HISTOGRAM) {
-			BarController.updateBars();
+			BarController.updateBars(axis_index);
 		}
 	}
 
 	//Given a val between min and max, returns the position for positioning
-	static function makeFraction(val : float, i : int) {
-		if (minMaxCache[i].Count > 0) {
-			var min = minMaxCache[i][0];
-			var max = minMaxCache[i][1];
+	static function makeFraction(val : float, axisIndex : int) {
+		if (minMaxCache[axisIndex].Count > 0) {
+			var min = minMaxCache[axisIndex][0];
+			var max = minMaxCache[axisIndex][1];
 			var frac = scale*(val - min + .0001) / (max - min - .0001);
 			if (frac < 0) {
 				frac = 0;
@@ -322,5 +324,20 @@ class GraphController extends MonoBehaviour {
 		return (method == 1);
 	}
 
+	static function getMinValue(axis_index : int) : float{
+		if (minMaxCache[axis_index].Count > 0) {
+			return minMaxCache[axis_index][0];
+		} else {
+			return 0.0;
+		}
+	}
+
+	static function getMaxValue(axis_index : int) : float {
+		if (minMaxCache[axis_index].Count > 0) {
+			return minMaxCache[axis_index][1];
+		} else {
+			return 0.0;
+		}
+	}
 
 }

@@ -73,6 +73,7 @@
      <Compile Include="Assets\Scripts\Graphing\BarController.js" />
      <Compile Include="Assets\Scripts\Graphing\GraphController.js" />
      <Compile Include="Assets\Scripts\Graphing\GraphMenu.js" />
+     <Compile Include="Assets\Scripts\Graphing\HistogramController.js" />
      <Compile Include="Assets\Scripts\Interface\BaseMenu.js" />
      <Compile Include="Assets\Scripts\Interface\ColorPicker.js" />
      <Compile Include="Assets\Scripts\Interface\Dropdown.js" />
