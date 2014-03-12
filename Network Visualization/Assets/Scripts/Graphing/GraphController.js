@@ -225,6 +225,10 @@ class GraphController extends MonoBehaviour {
 		
 		//Update the appropriate controller.
 		updateMethodController(axis_index);
+
+
+		//Update the axes tick marks.
+		AxisController.Redraw();
 	}
 
 
@@ -309,6 +313,10 @@ class GraphController extends MonoBehaviour {
 		return (method == 0);
 	}
 
+	static function isUsingMethodWithBars() {
+		return (method == 1);
+	}
+
 	//Used by the menu to decide if it should be drawn
 	static function methodRequiresSpecialRow() {
 		return (method == 1);
@@ -321,6 +329,11 @@ class GraphController extends MonoBehaviour {
 
 	//Used to determine if the special row can be turned all the way off
 	static function methodRequiresOneSpecialRow() {
+		return (method == 1);
+	}
+
+	//Used to determine if tick marks should be squashed to line up with bars.
+	static function methodRequiresTickSquash() {
 		return (method == 1);
 	}
 

@@ -31,7 +31,7 @@ class HistogramController extends MonoBehaviour {
 
 					bar.setDesiredPosition(new Vector3(xPosition, yPosition, zPosition));
 
-					var fillMargins = false;
+					var fillMargins = true;
 					if (fillMargins) {
 						var marginMultiplier : float = 2;
 					} else {
@@ -142,11 +142,21 @@ class HistogramController extends MonoBehaviour {
 		var numBars = BarController.getNumBars(axisIndex);
 
 		// Avoid divide-by-zero errors
-		if (max-min == 0) {
+		if (max == min) {
 			return 0;
 		}
 
-		var bucket = (val - min) / (max - min) * (numBars - 1);		
+		// Avoid overflowing on the very last node.
+		if (val == max) {
+			return numBars - 1;
+		}
+
+		// Compensate for discrete values needing to fill fewer bars
+		if (BarController.isRepresentative(axisIndex)) {
+			numBars -= 1;
+		}
+
+		var bucket = (val - min) / (max - min) * numBars;		
 
 		return bucket;
 	}

@@ -34,6 +34,8 @@ var blueAxisInstance : Material;
 private static var defaultPosition = Vector3.zero;
 private static var defaultRotation = new Quaternion();
 
+private static var fontSizeAdjust = 1500;
+
 static function isDrawingAxes(){
 	return draw_axes;
 }
@@ -143,12 +145,12 @@ function DrawAxes() {
 			var tickCount = tickCounts[i];
 			var lastPosition = Vector3.zero;
 
-			tickRenderer.SetVertexCount(1+5*tickCount);
+			tickRenderer.SetVertexCount(1+5*(tickCount+1));
 			tickRenderer.SetPosition(0, lastPosition);	
 
 			//Loop to draw ticks and gridlines.		
-			for (var tickIndex = 0 ; tickIndex < tickCount ; tickIndex++) {
-				var pivot = lastPosition+direction*scale/tickCount;
+			for (var tickIndex = 0 ; tickIndex <= tickCount ; tickIndex++) {
+				var pivot = getPivotPosition(tickIndex, i, tickCount);
 			
 				var tickPositionIndex = 1 + tickIndex*5;
 				tickRenderer.SetPosition(tickPositionIndex, pivot);
@@ -259,7 +261,7 @@ function DrawGridlines() {
 
 function DrawTickLabels() {
 	//reposition labels for camera.
-	var scale : float = GraphController.getScale();
+	
 	var graphing = GraphController.isGraphing() && draw_tick_labels && draw_axes;
 	for (var axis_index = 0 ; axis_index < 3 ; axis_index++) { 
 		var labels = tickLabels[axis_index];
@@ -271,12 +273,25 @@ function DrawTickLabels() {
 			} else {
 				label.text = "";
 			}
-			var labelPosition = index*directions[axis_index]*scale/(count);
+
+			var labelPosition = getPivotPosition(index, axis_index, count);
+
 			label.transform.position = Camera.main.WorldToViewportPoint(labelPosition);
-			var fontSize : float = 1500/Vector3.Distance(Camera.main.transform.position, labelPosition);
+			var fontSize : float = fontSizeAdjust/Vector3.Distance(Camera.main.transform.position, labelPosition);
 			label.fontSize = Mathf.Clamp(fontSize, 10, 25);
 		}
 	}
+}
+
+private static function getPivotPosition(index : int, axis_index : int, count : int) {
+	var squashTicks = GraphController.methodRequiresTickSquash();
+	var scale : float = GraphController.getScale();
+	if (squashTicks && BarController.isRepresentative(axis_index)) {
+		var position = (index+.5) * scale / (count+1);
+	} else {
+		position = index * scale / count ;
+	}
+	return position * directions[axis_index];
 }
 
 //called by graph controller when a axis's attribute changes
@@ -316,7 +331,7 @@ static function Redraw() {
 	instance.DrawGridlines();	
 }
 
-function LateUpdate(){
+function LateUpdate() {
 	DrawTickLabels();
 }
 

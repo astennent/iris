@@ -18,6 +18,7 @@ class TerminalMenu extends BaseMenu {
 		parent = GetComponent(MainMenu);
 		super.Start();
 		width = 600;
+		x =  -width;
 
 		//initialize to display all levels.
 		for (var level in displaying_levels) {

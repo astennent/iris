@@ -19,8 +19,19 @@ class Bar extends MonoBehaviour {
 	}
 
 	function Update() {
+		snapToBottom();
 		transform.position = Vector3.Lerp(transform.position, desiredPosition, 0.5);
 		transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, 0.5);
+
+		renderer.enabled = (GraphController.isGraphing() && GraphController.isUsingMethodWithBars());
+	}
+
+	function snapToBottom() {
+		//Snap to the bottom.
+		var specialAxis = GraphController.getSpecialRowAxis();
+		if (specialAxis != -1) {
+			desiredPosition[specialAxis] = desiredScale[specialAxis]/2;
+		}
 	}
 
 }

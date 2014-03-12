@@ -34,19 +34,26 @@ class BarController extends MonoBehaviour {
 		
 		// Use the number of ticks from the AxisController to determine the number of buckets.
 		numBuckets[axisIndex] = AxisController.getTickCounts()[axisIndex]+1;
+		var uniqueCount = GraphController.getUniqueValueCount(axisIndex);
 
 		// Only use one bucket for the counting axis.
 		if (GraphController.getAxes()[axisIndex] == null) {
 			numBuckets[axisIndex] = 1;
+			representativeTracker[axisIndex] = true;
 		}
 
-		var uniqueCount = GraphController.getUniqueValueCount(axisIndex);
-		if (uniqueCount > numBuckets[axisIndex]) {
+		// If every unique value cannot get its own column, the number of bars 
+		// can be reduced to fit naturally inside the tick counts.
+		else if (uniqueCount > numBuckets[axisIndex] && numBuckets[axisIndex] > 1) {
 			representativeTracker[axisIndex] = false;
 			numBuckets[axisIndex] -= 1;
-		} else {
+		} 
+
+		// Otherwise, the tick position must be squashed to line up with the bars, 
+		// instead of going edge-to-edge
+		else {
 			representativeTracker[axisIndex] = true;
-		}		
+		}
 
 		//Update the bars array to use the correct number of bars.
 		updateBarArray(axisIndex);
