@@ -144,7 +144,7 @@ static function ColorByAttribute(attribute : Attribute, value : String, rule  : 
 	}
 }
 
-static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean){
+static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean) : void {
 	var coloring_halo = rule.coloring_halo;
 	var coloring_node = rule.coloring_node;
 
@@ -158,9 +158,7 @@ static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, c
 	} else if (rule.getMethod() == 3) {
 		var continuousAttribute = rule.getContinuousAttribute();
 		if (continuousAttribute != null) {
-			var numerator : float = node.GetNumeric(continuousAttribute);
-			var denominator : float = continuousAttribute.getMaxValue();
-			color = GenFractionalColor(numerator, denominator);
+			color = continuousAttribute.genFractionalColor(node);
 		} else {
 			color = Color.white;
 		}

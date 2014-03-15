@@ -130,7 +130,7 @@ class Node extends TimeObject {
 
 		if (fkeyWeightAttribute != null) {
 			connectionAttributeWeight = connection.GetNumeric(fkeyWeightAttribute);
-			averageValue = fkeyWeightAttribute.getAverageValue();
+			averageValue = fkeyWeightAttribute.getAverage();
 		} else {
 			connectionAttributeWeight = 1;
 			averageValue = 1;

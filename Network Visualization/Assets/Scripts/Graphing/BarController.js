@@ -24,7 +24,7 @@ class BarController extends MonoBehaviour {
 			return bars.Count;
 		} else if (axisIndex == 1) {
 			return bars[0].Count;
-		} else if (axisIndex == 2) {
+		} else {//(axisIndex == 2) {
 			return bars[0][0].Count;
 		}
 	}

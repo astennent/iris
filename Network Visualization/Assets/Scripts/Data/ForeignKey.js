@@ -107,13 +107,12 @@ class ForeignKey {
 		return weightAttribute.column_index;
 	}
  
-	//Only set by id so that you can only have weights from the "from" file.
+	//This can only be set by id (instead of attribute itself) so that you can only have weights from the "from" file.
 	function setWeightAttributeIndex(weightAttributeIndex : int) {
 		if (weightAttributeIndex == -1) {
 			this.weightAttribute = null;
 		} else {
 			this.weightAttribute = from_file.attributes[weightAttributeIndex];
-			weightAttribute.invalidateMinMax();
 		}
 
 		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {

@@ -27,6 +27,9 @@ class Data extends MonoBehaviour {
 		var datum = new Datum(attribute, value);
 		dataSource.attr_dict[attribute] = datum;
 		dataSource.index_dict[attribute.column_index] = datum;
+		
+		// The attribute's statistics will be recalculated when requested
+		if (initialized) attribute.invalidate(); 
 	}
 
 	function Get(attribute : Attribute) {

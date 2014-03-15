@@ -32,21 +32,14 @@ private var timeFrameFormat : String = "";
 private var validTimeFrameFormat : boolean = false;
 private var timeFrameFormatWarning : String = "";
 
-private var minValue : float = 0;
-private var maxValue : float = 0;
-private var averageValue : float = 0;
-private var sum : float = 0;
-private var countValue : int = 0;
-private var valuesValid = false;
-
-
-class Attribute {
+class Attribute extends Stats {
 
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
 		this.file = file;
 		this.column_index = column_index;
 		this.column_name = column_name;
+		setStatsAttribute(this);
 	}
 
 	function ToggleShown(){
@@ -183,95 +176,6 @@ class Attribute {
 			}
 		}
 		return output;
-	}
-
-	function updateValues() {
-		updateValues(false);
-	}
-	function updateValues(force : boolean) {
-		if (valuesValid && !force) {
-			return;
-		}
-		minValue = 0;
-		maxValue = 0;
-		averageValue = 0;
-		sum = 0;
-		countValue = 0;
-		if (file.linking_table) { // There is no central location for connections 
-									//in linking tables, so this is expensive.
-			
-			// Find all files that are be connected with the linking table.
-			var filesToCheck = new HashSet.<DataFile>();
-			for (var fkey in file.getForeignKeys(true)) {
-				filesToCheck.Add(fkey.to_file);
-			}
-
-			//Loop over those files and check the relevant connections
-			var checkedFiles = new HashSet.<DataFile>();
-			for (var file in filesToCheck) {
-				if (checkedFiles.Contains(file)) {
-					continue;				
-				} 
-
-				for (var node in file.getNodes()) {
-					for (var connection in node.getConnections(true)) {
-						//check that the connection's data source is this file.
-						if (connection.source == file) {
-							updateValues(connection);
-						}
-					}
-				}
-
-				checkedFiles.Add(file);
-			}
-		} else {
-			var nodes = file.getNodes();
-			for (var node in nodes) {
-				updateValues(node);
-			}
-		}
-		averageValue = sum / countValue;
-		valuesValid = true;
-	}
-
-	//helper function called by the public one, uses connections or nodes.
-	private function updateValues(data : Data) {
-		var val = data.GetNumeric(this);
-		if (val > maxValue) {
-			maxValue = val;
-		}
-		if (val < minValue) {
-			minValue = val;
-		}
-		sum+=val;
-		countValue += 1;
-	}
-
-	function validateValues() {
-		if (!valuesValid) {
-			updateValues();
-		}
-	}
-	function getMinValue() {
-		validateValues();
-		return minValue;
-	}
-	function getMaxValue() {
-		validateValues();
-		return maxValue;
-	}
-	function getAverageValue() {
-		validateValues();
-		return averageValue;
-	}
-	function getMiddleValue() {
-		validateValues();
-		return (maxValue + minValue)/2;
-	}
-
-	//TODO: make this called by time series changes and removing and adding nodes and connections.
-	function invalidateMinMax() {
-		valuesValid = false;
 	}
 
 }
