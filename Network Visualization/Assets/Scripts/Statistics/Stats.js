@@ -146,7 +146,6 @@ class Stats {
 		valid = true;
 	}
 
-	//TODO: Implement and use.
 	public function genFractionalColor(data : Data) : Color {
 		var num = data.GetNumeric(attribute);
 		return ColorController.GenFractionalColor(num-getMin(), getMax()-getMin());

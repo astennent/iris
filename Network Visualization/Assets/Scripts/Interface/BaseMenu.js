@@ -84,7 +84,7 @@ class BaseMenu extends MonoBehaviour {
 	}
 
 	private function EnableDisplay(){
-		Terminal.C("Enable Display", this);
+		Terminal.V("Enable Display", "BaseMenu");
 		if (parent != null) {
 
 			//Enable the display of the parent menu, if necessary
@@ -107,7 +107,7 @@ class BaseMenu extends MonoBehaviour {
 	//if passItOn, only close the lowest-level children. (ex. User presses escape)
 	//otherwise, close self and all children.
 	private function DisableDisplay(passItOn : boolean) {
-		Terminal.E("Disable Display", this);
+		Terminal.W("Disable Display", "BaseMenu");
 		if (displaying) {
 			var closedChild = false;
 			for (var subMenu in children) {

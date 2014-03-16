@@ -74,7 +74,8 @@ static function ReInit(){
 
 //Disabled until a faster algorithm can be found.
 function Update() {
-	if (false && !NetworkController.isPaused){
+	/*
+	if (!NetworkController.isPaused){
 		
 		var index = 0; 
 		for (var leader in leaders){
@@ -113,5 +114,5 @@ function Update() {
 			index++;
 		}	
 				
-	}
+	}*/
 }

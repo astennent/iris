@@ -93,6 +93,7 @@
      <Compile Include="Assets\Scripts\StreamReader\DemoStreamReader.js" />
      <Compile Include="Assets\Scripts\StreamReader\IrisStreamReader.js" />
      <Compile Include="Assets\Scripts\Terminal\Terminal.js" />
+     <Compile Include="Assets\Scripts\Terminal\TerminalEvaluator.js" />
      <Compile Include="Assets\Scripts\Terminal\TerminalMenu.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeFrame.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeFrameMenu.js" />

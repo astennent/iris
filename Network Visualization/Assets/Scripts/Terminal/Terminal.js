@@ -8,11 +8,16 @@ class Terminal extends MonoBehaviour {
 
 	static var levels = ["Command", "Verbose", "Warning", "Error"];
 
+	private static var evaluator = new TerminalEvaluator();
+
 	//public shorthand methods
-	static function C (text : String, contextObj) { Log(text, 0, contextObj); }
-	static function V (text : String, contextObj) { Log(text, 1, contextObj); }
-	static function W (text : String, contextObj) { Log(text, 2, contextObj); }
-	static function E (text : String, contextObj) { Log(text, 3, contextObj); }
+	static function C (text : String, contextObj) { return Log(text, 0, contextObj); }
+	static function V (text : String, contextObj) { return Log(text, 1, contextObj); }
+	static function W (text : String, contextObj) { return Log(text, 2, contextObj); }
+	static function E (text : String, contextObj) { return Log(text, 3, contextObj); }
+
+	private static var previousCommands = new List.<String>();
+	private static var previousCommandIndex = 0;
 
 	private static function Log(text : String, level : int, contextObj) {
 		var context = contextObj+"";
@@ -26,6 +31,7 @@ class Terminal extends MonoBehaviour {
 			buffer[writeIndex] = message;
 			logicalSize++;
 		}
+		return message;
 	}
 
 	//takes a logical index and adjusts it from the startIndex
@@ -46,6 +52,36 @@ class Terminal extends MonoBehaviour {
 	static function bufferSize() {
 		return logicalSize;
 	}
+
+	static function cycleCommand(up : boolean) {
+		if (previousCommands.Count == 0) {
+			return "";
+		}
+		
+		var indexAdjust = (up) ? -1 : 1;
+		previousCommandIndex += indexAdjust;
+
+		if (previousCommandIndex < 0) {
+			previousCommandIndex = previousCommands.Count - 1;
+		} else if (previousCommandIndex > previousCommands.Count - 1) {
+			previousCommandIndex = 0;
+		}
+
+		return previousCommands[previousCommandIndex];
+	}
+
+	static function Evaluate(input : String) {
+		var result = evaluator.processCommand(input);
+
+		//Don't store consecutive duplicate commands
+		if (previousCommands.Count == 0 || input != previousCommands[previousCommands.Count-1]) {
+			previousCommands.Add(input);
+			previousCommandIndex = previousCommands.Count;
+		}
+
+		return result;
+	}
+
 }
 
 class Message {
