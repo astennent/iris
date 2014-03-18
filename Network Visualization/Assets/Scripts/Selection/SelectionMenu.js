@@ -56,7 +56,7 @@ class SelectionMenu extends BaseMenu {
 
 		//decide how big the box should be. 
 		var outBoxHeight : int;
-		if (numNodes == 1) {
+		if (numNodes == 1 || SelectionController.getPrimaryNode() == null) {
 			return cur_y; 
 		} else {
 			var max_height = (MenuController.getScreenHeight()-cur_y)/2;
@@ -87,7 +87,7 @@ class SelectionMenu extends BaseMenu {
 					SelectionController.selectPrimaryNode(node);
 				}
 
-				if (SelectionController.primaryNode != node) {
+				if (SelectionController.getPrimaryNode() != node) {
 					GUI.color = Color.white;
 				}
 
@@ -111,7 +111,7 @@ class SelectionMenu extends BaseMenu {
 
 	function DrawPrimaryNode(cur_y : int) {
 		var numNodes = SelectionController.getNumSelected();
-		var node = SelectionController.primaryNode;
+		var node = SelectionController.getPrimaryNode();
 		
 		GUI.color = node.getMenuColor();
 		var outerRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);

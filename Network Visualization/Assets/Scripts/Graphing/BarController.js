@@ -20,24 +20,33 @@ class BarController extends MonoBehaviour {
 	}
 
 	static function getNumBars(axisIndex : int) {
+		var numBars = 1;
 		if (axisIndex == 0) {
-			return bars.Count;
+			numBars = bars.Count;
 		} else if (axisIndex == 1) {
-			return bars[0].Count;
+			numBars = bars[0].Count;
 		} else {//(axisIndex == 2) {
-			return bars[0][0].Count;
+			numBars = bars[0][0].Count;
 		}
+
+		if (numBars > 1 && isRepresentative(axisIndex)) {
+			numBars -= 1;
+		}
+
+		return numBars;
 	}
 
 	// Called when the axis selecctions change.
 	static function updateBars(axisIndex : int) {
+
+		var attribute = GraphController.getAxes()[axisIndex];
 		
 		// Use the number of ticks from the AxisController to determine the number of buckets.
 		numBuckets[axisIndex] = AxisController.getTickCounts()[axisIndex]+1;
-		var uniqueCount = GraphController.getUniqueValueCount(axisIndex);
+		var uniqueCount = attribute.getUniqueValueCount();
 
 		// Only use one bucket for the counting axis.
-		if (GraphController.getAxes()[axisIndex] == null) {
+		if (attribute == null) {
 			numBuckets[axisIndex] = 1;
 			representativeTracker[axisIndex] = true;
 		}

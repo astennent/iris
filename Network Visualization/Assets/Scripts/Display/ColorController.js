@@ -241,12 +241,15 @@ static function GenCentralityColor(rule : ColorRule, node : Node) {
 }
 
 static function GenFractionalColor(numerator : float, denominator : float) {
-
 	if (denominator == 0) {
 		return Color.white;
+	} else {
+		return GenFractionalColor(numerator / denominator);
 	}
+}
 
-	var fraction : float = numerator / denominator;
+// Expects a number between 0 and 1
+static function GenFractionalColor(fraction : float) {
 	var adjusted_frac : float;
 	if (fraction > 2.0/3) { //red down to yellow
 		adjusted_frac = (fraction - 2.0/3)*3;

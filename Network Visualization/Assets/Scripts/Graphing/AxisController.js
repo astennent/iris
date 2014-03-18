@@ -264,12 +264,13 @@ function DrawTickLabels() {
 	
 	var graphing = GraphController.isGraphing() && draw_tick_labels && draw_axes;
 	for (var axis_index = 0 ; axis_index < 3 ; axis_index++) { 
+		var attribute = GraphController.getAxes()[axis_index];
 		var labels = tickLabels[axis_index];
 		var count = labels.Count-1;
 		for (var index = 0 ; index < count+1 ; index++) {
 			var label = labels[index];
 			if (graphing) {
-				label.text = ""+GraphController.getFractionalValue((1.0*index)/count, axis_index);
+				label.text = ""+(index*attribute.getMax()/count);
 			} else {
 				label.text = "";
 			}
@@ -289,14 +290,15 @@ private static function getPivotPosition(index : int, axis_index : int, count : 
 	if (squashTicks && BarController.isRepresentative(axis_index)) {
 		var position = (index+.5) * scale / (count+1);
 	} else {
-		position = index * scale / count ;
+		position = index * scale / count;
 	}
 	return position * directions[axis_index];
 }
 
 //called by graph controller when a axis's attribute changes
 static function updateAxis(axis_index : int ){
-	var originalCount = GraphController.getUniqueValueCount(axis_index)-1;
+	var attribute = GraphController.getAxes()[axis_index];
+	var originalCount = (attribute != null) ? attribute.getUniqueValueCount()-1 : 0;
 
 	var count = originalCount;
 	if (originalCount < 0 || originalCount > 10) {

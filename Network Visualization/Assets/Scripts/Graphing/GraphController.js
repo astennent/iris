@@ -8,9 +8,6 @@ class GraphController extends MonoBehaviour {
 
 	private static var axes : Attribute[];
 
-	private static var minMaxCache = new List.<List.<float> >();
-	private static var uniqueValueCounts = new List.<int>();
-
 	private static var scale : float = 200;
 
 	private static var forcingNodeSize : boolean = true;
@@ -81,10 +78,6 @@ class GraphController extends MonoBehaviour {
 
 	static function resetAxes(){
 		axes = new Attribute[3];
-		for (var i = 0 ; i < 3 ; i++) {
-			minMaxCache.Add(new List.<float>());
-			uniqueValueCounts.Add(0);
-		}
 		if (AxisController.initialized) {
 			AxisController.Redraw();
 		}
@@ -123,8 +116,8 @@ class GraphController extends MonoBehaviour {
 		return axes;
 	}
 
-	static function getUniqueValueCount(index : int) {
-		return uniqueValueCounts[index];
+	static function getAxis(axisIndex : float) {
+		return axes[axisIndex];
 	}
 
 	static function getScale(){
@@ -195,31 +188,7 @@ class GraphController extends MonoBehaviour {
 
 	//Called by setAxis when an attribute is changed
 	private static function updateValues(axis_index : int, attribute : Attribute) {
-		var minMax = new List.<float>();
-		var uniqueValues = new HashSet.<float>();
-		//update the min/max cache
-		if (attribute != null) {
-			minMax.Add(int.MaxValue);
-			minMax.Add(int.MinValue);
-			var nodes = file.nodes;
-			for (var entry in nodes) {
-				var value = entry.Value.GetNumeric(attribute);
-
-				//update the cache.
-				if (value < minMax[0]) {
-					minMax[0] = value;
-				} 
-				if (value > minMax[1]) {
-					minMax[1] = value;
-				}
-
-				uniqueValues.Add(value);
-			}
-		}
-
-		uniqueValueCounts[axis_index] = uniqueValues.Count;	
-		minMaxCache[axis_index] = minMax;
-
+		
 		//Send a message to the axis controller to update the number of ticks.
 		AxisController.updateAxis(axis_index);
 		
@@ -249,17 +218,8 @@ class GraphController extends MonoBehaviour {
 				var attribute = axes[i];
 
 				if (attribute != null) {
-					var value = node.GetNumeric(attribute);
-					var coordinate = makeFraction(value, i);
-
-					//adjust the desired position
-					if (i == 0) {
-						desired_position.x = coordinate;
-					} else if (i == 1){
-						desired_position.y = coordinate;
-					} else {
-						desired_position.z = coordinate;
-					}
+					var coordinate = axes[i].getFraction(node) * scale;
+					desired_position[i] = coordinate;
 				}
 			}
 			node.transform.position = Vector3.Lerp(node.transform.position, desired_position, .3);
@@ -273,41 +233,6 @@ class GraphController extends MonoBehaviour {
 			BarController.updateBars(axis_index);
 		}
 	}
-
-	//Given a val between min and max, returns the position for positioning
-	static function makeFraction(val : float, axisIndex : int) {
-		if (minMaxCache[axisIndex].Count > 0) {
-			var min = minMaxCache[axisIndex][0];
-			var max = minMaxCache[axisIndex][1];
-			var frac = scale*(val - min + .0001) / (max - min - .0001);
-			if (frac < 0) {
-				frac = 0;
-			} else if (frac > scale) {
-				frac = scale;
-			}
-			return frac;
-		} 
-		return 0;
-	}
-
-	//Given a val between 0 and 1, returns the fraction between min and max
-	static function getFractionalValue(val : float, i : int) {
-		if (minMaxCache[i].Count > 0) {
-			var min = minMaxCache[i][0];
-			var max = minMaxCache[i][1];
-
-			if (val < 0) {
-				return min;
-			} else if (val > 1) {
-				return max;
-			}
-
-			var frac = min + val*(max - min);
-			return frac;
-		} 
-		return 0;
-	}
-
 
 	static function isUsingMethodWithNodes() {
 		return (method == 0);
@@ -335,22 +260,6 @@ class GraphController extends MonoBehaviour {
 	//Used to determine if tick marks should be squashed to line up with bars.
 	static function methodRequiresTickSquash() {
 		return (method == 1);
-	}
-
-	static function getMinValue(axis_index : int) : float{
-		if (minMaxCache[axis_index].Count > 0) {
-			return minMaxCache[axis_index][0];
-		} else {
-			return 0.0;
-		}
-	}
-
-	static function getMaxValue(axis_index : int) : float {
-		if (minMaxCache[axis_index].Count > 0) {
-			return minMaxCache[axis_index][1];
-		} else {
-			return 0.0;
-		}
 	}
 
 }

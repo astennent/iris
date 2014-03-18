@@ -11,8 +11,6 @@ class HistogramController extends MonoBehaviour {
 
 		var bars = BarController.getBars();
 
-		var ranges = getRanges();
-
 		var xAdjust = GraphController.getScale() / (bars.Count) / 2.0;
 		var yAdjust = GraphController.getScale() / (bars[0].Count) / 2.0;
 		var zAdjust = GraphController.getScale() / (bars[0][0].Count) / 2.0;
@@ -54,31 +52,6 @@ class HistogramController extends MonoBehaviour {
 		return position;
 	}
 
-	private static function getRanges() {
-
-		var mins = new float[3];
-		var maxes = new float[3];
-		var ranges = new float[3];
-
-		mins[0] = GraphController.getMaxValue(0);
-		maxes[0] = GraphController.getMinValue(0)+0.001;
-		mins[1] = GraphController.getMaxValue(1);
-		maxes[1] = GraphController.getMinValue(1)+0.001;
-		mins[2] = GraphController.getMaxValue(2);
-		maxes[2] = GraphController.getMinValue(2)+0.001;
-		ranges[0] = maxes[0] - mins[0] + 0.001;
-		ranges[1] = maxes[1] - mins[1] + 0.001;
-		ranges[2] = maxes[2] - mins[2] + 0.001;
-
-
-		var countAxis = GraphController.getSpecialRowAxis();
-		mins[countAxis] = 0;
-		maxes[countAxis] = 0.001;
-		ranges[countAxis] = 0.001;
-
-		return ranges;
-	}
-
 	private static function updateCountAxisScale() {
 
 		var bars = BarController.getBars();
@@ -98,7 +71,7 @@ class HistogramController extends MonoBehaviour {
 				var attribute = axes[axisIndex];
 				if (attribute != null) {
 					var val = node.GetNumeric(attribute);
-					var bucketVal = getBucket(val, axisIndex);
+					var bucketVal = getBucket(val, axisIndex, attribute);
 					bucket[axisIndex] = bucketVal;
 				}
 			}
@@ -136,27 +109,16 @@ class HistogramController extends MonoBehaviour {
 
 	}
 
-	private static function getBucket(val : float, axisIndex : int) {
-		var max = GraphController.getMaxValue(axisIndex);
-		var min = GraphController.getMinValue(axisIndex);
+	private static function getBucket(val : float, axisIndex : int, attribute : Attribute) {
+
 		var numBars = BarController.getNumBars(axisIndex);
 
-		// Avoid divide-by-zero errors
-		if (max == min) {
-			return 0;
-		}
-
-		// Avoid overflowing on the very last node.
-		if (val == max) {
+		// Avoid overflow on the very last node.
+		if (!BarController.isRepresentative(axisIndex) && val == attribute.getMax()) {
 			return numBars - 1;
 		}
 
-		// Compensate for discrete values needing to fill fewer bars
-		if (BarController.isRepresentative(axisIndex)) {
-			numBars -= 1;
-		}
-
-		var bucket = (val - min) / (max - min) * numBars;		
+		var bucket = attribute.getFraction(val) * numBars;	
 
 		return bucket;
 	}

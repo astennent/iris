@@ -10,6 +10,12 @@ class Terminal extends MonoBehaviour {
 
 	private static var evaluator = new TerminalEvaluator();
 
+	//public shorterhand methods
+	static function C (text : String) { return C(text, ""); }
+	static function V (text : String) { return V(text, ""); }
+	static function W (text : String) { return W(text, ""); }
+	static function E (text : String) { return E(text, ""); }
+
 	//public shorthand methods
 	static function C (text : String, contextObj) { return Log(text, 0, contextObj); }
 	static function V (text : String, contextObj) { return Log(text, 1, contextObj); }

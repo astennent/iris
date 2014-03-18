@@ -11,7 +11,7 @@ private static var startCoords : Vector2; //corner of selection box
 
 
 static var nodes = new HashSet.<Node>(); //list of all selected nodes
-static var primaryNode : Node; //the focused selected node
+private static var primaryNode : Node; //the focused selected node
 
 private static var networkCamera : NetworkCamera;
 private static var cameraTransform : Transform;
@@ -19,6 +19,16 @@ private static var cameraTransform : Transform;
 function Start(){
 	networkCamera = Camera.main.GetComponent(NetworkCamera);
 	cameraTransform = networkCamera.transform;
+}
+
+static function getPrimaryNode() {
+	if (primaryNode != null) {
+		return primaryNode;
+	} else if (primaryNode == null && nodes.Count == 0) {
+		return null;
+	} else {
+		for (var node in nodes) { selectPrimaryNode(node); return node; }
+	}
 }
 
 static var last_click_time = 0.0;

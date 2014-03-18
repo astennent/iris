@@ -8,8 +8,12 @@ class Stats {
 	private var countValue : int;
 	private var sumValue : float;
 	private var attribute : Attribute;
+	private var uniqueValueCount : int;
 
 	private var valid : boolean = false;
+
+	private var values : List.<float>;
+	private var uniqueValues : HashSet.<float>;
 
 	function setStatsAttribute(attribute : Attribute) {
 		minValue = 0;
@@ -44,6 +48,11 @@ class Stats {
 		return countValue;
 	}
 
+	function getUniqueValueCount() {
+		updateStats();
+		return uniqueValueCount;
+	}
+
 	function getAverage() {
 		if (maxValue != minValue) {
 			return sumValue/countValue;
@@ -58,19 +67,20 @@ class Stats {
 			return;
 		}
 
-		var values = new List.<float>();
+		values = new List.<float>();
+		uniqueValues = new HashSet.<float>();
 
 		if (attribute.file.linking_table) {
-			values = updateValuesForLinkingTable(values);
+			updateValuesForLinkingTable();
 		} else {
-			values = updateValuesForNormalTable(values);
+			updateValuesForNormalTable();
 		}
 
-		calculateStats(values);
+		calculateStats();
 	}
 
 // There is no central location for connections in linking tables, so this is expensive.
-	private function updateValuesForLinkingTable(values : List.<float>) {
+	private function updateValuesForLinkingTable() {
 		// Find all files that are be connected with the linking table.
 		var filesToCheck = new HashSet.<DataFile>();
 		for (var fkey in attribute.file.getForeignKeys(true)) {
@@ -88,29 +98,27 @@ class Stats {
 				for (var connection in node.getConnections(true)) {
 					//check that the connection's data source is this file.
 					if (connection.source == file) {
-						values = addValue(connection, values);
+						addValue(connection);
 					}
 				}
 			}
 
 			checkedFiles.Add(file);
 		}
-		return values;
 	}
 
-	private function updateValuesForNormalTable(values : List.<float>) {
+	private function updateValuesForNormalTable() {
 		var nodes = attribute.file.getNodes();
 		for (var node in nodes) {
-			values = addValue(node, values);
+			addValue(node);
 		}
-		return values;
 	}
 
 	//Adds a single data point to the collection
-	private function addValue(data : Data, values : List.<float>) {
+	private function addValue(data : Data) {
 		var val = data.GetNumeric(attribute);
 		values.Add(val);
-		return values;
+		uniqueValues.Add(val);
 	}
 
 	//Marks stats as invalid. They will be updated whenever they are required.
@@ -118,9 +126,10 @@ class Stats {
 		valid = false;
 	}
 
-	private function calculateStats(values : List.<float>) {
+	private function calculateStats() {
 
 		countValue = values.Count;
+		uniqueValueCount = uniqueValues.Count;
 		
 		if (countValue == 0) {
 			minValue = 0;
@@ -144,11 +153,27 @@ class Stats {
 		}
 
 		valid = true;
+
+		// Is this useless optimization?
+		values.Clear();
+		uniqueValues.Clear();
 	}
 
 	public function genFractionalColor(data : Data) : Color {
 		var num = data.GetNumeric(attribute);
-		return ColorController.GenFractionalColor(num-getMin(), getMax()-getMin());
+		return ColorController.GenFractionalColor(getFraction(num));
+	}
+
+	public function getFraction(data : Data) {
+		return getFraction(data.GetNumeric(attribute));
+	}
+
+	public function getFraction(num : float) {
+		if (getRange() == 0) {
+			return 0;
+		} else {
+			return ( num-getMin() ) / getRange();
+		}
 	}
 
 }
