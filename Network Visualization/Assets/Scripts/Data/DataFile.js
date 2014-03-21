@@ -25,7 +25,10 @@ var shown_indices : int[];
 
 var first_row : String[]; 
 
-var nodes = new Dictionary.<String, Node>();
+private var nodes = new Dictionary.<String, Node>();
+private var nodeListCache : List.<Node>;
+private var nodeListCacheTimed : List.<Node>;
+private var hasValidNodeLists = false;
 
 var isDemoFile : boolean = false;
 
@@ -355,8 +358,8 @@ class DataFile {
 		//Process self
 		if (linking_table) {
 			for (var foreignKey in foreignKeys) {
-				for (var node in foreignKey.to_file.nodes){
-					node.Value.DeactivateConnections(foreignKey);
+				for (var node in foreignKey.to_file.getNodes()){
+					node.DeactivateConnections(foreignKey);
 				}
 			}
 		} else {
@@ -473,7 +476,8 @@ class DataFile {
 	    if (cur > max ) {
 	    	i = 0;
 	    	var x = 5/i;
-	    }	  
+	    }	
+	    invalidateListCache();  
 	}
 
 
@@ -494,8 +498,7 @@ class DataFile {
 				//TODO: special case when the foreign key points exactly to the other file's primary keys.
 				
 				//loop over other file's nodes. This is n^2 argh
-				for (var other_entry in other_file.nodes){
-					var to_node : Node = other_entry.Value;	
+				for (var to_node in other_file.getNodes()){
 		
 					for (var pair in fkeyPairs){					
 
@@ -715,7 +718,41 @@ class DataFile {
 		return sr;
 	}
 
+	function invalidateListCache() {
+		hasValidNodeLists = false;
+	}
+
+	function updateNodeLists() {
+		nodeListCache = new List.<Node>();
+		nodeListCacheTimed = new List.<Node>();
+		for (var node in nodes.Values) {
+			if (node.hasValidTime()) {
+				nodeListCacheTimed.Add(node);
+			}
+			nodeListCache.Add(node);
+		}
+		hasValidNodeLists = true;
+	}
+
 	function getNodes() {
-		return nodes.Values;
+		return getNodes(false);
+	}
+
+	function getNodeDict() {
+		return nodes;
+	}
+
+	function getNodes(respectTimeSeries : boolean) : List.<Node> {
+		if (!hasValidNodeLists) {
+			updateNodeLists();
+		}
+		return (respectTimeSeries) ? nodeListCacheTimed : nodeListCache;
+	}
+
+	function invalidateAllStats() {
+		invalidateListCache();
+		for (var attribute in attributes) {
+			attribute.invalidate();
+		}
 	}
 }

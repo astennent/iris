@@ -94,7 +94,7 @@ class Stats {
 				continue;				
 			} 
 
-			for (var node in file.getNodes()) {
+			for (var node in file.getNodes(true)) {
 				for (var connection in node.getConnections(true)) {
 					//check that the connection's data source is this file.
 					if (connection.source == file) {
@@ -108,7 +108,7 @@ class Stats {
 	}
 
 	private function updateValuesForNormalTable() {
-		var nodes = attribute.file.getNodes();
+		var nodes = attribute.file.getNodes(true);
 		for (var node in nodes) {
 			addValue(node);
 		}

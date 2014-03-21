@@ -1,4 +1,4 @@
-#pragma downcast
+#pragma strict
 
 private static var BOX_RANGE : float = 1000;
 
@@ -27,7 +27,11 @@ static function getPrimaryNode() {
 	} else if (primaryNode == null && nodes.Count == 0) {
 		return null;
 	} else {
-		for (var node in nodes) { selectPrimaryNode(node); return node; }
+		//Choose the first node.
+		var enumerator = nodes.GetEnumerator();
+		enumerator.MoveNext();
+		selectPrimaryNode(enumerator.Current);
+		return primaryNode;
 	}
 }
 
@@ -72,7 +76,7 @@ function LateUpdate(){
 }
 
 static function ProcessDrag(){
-	if(!Input.GetMouseButton(0)  || !networkCamera.freeCamera){
+	if(!Input.GetMouseButton(0)  || !CameraController.isFree()){
 		dragging = false;
 		return;
 	}
@@ -113,7 +117,7 @@ static function ProcessDrag(){
 }
 
 private function ProcessBoxing(){
-	if (dragging || !networkCamera.freeCamera || GraphController.isGraphing()){
+	if (dragging || !CameraController.isFree() || GraphController.isGraphing()){
 		boxing = false;
 		return;
 	}
@@ -125,6 +129,7 @@ private function ProcessBoxing(){
 }
 
 private function startBoxing() {
+	print("Start Boxing");
 	boxing = true;
 	clearedSelectionSinceBoxStart = false;
 	startCoords = Input.mousePosition;
@@ -172,8 +177,7 @@ private function selectBoxedItems(){
 	var bottom = Mathf.Max(mouseCoords.y, startCoords.y);
 
 	for (var file : DataFile in FileManager.files){
-		for (var entry in file.nodes){
-			var node : Node = entry.Value.GetComponent(Node);
+		for (var node in file.getNodes(true)){
 			if (Vector3.Distance(node.transform.position, Camera.main.transform.position) < BOX_RANGE) {
 				var node_coords = Camera.main.WorldToScreenPoint(node.transform.position);
 				node_coords.y = Screen.height - node_coords.y; //stupid unity.
@@ -202,8 +206,7 @@ static function selectAllInGroup(group_id : int, clear : boolean){
 		clearSelectedNodes();
 	}
 	for (var file : DataFile in FileManager.files){
-		for (var entry in file.nodes){
-			var node : Node = entry.Value.GetComponent(Node);
+		for (var node in file.getNodes()){
 			if (node.group_id == group_id){
 				nodes.Add(node);
 				node.setSelected(true);
@@ -214,8 +217,7 @@ static function selectAllInGroup(group_id : int, clear : boolean){
 
 static function selectAll(){
 	for (var file : DataFile in FileManager.files){
-		for (var entry in file.nodes){
-			var node : Node = entry.Value.GetComponent(Node);
+		for (var node in file.getNodes()){
 			nodes.Add(node);
 			node.setSelected(true);	
 		}

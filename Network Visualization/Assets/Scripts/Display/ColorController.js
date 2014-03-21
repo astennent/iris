@@ -48,8 +48,7 @@ static function moveRuleDown(i : int){
 static function ApplyAllRules(){
 	//reset all halos.
 	for (var file : DataFile in FileManager.files){
-		for (var entry in file.nodes){
-			var node : Node = entry.Value;
+		for (var node in file.getNodes()){
 			node.resetColorRules();
 		}
 	}
@@ -107,9 +106,8 @@ private static function ApplyFallbackRule(rule : ColorRule, change_color : boole
 			}
 	} else if (rule_type == 2) {
 		for (var file in FileManager.files){
-			var nodes = file.nodes;
-			for (var entry in nodes){
-				var node : Node = entry.Value;
+			var nodes = file.getNodes();
+			for (var node in nodes){
 				var color : Color = rule.getColor();
 				ColorNodeForRule(node, rule, color, change_color, change_size);
 			}
@@ -127,8 +125,8 @@ static function ColorByCluster(cluster_id : int, rule  : ColorRule, change_color
 
 static function ColorBySource(file : DataFile, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
-	for (var node in file.nodes){
-		ColorNodeForRule(node.Value, rule, color, change_color, change_size);
+	for (var node in file.getNodes()){
+		ColorNodeForRule(node, rule, color, change_color, change_size);
 	}
 }
 //color nodes based on a certain attribute value.
@@ -137,9 +135,9 @@ static function ColorByAttribute(attribute : Attribute, value : String, rule  : 
 	var file : DataFile = attribute.file;
 	var attr_index : int = file.attributes.IndexOf(attribute);
 
-	for (var node in file.nodes){
-		if (node.Value.Get(attr_index) == value) { 
-			ColorNodeForRule(node.Value, rule, color, change_color, change_size);
+	for (var node in file.getNodes()){
+		if (node.Get(attr_index) == value) { 
+			ColorNodeForRule(node, rule, color, change_color, change_size);
 		}
 	}
 }

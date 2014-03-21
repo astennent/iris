@@ -1,4 +1,4 @@
-#pragma downcast
+#pragma strict
 
 class SearchMenu extends BaseMenu {
 
@@ -43,10 +43,10 @@ class SearchMenu extends BaseMenu {
 	    
 	    var count = 0;
 	    GUI.skin.button.alignment = TextAnchor.MiddleLeft;
-	    for (var match : Node in matches){
+	    for (var match : Node in matches) {
 	    	GUI.color = match.getMenuColor();
 	    	if (GUI.Button(Rect (10,count*30,width,30), match.getDisplayName())){
-	    		Camera.main.GetComponent(NetworkCamera).JumpTo(match.name);
+	    		Camera.main.GetComponent(NetworkCamera).setTarget(match);
 	    	}
 	    	if (count == match_index){
 	    		GUI.Button (Rect (0,count*30,10,30), "");
@@ -72,7 +72,7 @@ class SearchMenu extends BaseMenu {
 	       			lastScrollTime = Time.time;
 	       		}
 	       	} else if (e.keyCode == KeyCode.Return && matches.Count > 0){
-				Camera.main.GetComponent(NetworkCamera).JumpTo(matches[match_index].name);     		
+				Camera.main.GetComponent(NetworkCamera).setTarget(matches[match_index]);     		
 	       	} else if (e.keyCode == KeyCode.Escape){
 	       		DisableDisplay(SearchMenu);
 	       	}

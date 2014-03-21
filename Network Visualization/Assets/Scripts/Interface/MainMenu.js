@@ -80,7 +80,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 80;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(1, 0, 0);
-			if (Camera.main.GetComponent(NetworkCamera).freeCamera){
+			if (CameraController.isFree()){
 				var lock_pic = unlocked;
 				var tooltip = "Lock Camera";			
 			}	else {
@@ -88,7 +88,7 @@ class MainMenu extends BaseMenu {
 				tooltip = "Unlock Camera";
 			}
 			if (GUI.Button(button_position, lock_pic)){
-				Camera.main.GetComponent(NetworkCamera).ToggleLocked();
+				CameraController.toggleFree();
 			}
 
 			

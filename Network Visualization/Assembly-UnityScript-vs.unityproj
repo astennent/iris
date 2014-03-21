@@ -46,6 +46,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Camera\CameraController.js" />
+     <Compile Include="Assets\Scripts\Camera\FreeCamera.js" />
+     <Compile Include="Assets\Scripts\Camera\GraphingCamera.js" />
      <Compile Include="Assets\Scripts\Camera\NetworkCamera.js" />
      <Compile Include="Assets\Scripts\Clustering\CentralityController.js" />
      <Compile Include="Assets\Scripts\Clustering\ClusterController.js" />

@@ -50,6 +50,7 @@ static function toggleEnabled() {
 static function setEnabled(timeSeriesEnabled : boolean) {
 	this.timeSeriesEnabled = timeSeriesEnabled;
 	validateAllTimeObjects();
+	FileManager.invalidateAllStats();
 }
 
 static function getCurrentDate() {
@@ -58,8 +59,9 @@ static function getCurrentDate() {
 static function setCurrentDate(date : Date) {
 	var dates_equivalent = datesAreEquivalent(current_date, date);
 	current_date = date;
-	if (!dates_equivalent) {
+	if (!dates_equivalent && timeSeriesEnabled) {
 		validateAllTimeObjects();
+		FileManager.invalidateAllStats();
 	}
 }
 
@@ -178,7 +180,7 @@ static function updateDates(width : int) {
 
 static function validateAllTimeObjects() {
 	for (var file in FileManager.files) {
-		for (var node in file.nodes.Values) {
+		for (var node in file.getNodes()) {
 			node.validateDate();
 		}
 	}

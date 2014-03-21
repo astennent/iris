@@ -74,9 +74,6 @@ static function CalculateDegreeCentrality(){
 		for (var node in nodes) {			
 			//Degree centrality is simply a count of connected nodes.
 			var node_centrality : float = node.getConnections(true).Count;
-			if (node.Get(1) == "al-Qaeda") {
-				print(node_centrality);
-			}
 			degreeCentralities[node] = node_centrality;
 
 			var group_id = node.group_id;

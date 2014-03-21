@@ -79,7 +79,7 @@ class HistogramController extends MonoBehaviour {
 			try {
 			counts[bucket[0], bucket[1], bucket[2]] += 1;
 			} catch(e) {
-				print(bucket[0] + " " + bucket[1] + " " + bucket[2]);
+				//print(bucket[0] + " " + bucket[1] + " " + bucket[2]);
 			}
 
 		}

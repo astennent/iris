@@ -12,9 +12,8 @@ static function ReInit(){
 	
 	//Reset group ids
 	for (var file in FileManager.files){
-		var nodes = file.nodes;
-		for (var entry in nodes){
-			var node : Node = entry.Value;
+		var nodes = file.getNodes();
+		for (var node in nodes){
 			node.group_id = -1;
 		}
 	}
@@ -23,10 +22,9 @@ static function ReInit(){
 	group_dict.Clear();
 
 	for (var file in FileManager.files){
-		nodes = file.nodes;
-		for (entry in nodes){ //loop over the node names
-			node = entry.Value;		
-	
+		nodes = file.getNodes();
+		for (node in nodes){ //loop over the node names
+
 			//if you haven't seen this node before, create a new group for it.
 			if (node.group_id == -1){			
 				var to_be_checked : List.<Node> = new List.<Node>();
@@ -56,9 +54,8 @@ static function ReInit(){
 	//At this point, all nodes' group_ids have been initialized. All that's left is to put them in a dictionary.
 	var index : int = 0;
 	for (var file in FileManager.files){
-		nodes = file.nodes;		
-		for (var entry in nodes){ //loop over the node names
-			node = entry.Value;
+		nodes = file.getNodes();		
+		for (var node in nodes){ //loop over the node names
 			if (!group_dict.ContainsKey(node.group_id)){
 				group_dict[node.group_id] = new List.<Node>();
 				leaders[index] = node;

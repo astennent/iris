@@ -43,7 +43,6 @@ class BarController extends MonoBehaviour {
 		
 		// Use the number of ticks from the AxisController to determine the number of buckets.
 		numBuckets[axisIndex] = AxisController.getTickCounts()[axisIndex]+1;
-		var uniqueCount = attribute.getUniqueValueCount();
 
 		// Only use one bucket for the counting axis.
 		if (attribute == null) {
@@ -53,7 +52,7 @@ class BarController extends MonoBehaviour {
 
 		// If every unique value cannot get its own column, the number of bars 
 		// can be reduced to fit naturally inside the tick counts.
-		else if (uniqueCount > numBuckets[axisIndex] && numBuckets[axisIndex] > 1) {
+		else if (attribute.getUniqueValueCount() > numBuckets[axisIndex] && numBuckets[axisIndex] > 1) {
 			representativeTracker[axisIndex] = false;
 			numBuckets[axisIndex] -= 1;
 		} 

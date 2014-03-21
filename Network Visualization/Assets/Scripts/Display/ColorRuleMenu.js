@@ -126,14 +126,14 @@ class ColorRuleMenu extends BaseMenu {
 			
 			var line_count : int  = 0;
 			for (var file : DataFile in FileManager.files){
-				line_count += file.nodes.Count + 3;
+				line_count += file.getNodes().Count + 3;
 			}
 
 			clusterScrollPosition = GUI.BeginScrollView (scrollBox, 
 				clusterScrollPosition, Rect (0, 0, width, 20*line_count+20));
 
 			for (var file : DataFile in FileManager.files){
-				for (var entry in file.nodes){
+				for (var entry in file.getNodeDict()){
 					var node = entry.Value;
 					var key = entry.Key;
 					var usedNodeBefore = rule.usesNode(node);
@@ -230,9 +230,8 @@ class ColorRuleMenu extends BaseMenu {
 			}
 		}
 		attributeMatchCount = 0;
-		for (var node in file.nodes){
-			var data = node.Value;
-			var value = data.Get(attribute_index);
+		for (var node in file.getNodes()){
+			var value = node.Get(attribute_index);
 			var value_string = (value+"")/*.ToLower()*/;
 			if (value_string.StartsWith(searchString/*.ToLower()*/) && !attributeValueCache.Contains(value)){
 				if (attributeMatchCount < 20){

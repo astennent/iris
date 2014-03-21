@@ -21,6 +21,7 @@ class GraphMenu extends BaseMenu {
 
 		if (displaying) {
 			var cur_y = DrawEnableButton(40);
+			cur_y = DrawCameraButtons(cur_y);
 			cur_y = DrawFileSelection(cur_y);
 			if (GraphController.getFile() != null) {
 				cur_y = DrawMethodSelection(cur_y);
@@ -80,6 +81,27 @@ class GraphMenu extends BaseMenu {
 		}
 
 		return cur_y+30;
+	}
+
+	private function DrawCameraButtons(cur_y : int) {
+
+		cur_y += 5;
+
+		var buttonHeight = 40;
+		var spacing = 8;
+		var numButtons = 5;
+		var buttonWidth = buttonHeight;
+		var buttonX = x + width/2 - (buttonWidth*numButtons + spacing*(numButtons-1))/2;
+
+		for (var i = 0 ; i < numButtons ; i++) {
+			var buttonRect = new Rect(buttonX, cur_y, buttonWidth, buttonHeight);
+			if (GUI.Button(buttonRect, "")) {
+				GraphingCamera.setPositionIndex(i);
+			}
+			buttonX += buttonWidth + spacing;
+		}
+
+		return cur_y + 40;
 	}
 
 	private function DrawOptions(cur_y : int) {

@@ -10,8 +10,7 @@ static function UpdateMatches(searchString : String){
 	matches = new List.<Node>();
 
 	for (var file in FileManager.files){
-		for (var entry in file.nodes){
-			var node = entry.Value;
+		for (var node in file.getNodes()){
 			if (searchString != "" && node.getDisplayName().Contains(searchString)){
 				matches.Add(node);
 			}					

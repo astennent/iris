@@ -145,9 +145,8 @@ static function ActivateFile(index : int){
 
 static function UpdateNodeSizes(){
 	for (var file in files){
-		var nodes = file.nodes;
-		for (var entry in nodes){
-			var node : Node = entry.Value;
+		var nodes = file.getNodes();
+		for (var node in nodes){
 			node.UpdateSize();
 		}
 	}
@@ -160,4 +159,10 @@ static function getFileIndex(file : DataFile) {
 		}
 	}
 	return -1;
+}
+
+static function invalidateAllStats() {
+	for (var file in files) {
+		file.invalidateAllStats();
+	}
 }

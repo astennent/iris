@@ -51,9 +51,8 @@ static function isPaused() : boolean {
 function Update(){
 	if (Input.GetButtonDown("Scatter")){
 		for (var file in FileManager.files){
-			var nodes = file.nodes;
-			for (entry in nodes){ //loop over the node names
-				var node = entry.Value;
+			var nodes = file.getNodes();
+			for (node in nodes){ //loop over the node names
 				var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
 				node.transform.position = randPos;
 			}

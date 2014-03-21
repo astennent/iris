@@ -87,13 +87,16 @@ class GraphController extends MonoBehaviour {
 		return graphing;
 	}
 
-	static function toggleGraphing(){
+	static function toggleGraphing() {
 		setGraphing(!graphing);
 	}
 	static function setGraphing(graphing : boolean) {
 		this.graphing = graphing;
 		FileManager.UpdateNodeSizes();
 		AxisController.Redraw();
+		if (graphing) {
+			CameraController.useGraphing();
+		}
 	}
 
 	static function setFileIndex(file_index : int) {
@@ -210,9 +213,8 @@ class GraphController extends MonoBehaviour {
 	}
 
 	function UpdateNodesForScatterplot() {
-		var nodes = file.nodes;
-		for (var entry in nodes) {
-			var node = entry.Value;
+		var nodes = file.getNodes(true);
+		for (var node in nodes) {
 			var desired_position : Vector3 = Vector3.zero;
 			for (var i = 0 ; i < 3 ; i++) {
 				var attribute = axes[i];
