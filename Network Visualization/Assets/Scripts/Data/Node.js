@@ -315,6 +315,9 @@ class Node extends TimeObject {
 			Camera.main.transform.parent = null;
 		}
 
+		// Mark all the Stats this node was used in as invalid
+		source.invalidateAllStats();		
+
 		SelectionController.deselectNode(this);
 		Destroy(gameObject);
 	}

@@ -62,6 +62,10 @@ class Connection extends TimeObject {
 	function Deactivate(){
 		from.alertConnectionDeactivated(this);
 		to.alertConnectionDeactivated(this);
+
+		// Update source file to reflect change.
+		source.invalidateAllStats();
+		
 		Destroy(gameObject);
 	}
 

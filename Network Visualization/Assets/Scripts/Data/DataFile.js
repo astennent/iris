@@ -7,15 +7,6 @@ import System.Collections.Generic;
 
 var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
 
-//What the computer thinks the types should be.
-var expected_column_types : boolean[]; //This is global for validation on swapping types.
-
-var using_headers : boolean = true;
-var fname : String = "";
-var has_nodes; //determines whether the file will generate nodes. Edge files do not generate nodes.
-var delimiter : char = ','[0];
-
-var initialized : boolean = false; //used to determine if it should ScanForMetadata on click from the FileMenu. Happens once.
 var imported : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
 
 var linking_table : boolean = false;
@@ -30,37 +21,23 @@ private var nodeListCache : List.<Node>;
 private var nodeListCacheTimed : List.<Node>;
 private var hasValidNodeLists = false;
 
-var isDemoFile : boolean = false;
-
 var timeFrame : TimeFrame;
 
 private var foreignKeys = new List.<ForeignKey>();
 private var inactiveKeys = new List.<ForeignKey>();
 
-/*
-	Logic for headers: If the first row has a number int it, it's probably not a header
-	Logic for types: If the entire column (not including header) is numbers, it is a number.
-		Otherwise, it's text.
-		
-	Note that text and numbers can both be foreign keys, but only numbers can have 
-		continuous coloring by attribute (vs. discrete colors)
-*/	
-
-private var cachedFileContents : List.<List.<String> >; //Contents are stored after load.
-
-class DataFile {
+class DataFile extends LoadableFile {
 
 	//Constructor
 	public function DataFile(fname : String, isDemo : boolean){
 		this.fname = fname; 
 		this.isDemoFile = isDemo;
-		ScanForMetadata();
-	    initialized = true;
+		generateAttributes();
 	    timeFrame = new TimeFrame(this);
 	}
 
-	//Computes header names and creates attributes
-	function ScanForMetadata(){
+	//Computes header names, guesses shown/pkey information, and creates attributes
+	function generateAttributes(){
 		
 		first_row = getFirstRow();
 
@@ -93,55 +70,6 @@ class DataFile {
 	    } 	
 	}
 
-	function splitLine(line : String) {
-		var splitLine = new List.<String>();
-		var escaped : boolean = false;
-
-		for (var x :int =0; x < line.Length ; x++){
-			if (line[x] == "\""[0]){ //match on quotes
-				escaped = !escaped;
-			} else if (!escaped && line[x] == delimiter){
-				var entry = line.Substring(0, x);
-				splitLine.Add(entry);
-				line = line.Substring(x+1);
-				x=-1;
-			}
-			if (x == line.Length-1) {
-				splitLine.Add(line);
-			}
-		}
-		var output : String[] = new String[splitLine.Count];
-	    //remove extra quotes
-		for (x = 0 ; x < splitLine.Count ; x++){
-			entry = splitLine[x];
-			if (entry.Length > 1 && entry[0] == "\"" && entry[entry.Length-1] == "\"") {
-				entry = entry.Substring(1, entry.Length-2);
-			}
-			output[x] = entry;
-		}
-		return output;
-	}
-
-	//determines if the number passed variable is a number.
-	function isNumber(n : String) {
-		try { 
-			var num = float.Parse(n);
-			return true;
-		} catch (err){
-			return false;
-		}
-	}
-
-	//gets everything in the file name after the trailing /
-	function shortName(){
-		if (fname.Contains("\\")){
-			return fname.Substring(fname.LastIndexOf("\\")+1);
-		} else if (fname.Contains("/")){
-			return fname.Substring(fname.LastIndexOf("/")+1);
-		} else {
-			return fname;
-		}
-	}
 
 	function ToggleUsingHeaders() {
 		using_headers = !using_headers;	
@@ -150,6 +78,7 @@ class DataFile {
 	    	if (using_headers){
 	    		attribute.setColumnName(first_row[i]);
 	    	} else {
+	    		//TODO: Generate the node.
 	    		attribute.setColumnName('col'+i);
 	    	}
 	    } 	
@@ -436,8 +365,6 @@ class DataFile {
 		return list;
 	}
 
-
-
 	function GenerateNodes(){
 		//TODO: destroy nodes and connections.
 		nodes = new Dictionary.<String, Node>();
@@ -646,77 +573,6 @@ class DataFile {
 		pkey_indices = output;
 	}
 
-	function getFirstRow() : String[] {
-		try {
-			var sr = getStreamReader();
-
-			if (  sr != null && sr.Peek() != -1  ) {
-				var line : String = sr.ReadLine();
-				return splitLine(line);
-			}
-
-			if (sr != null) sr.Close();
-		} catch (err){
-			print("" + err);
-			if (sr != null) sr.Close();
-		}
-
-		return null;
-	}
-
-	function getFileContents() : List.<List.<String> > {
-		
-		//If you've already loaded it, use that instead.
-		if (cachedFileContents != null) {
-			return cachedFileContents;
-		}
-
-		var output = new List.<List.<String> >();
-		try {		
-			var sr = getStreamReader();
-
-			//If you use headers, skip first row.
-			var on_first_row = using_headers;
-
-			while (  sr != null && sr.Peek() != -1  ) {
-				if (on_first_row) {
-					on_first_row = false;
-					sr.ReadLine(); //read and drop the first line.
-					continue;
-				}
-				var row = new List.<String>();
-				var line : String = sr.ReadLine();
-				var splitLine : String[] = splitLine(line);
-				for (var cell in splitLine) {
-					row.Add(cell);
-				}
-				output.Add(row);
-			}
-
-			if (sr != null) sr.Close();
-		} catch (err){
-			Debug.Log("" + err);
-
-			if (sr != null) sr.Close();
-		}
-
-		//cache for later use.
-		cachedFileContents = output;
-		
-		return output;
-	}
-
-	function getStreamReader() : IrisStreamReader{
-		var sr : IrisStreamReader = null; //StreamReader interface.
-		if (isDemoFile) {
-			sr = new DemoStreamReader();
-			sr.setCurrentFile(fname);
-		} else {
-			sr = new DefaultStreamReader();
-			sr.setCurrentFile(fname);
-		}
-		return sr;
-	}
 
 	function invalidateListCache() {
 		hasValidNodeLists = false;
