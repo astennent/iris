@@ -24,7 +24,6 @@ private var hasValidNodeLists = false;
 var timeFrame : TimeFrame;
 
 private var foreignKeys = new List.<ForeignKey>();
-private var inactiveKeys = new List.<ForeignKey>();
 
 class DataFile extends LoadableFile {
 
@@ -70,7 +69,6 @@ class DataFile extends LoadableFile {
 	    } 	
 	}
 
-
 	function ToggleUsingHeaders() {
 		using_headers = !using_headers;	
 	    for (var i = 0 ; i < attributes.Count ; i++){
@@ -95,14 +93,6 @@ class DataFile extends LoadableFile {
 			if (fkey == foreignKey){
 				checkAspectReset(fkey);
 				foreignKeys.RemoveAt(i);
-				return;
-			}
-		}
-		for (var j = 0 ; j < inactiveKeys.Count ; j++){
-			var inactiveKey = inactiveKeys[j];
-			if (fkey == inactiveKey){
-				checkAspectReset(fkey);
-				inactiveKeys.RemoveAt(j);
 				return;
 			}
 		}
@@ -160,33 +150,10 @@ class DataFile extends LoadableFile {
 		}
 	}
 
-	//promote or demote a foreign key based on it's number of attributes.
-	//called by ForeignKey
-	function promoteFkey(fkey : ForeignKey){
-		for (var i = 0 ; i < inactiveKeys.Count ; i++){
-			var inactiveKey = inactiveKeys[i];
-			if (fkey == inactiveKey){
-				foreignKeys.Insert(0, fkey);
-				inactiveKeys.RemoveAt(i);
-				return;
-			}
-		}
-	}
-	function demoteFkey(fkey : ForeignKey){
-		for (var i = 0 ; i < foreignKeys.Count ; i++){
-			var foreignKey = foreignKeys[i];
-			if (fkey == foreignKey){
-				foreignKeys.RemoveAt(i);
-				inactiveKeys.Insert(0, fkey);
-				return;
-			}
-		}
-	}
-
-	//creates an empty foreign key and marks it as inactive.
+	//creates an empty foreign key.
 	function createEmptyFkey(other_file : DataFile){
 		var foreignKey = new ForeignKey(this, other_file, this);
-		inactiveKeys.Add(foreignKey);
+		foreignKeys.Add(foreignKey);
 	}
 
 	function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
@@ -223,17 +190,7 @@ class DataFile extends LoadableFile {
 		return false;
 	}
 
-	function getForeignKeys(includeInactive : boolean){
-		if (includeInactive){
-			var output = new List.<ForeignKey>();
-			for (var ikey in inactiveKeys){
-				output.Add(ikey);
-			}
-			for (var key in foreignKeys){
-				output.Add(key);
-			}
-			return output;
-		}
+	function getForeignKeys(){
 		return foreignKeys;
 	}
 
@@ -450,6 +407,8 @@ class DataFile extends LoadableFile {
 	}
 		
 	function GenerateConnectionsForLinkingTable(){
+
+		Debug.Log(foreignKeys.Count);
 
 		var fileContents = getFileContents();
 		for (var row in fileContents) {

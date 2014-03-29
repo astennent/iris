@@ -169,7 +169,7 @@ class Attribute extends Stats {
 
 	function getSimpleFKeys() {
 		var output = new List.<ForeignKey>();
-		for (var fkey in file.getForeignKeys(true)) {
+		for (var fkey in file.getForeignKeys()) {
 			var keyPairs = fkey.getKeyPairs();
 			if (keyPairs.Count == 1 && keyPairs[0][0] == this) {
 				output.Add(fkey);

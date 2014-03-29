@@ -83,7 +83,7 @@ class Stats {
 	private function updateValuesForLinkingTable() {
 		// Find all files that are be connected with the linking table.
 		var filesToCheck = new HashSet.<DataFile>();
-		for (var fkey in attribute.file.getForeignKeys(true)) {
+		for (var fkey in attribute.file.getForeignKeys()) {
 			filesToCheck.Add(fkey.to_file);
 		}
 

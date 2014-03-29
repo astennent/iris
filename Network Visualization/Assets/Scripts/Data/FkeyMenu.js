@@ -62,7 +62,7 @@ class FkeyMenu extends BaseMenu {
 		}
 					
 		//display all active keys
-		var foreignKeys = file.getForeignKeys(true);
+		var foreignKeys = file.getForeignKeys();
 		cur_y += 40;
 		for (var fkey_index = 0 ; fkey_index < foreignKeys.Count ; fkey_index++){
 			var foreignKey = foreignKeys[fkey_index];

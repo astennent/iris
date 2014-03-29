@@ -5,7 +5,6 @@ var from_file : DataFile; //
 var to_file : DataFile;
 var source_file : DataFile;
 var isBidirectional : boolean = false;
-var activated : boolean = false;
 
 private var weightAttribute : Attribute = null;
 private var weightModifier : float = 1.0;
@@ -35,7 +34,6 @@ class ForeignKey {
 		from.setAspect(Attribute.FOREIGN_KEY, true);
 
 		keyPairs.Add(tuple);
-		activated = true;
 	}
 
 	function removeKeyPair(from : Attribute, to : Attribute){
@@ -49,17 +47,6 @@ class ForeignKey {
 
 	function removeKeyPair(index : int){
 		keyPairs.RemoveAt(index);
-		checkActivated();
-	}
-
-	function checkActivated(){
-		if (keyPairs.Count == 0 && activated){
-			activated = false;
-			from_file.demoteFkey(this);
-		} else if (keyPairs.Count > 0 && !activated){
-			activated = true;
-			from_file.promoteFkey(this);
-		}
 	}
 
 	function getKeyPairs(){
