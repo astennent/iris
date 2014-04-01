@@ -6,7 +6,7 @@ class Node extends TimeObject {
 
 	private var label : GameObject;
 
-	private var connections : List.<Connection>;
+	private var connections : LinkedList.<Connection>;
 	var connectionPrefab : GameObject;
 	var lineMat : Material;
 	var color : Color;
@@ -44,7 +44,7 @@ class Node extends TimeObject {
 		label.transform.parent = this.transform;
 		UpdateSize();
 		
-		connections = new List.<Connection>();
+		connections = new LinkedList.<Connection>();
 		
 		sizing_type = 0; //by # connections
 			
@@ -76,7 +76,7 @@ class Node extends TimeObject {
 		}
 		var newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
 		newConn.Init(connectionSource, lineMat, color, isOutgoing, this, other, foreignKey);
-		connections.Add( newConn );
+		connections.AddLast( newConn );
 		UpdateSize();
 		return newConn;
 	}
@@ -96,8 +96,7 @@ class Node extends TimeObject {
 		setRender(true);
 		var oldRotation = transform.rotation;
 		
-		for (var i = 0 ; i < connections.Count ; i++){
-			var connection = connections[i];
+		for (var connection in connections) {
 			var other_node : Node = connection.to;
 
 			//Do not process the connection if the connection or node is not in the correct time.
@@ -324,42 +323,38 @@ class Node extends TimeObject {
 
 	//deactivate connections that go to a certain file, presumably because you just deactivated it.
 	function DeactivateConnections(file : DataFile){
-		var replacement_connections = new List.<Connection>();
-		for (var x = 0 ; x < connections.Count ; x++){
-			var connection = connections[x];
-			if (connection.to.source == file){
+		var entry = connections.First;
+		while (entry != null) {
+			var nextEntry = entry.Next;
+			var connection = entry.Value;
+			if (connection.to.source == file) {
 				connection.Deactivate();
-				x--;
-			} else {
-				replacement_connections.Add(connection);
+				connections.Remove(connection);
 			}
+			entry = nextEntry;
 		}
-		connections = replacement_connections;
+
 		UpdateSize();
 	}
 
 	function DeactivateConnections(foreignKey : ForeignKey) {
-		var replacement_connections = new List.<Connection>();
-		for (var x = 0 ; x < connections.Count ; x++){
-			var connection = connections[x];
-			if (connection.foreignKey == foreignKey){
+		var entry = connections.First;
+		while (entry != null) {
+			var nextEntry = entry.Next;
+			var connection = entry.Value;
+			if (connection.foreignKey == foreignKey) {
 				connection.Deactivate();
-				x--;
-			} else {
-				replacement_connections.Add(connection);
+				connections.Remove(connection);
 			}
+			entry = nextEntry;
 		}
-		connections = replacement_connections;
+
 		UpdateSize();
 	}
 
 	//called by connections to alert the node that they've been killed.
 	function alertConnectionDeactivated(connection : Connection){
-		for (var x = 0 ; x < connections.Count ; x++){
-			if (connections[x] == connection) {
-				connections.RemoveAt(x);
-			}
-		}
+		connections.Remove(connection);
 	}
 
 	function Set(attribute : Attribute, value : String) {
@@ -396,15 +391,16 @@ class Node extends TimeObject {
 		dateValidationResizeRequired = true;
 	}
 
+	//TODO: Cache this
 	function getConnections(respectTimeSeries : boolean) {
 		if (!respectTimeSeries) {
 			return connections;
 		}
 
-		var output = new List.<Connection>();
+		var output = new LinkedList.<Connection>();
 		for (var connection in connections) {
 			if (connection.hasValidTime() && connection.to.hasValidTime()) {
-				output.Add(connection);
+				output.AddLast(connection);
 			}
 		}
 		return output;

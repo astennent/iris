@@ -17,8 +17,8 @@ var shown_indices : int[];
 var first_row : String[]; 
 
 private var nodes = new Dictionary.<String, Node>();
-private var nodeListCache : List.<Node>;
-private var nodeListCacheTimed : List.<Node>;
+private var nodeListCache : LinkedList.<Node>;
+private var nodeListCacheTimed : LinkedList.<Node>;
 private var hasValidNodeLists = false;
 
 var timeFrame : TimeFrame;
@@ -538,13 +538,13 @@ class DataFile extends LoadableFile {
 	}
 
 	function updateNodeLists() {
-		nodeListCache = new List.<Node>();
-		nodeListCacheTimed = new List.<Node>();
+		nodeListCache = new LinkedList.<Node>();
+		nodeListCacheTimed = new LinkedList.<Node>();
 		for (var node in nodes.Values) {
 			if (node.hasValidTime()) {
-				nodeListCacheTimed.Add(node);
+				nodeListCacheTimed.AddLast(node);
 			}
-			nodeListCache.Add(node);
+			nodeListCache.AddLast(node);
 		}
 		hasValidNodeLists = true;
 	}
@@ -557,7 +557,7 @@ class DataFile extends LoadableFile {
 		return nodes;
 	}
 
-	function getNodes(respectTimeSeries : boolean) : List.<Node> {
+	function getNodes(respectTimeSeries : boolean) : LinkedList.<Node> {
 		if (!hasValidNodeLists) {
 			updateNodeLists();
 		}

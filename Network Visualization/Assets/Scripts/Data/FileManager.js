@@ -7,7 +7,7 @@ static var files = new List.<DataFile>(); //holds File objects.
 static var dest_directories = new List.<DirectoryInfo>();
 static var dest_files = new List.<FileInfo>();
 
-static var demoMode = false;
+static var demoMode = true;
 
 function Start(){
 	if (demoMode){
