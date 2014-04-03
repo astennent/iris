@@ -1,6 +1,6 @@
 #pragma strict
 
-//extended by Connection and Node
+//extended by Edge and Node
 class TimeObject extends Data {
 
 	static var DEFAULT_DATE = new Date(1, 1, 1);

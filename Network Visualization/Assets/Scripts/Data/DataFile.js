@@ -216,7 +216,7 @@ class DataFile extends LoadableFile {
 		if (!linking_table) {
 			GenerateNodes();
 		}
-		GenerateConnections();
+		GenerateEdges();
 		
 		SearchController.ReInit();
 		ClusterController.ReInit();
@@ -245,15 +245,15 @@ class DataFile extends LoadableFile {
 		if (linking_table) {
 			for (var foreignKey in foreignKeys) {
 				for (var node in foreignKey.to_file.getNodes()){
-					node.DeactivateConnections(foreignKey);
+					node.DeactivateEdges(foreignKey);
 				}
 			}
 		} else {
 			for (var foreignKey in foreignKeys) {
 				var from_file = foreignKey.from_file;
 				var to_file = foreignKey.to_file;
-				from_file.DeactivateConnections(to_file);
-				to_file.DeactivateConnections(from_file);
+				from_file.DeactivateEdges(to_file);
+				to_file.DeactivateEdges(from_file);
 			}
 		}
 		for (var node in nodes) {
@@ -266,9 +266,9 @@ class DataFile extends LoadableFile {
 	}
 
 	//called by linking table files, executed by non-linking tables.
-	function DeactivateConnections(file : DataFile){
+	function DeactivateEdges(file : DataFile){
 		for (var node in nodes){
-			node.Value.DeactivateConnections(file);
+			node.Value.DeactivateEdges(file);
 		}
 	} 
 
@@ -309,7 +309,7 @@ class DataFile extends LoadableFile {
 	private function determineDependents(checked : HashSet.<DataFile>, list : List.<DataFile>) : List.<DataFile> {
 		for (var file in FileManager.files) {
 			if (!checked.Contains(file)) {
-				//see if there's a direct connection to this file.
+				//see if there's a direct edge to this file.
 				for (var fkey in file.foreignKeys) {
 					if (fkey.to_file == this) {
 						checked.Add(file);			
@@ -323,7 +323,7 @@ class DataFile extends LoadableFile {
 	}
 
 	function GenerateNodes(){
-		//TODO: destroy nodes and connections.
+		//TODO: destroy nodes and edges.
 		nodes = new Dictionary.<String, Node>();
 		UpdatePKeyIndices();
 		UpdateShownIndices();
@@ -365,15 +365,15 @@ class DataFile extends LoadableFile {
 	}
 
 
-	function GenerateConnections(){
+	function GenerateEdges(){
 		if (linking_table){
-			GenerateConnectionsForLinkingTable();
+			GenerateEdgesForLinkingTable();
 		} else {
-			GenerateConnectionsForNodeFile();
+			GenerateEdgesForNodeFile();
 		}
 	}
 		
-	function GenerateConnectionsForNodeFile() {
+	function GenerateEdgesForNodeFile() {
 		for (var entry in nodes){
 			var from_node : Node = entry.Value;
 			for (var foreignKey in foreignKeys) {
@@ -392,9 +392,9 @@ class DataFile extends LoadableFile {
 						var to_attribute_index = pair[1].column_index;
 						var to_attribute_value = to_node.Get(to_attribute_index);							
 						
-						//You found a match. Generate a connection.
+						//You found a match. Generate a edge.
 						if (from_attribute_value == to_attribute_value){
-							var newConn = from_node.AddConnection(this, to_node, true, foreignKey); 
+							var newConn = from_node.AddEdge(this, to_node, true, foreignKey); 
 							//Data should be stored in the node.
 							newConn.setDataSource(from_node);
 						}
@@ -406,7 +406,7 @@ class DataFile extends LoadableFile {
 		}
 	}
 		
-	function GenerateConnectionsForLinkingTable(){
+	function GenerateEdgesForLinkingTable(){
 
 		Debug.Log(foreignKeys.Count);
 
@@ -478,24 +478,24 @@ class DataFile extends LoadableFile {
 			foreignKeys[0].setLinkedFKey(foreignKeys[1]);
 			foreignKeys[1].setLinkedFKey(foreignKeys[0]);
 			
-			//TODO: make n-way connections.
+			//TODO: make n-way edges.
 
 			if (matches.Count == 2){
 				for (from_node in matches[0]){
 					for (to_node in matches[1]){
 
-						//The first (outgoing) connection is the one that gets a copy of the data.
-						var first_conn = from_node.AddConnection(this, to_node, true, foreignKeys[0]);
-						first_conn.CopyData(data);	
-						//The second (incoming) connection references the data of the first connection.
-						var second_conn = to_node.AddConnection(this, from_node, false, foreignKeys[1]);
-						second_conn.setDataSource(data);
+						//The first (outgoing) edge is the one that gets a copy of the data.
+						var first_edge = from_node.AddEdge(this, to_node, true, foreignKeys[0]);
+						first_edge.CopyData(data);	
+						//The second (incoming) edge references the data of the first edge.
+						var second_edge = to_node.AddEdge(this, from_node, false, foreignKeys[1]);
+						second_edge.setDataSource(data);
 
 					}
 				}
 			}
 
-			//Remove the template used to make those connections.
+			//Remove the template used to make those edges.
 			MonoBehaviour.Destroy(data);
 	    }
 		   

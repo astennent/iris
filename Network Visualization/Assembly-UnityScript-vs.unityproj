@@ -54,11 +54,11 @@
      <Compile Include="Assets\Scripts\Clustering\ClusterController.js" />
      <Compile Include="Assets\Scripts\Data\Attribute.js" />
      <Compile Include="Assets\Scripts\Data\AttributeMenu.js" />
-     <Compile Include="Assets\Scripts\Data\Connection.js" />
      <Compile Include="Assets\Scripts\Data\Data.js" />
      <Compile Include="Assets\Scripts\Data\DataFile.js" />
      <Compile Include="Assets\Scripts\Data\Datum.js" />
      <Compile Include="Assets\Scripts\Data\DrawLine.js" />
+     <Compile Include="Assets\Scripts\Data\Edge.js" />
      <Compile Include="Assets\Scripts\Data\FileManager.js" />
      <Compile Include="Assets\Scripts\Data\FileMenu.js" />
      <Compile Include="Assets\Scripts\Data\FkeyMenu.js" />

@@ -34,8 +34,8 @@ static function ReInit(){
 					var current_node = to_be_checked[to_be_checked.Count-1];
 					to_be_checked.RemoveAt(to_be_checked.Count-1);
 					current_node.group_id = current_id;			
-					for (var connection : Connection in current_node.getConnections(true)){
-						var other_node = connection.to;
+					for (var edge : Edge in current_node.getEdges(true)){
+						var other_node = edge.to;
 						if (other_node.group_id == -1){
 							to_be_checked.Add(other_node);
 						}

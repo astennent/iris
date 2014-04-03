@@ -73,7 +73,7 @@ static function CalculateDegreeCentrality(){
 		var nodes = entry.Value;
 		for (var node in nodes) {			
 			//Degree centrality is simply a count of connected nodes.
-			var node_centrality : float = node.getConnections(true).Count;
+			var node_centrality : float = node.getEdges(true).Count;
 			degreeCentralities[node] = node_centrality;
 
 			var group_id = node.group_id;
@@ -175,11 +175,11 @@ static function CalculateDistanceSums(from_node : Node) {
 			total_inverted_distance += (1.0/cur_count);
 		}
 
-		for (var connection : Connection in cur_node.getConnections(true)) {
-			var connection_node = connection.to;
-			if (! (alreadySeen.Contains(connection_node))){
-				alreadySeen.Add(connection_node);
-				path_queue.Enqueue(new Path(connection_node, cur_count+1 ));
+		for (var edge : Edge in cur_node.getEdges(true)) {
+			var edge_node = edge.to;
+			if (! (alreadySeen.Contains(edge_node))){
+				alreadySeen.Add(edge_node);
+				path_queue.Enqueue(new Path(edge_node, cur_count+1 ));
 			}
 		}
 	}
@@ -246,14 +246,14 @@ static function CalculateBetweennessSums(from_node : Node) {
 		var cur_node = cur_path.node;
 		var cur_depth = cur_path.depth;
 
-		for (var connection : Connection in cur_node.getConnections(true)) {
-			var connection_node = connection.to;
-			if (! (alreadySeen.ContainsKey(connection_node))){
-				alreadySeen[connection_node] = cur_depth;
-				path_queue.Enqueue(new Path(connection_node, cur_depth+1, cur_path));
+		for (var edge : Edge in cur_node.getEdges(true)) {
+			var edge_node = edge.to;
+			if (! (alreadySeen.ContainsKey(edge_node))){
+				alreadySeen[edge_node] = cur_depth;
+				path_queue.Enqueue(new Path(edge_node, cur_depth+1, cur_path));
 			}
 
-			if (alreadySeen[connection_node] == cur_depth) {
+			if (alreadySeen[edge_node] == cur_depth) {
 				var traceback_path = cur_path;
 				while (traceback_path.depth > 0) {
 					var traceback_node = traceback_path.node;

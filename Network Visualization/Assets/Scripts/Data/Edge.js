@@ -1,25 +1,24 @@
 #pragma strict
 
-class Connection extends TimeObject {
+class Edge extends TimeObject {
 
-	var mat : Material; //the material drawn by the connection.
+	var mat : Material; //the material drawn by the edge.
 	var color : Color; //line color
-	var isOutgoing : boolean; //is the connection an outgoing one? Determines offset, hides self if false and bidirectional is false.
+	var isOutgoing : boolean; //is the edge an outgoing one? Determines offset, hides self if false and bidirectional is false.
 	var from : Node;
 	var to : Node;
-	var foreignKey : ForeignKey; //the foreign key that gave rise to this connection.
+	var foreignKey : ForeignKey; //the foreign key that gave rise to this edge.
 
 	private var lineRenderer : LineRenderer;
 
 	function Init (source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, fkey : ForeignKey) {
-		mat = m;
 		color = c;
 		isOutgoing = o;
 		from = f;
 		to = t;
 		foreignKey = fkey;
 		lineRenderer = GetComponent(LineRenderer);
-		lineRenderer.material = mat;
+		lineRenderer.material = m;
 		lineRenderer.material.color = color;
 
 		this.source = source;		
@@ -33,7 +32,7 @@ class Connection extends TimeObject {
 		}
 
 		//Logic for hiding the lines. Currently only responds to graphing and timeSeries,
-		//TODO: more options for hiding based on rules or one-way connections
+		//TODO: more options for hiding based on rules or one-way edges
 		if (GraphController.isGraphing() || !hasValidTime() ||
 				!from.hasValidTime() || !to.hasValidTime()) {
 			lineRenderer.enabled = false;
@@ -60,8 +59,8 @@ class Connection extends TimeObject {
 	}
 
 	function Deactivate(){
-		from.alertConnectionDeactivated(this);
-		to.alertConnectionDeactivated(this);
+		from.alertEdgeDeactivated(this);
+		to.alertEdgeDeactivated(this);
 
 		// Update source file to reflect change.
 		source.invalidateAllStats();

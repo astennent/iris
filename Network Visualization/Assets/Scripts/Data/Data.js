@@ -1,9 +1,9 @@
 #pragma strict
 
-//Extended by Connection and Node through TimeObject
+//Extended by Edge and Node through TimeObject
 class Data extends MonoBehaviour {
 
-	//Used by Node and Connection.
+	//Used by Node and Edge.
 	var source : DataFile;
 	protected var initialized = false;
 
@@ -11,7 +11,7 @@ class Data extends MonoBehaviour {
 	private var index_dict = new Dictionary.<int, Datum>();
 
 	// Abstract away the source of the data, allowing for non-linking 
-	// connections to share their parent's data without redundancy.
+	// edges to share their parent's data without redundancy.
 	private var dataSource : Data = this;
 
 	//Default Constructor
@@ -56,7 +56,7 @@ class Data extends MonoBehaviour {
 		return dataSource.index_dict;
 	}
 
-	//Used for the construction of Connections.
+	//Used for the construction of Edges.
 	function CopyData(other : Data) {
 		if (other != null) {
 			dataSource.attr_dict = other.getDict();

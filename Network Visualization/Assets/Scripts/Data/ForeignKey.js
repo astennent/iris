@@ -12,7 +12,7 @@ var weightInverted = false;
 static var MIN_WEIGHT_MODIFIER : float = 0.01;
 static var MAX_WEIGHT_MODIFIER : float = 10;
 
-//The other connection if this is a linking table.
+//The other edge if this is a linking table.
 private var linkedFKey : ForeignKey;
 
 

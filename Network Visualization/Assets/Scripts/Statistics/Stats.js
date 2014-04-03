@@ -79,7 +79,7 @@ class Stats {
 		calculateStats();
 	}
 
-// There is no central location for connections in linking tables, so this is expensive.
+// There is no central location for edges in linking tables, so this is expensive.
 	private function updateValuesForLinkingTable() {
 		// Find all files that are be connected with the linking table.
 		var filesToCheck = new HashSet.<DataFile>();
@@ -87,7 +87,7 @@ class Stats {
 			filesToCheck.Add(fkey.to_file);
 		}
 
-		//Loop over those files and check the relevant connections
+		//Loop over those files and check the relevant edges
 		var checkedFiles = new HashSet.<DataFile>();
 		for (var file in filesToCheck) {
 			if (checkedFiles.Contains(file)) {
@@ -95,10 +95,10 @@ class Stats {
 			} 
 
 			for (var node in file.getNodes(true)) {
-				for (var connection in node.getConnections(true)) {
-					//check that the connection's data source is this file.
-					if (connection.source == file) {
-						addValue(connection);
+				for (var edge in node.getEdges(true)) {
+					//check that the edge's data source is this file.
+					if (edge.source == file) {
+						addValue(edge);
 					}
 				}
 			}

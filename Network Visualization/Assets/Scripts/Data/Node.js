@@ -6,10 +6,10 @@ class Node extends TimeObject {
 
 	private var label : GameObject;
 
-	private var connections : LinkedList.<Connection>;
-	var connectionPrefab : GameObject;
+	private var edges : LinkedList.<Edge>;
+	var edgePrefab : GameObject;
 	var lineMat : Material;
-	var color : Color;
+	private var color : Color;
 
 	var reticlePrefab : Reticle; //used to instantiate reticle
 	private var reticle : Reticle; //singleton reticle, instantiated on target
@@ -17,10 +17,10 @@ class Node extends TimeObject {
 	var desiredDistance : float;
 
 
-	var group_id :int = -1; //used by ClusterController to identify which group of connections it belongs to.
+	var group_id :int = -1; //used by ClusterController to identify which group of edges it belongs to.
 	private var activated = true;
 
-	var sizing_types = ["By Connections", "Manual", "By Attribute"];
+	var sizing_types = ["By Edges", "Manual", "By Attribute"];
 	private var sizing_type = 0;
 	private var manual_size : float = 10.0;
 	private var size : float = 2.5; //2.5 is the minimum
@@ -44,9 +44,9 @@ class Node extends TimeObject {
 		label.transform.parent = this.transform;
 		UpdateSize();
 		
-		connections = new LinkedList.<Connection>();
+		edges = new LinkedList.<Edge>();
 		
-		sizing_type = 0; //by # connections
+		sizing_type = 0; //by # edges
 			
 		renderer.material = new Material(NetworkController.getNodeTexture());
 		lineMat = new Material(NetworkController.getLineTexture());
@@ -58,27 +58,27 @@ class Node extends TimeObject {
 		UpdateDate();
 	}
 
-	function setColor(c : Color, colorConnections : boolean){
+	function setColor(c : Color, colorEdges : boolean){
 		color = c;
 		renderer.material.color = color;
-		if (colorConnections){
-			for (connection in connections){
-				connection.setColor(c);
+		if (colorEdges){
+			for (edge in edges){
+				edge.setColor(c);
 			}
 		}
 	}
 
-	function AddConnection (connectionSource : DataFile, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
-		for (var conn in connections){
-			if (conn == other){
+	function AddEdge (edgeSource : DataFile, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
+		for (var edge in edges){
+			if (edge.to == other){
 				return;
 			}
 		}
-		var newConn = GameObject.Instantiate(connectionPrefab).GetComponent(Connection);
-		newConn.Init(connectionSource, lineMat, color, isOutgoing, this, other, foreignKey);
-		connections.AddLast( newConn );
+		var newEdge = GameObject.Instantiate(edgePrefab).GetComponent(Edge);
+		newEdge.Init(edgeSource, lineMat, color, isOutgoing, this, other, foreignKey);
+		edges.AddLast( newEdge );
 		UpdateSize();
-		return newConn;
+		return newEdge;
 	}
 
 
@@ -96,15 +96,15 @@ class Node extends TimeObject {
 		setRender(true);
 		var oldRotation = transform.rotation;
 		
-		for (var connection in connections) {
-			var other_node : Node = connection.to;
+		for (var edge in edges) {
+			var other_node : Node = edge.to;
 
-			//Do not process the connection if the connection or node is not in the correct time.
-			if (!connection.hasValidTime() || !other_node.hasValidTime()) {
+			//Do not process the edge if the edge or node is not in the correct time.
+			if (!edge.hasValidTime() || !other_node.hasValidTime()) {
 				continue;
 			}
 
-			moveRelativeTo(other_node, other_node.size, null, connection);
+			moveRelativeTo(other_node, other_node.size, null, edge);
 		}
 	    
 	    transform.rotation = oldRotation;
@@ -115,32 +115,32 @@ class Node extends TimeObject {
 	
 	}
 
-	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, connection : Connection) {
+	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, edge : Edge) {
 
 		if (NetworkController.isPaused()){
 			return;
 		}
 
 		//Calculate the desired distance.
-		var foreignKey = connection.foreignKey;
+		var foreignKey = edge.foreignKey;
 		var fkeyWeightAttribute = foreignKey.getWeightAttribute();
-		var connectionAttributeWeight : float;
+		var edgeAttributeWeight : float;
 		var averageValue : float;
 
 		if (fkeyWeightAttribute != null) {
-			connectionAttributeWeight = connection.GetNumeric(fkeyWeightAttribute);
+			edgeAttributeWeight = edge.GetNumeric(fkeyWeightAttribute);
 			averageValue = fkeyWeightAttribute.getAverage();
 		} else {
-			connectionAttributeWeight = 1;
+			edgeAttributeWeight = 1;
 			averageValue = 1;
 		}
 
-		//Ratio of the connection weight to the middle weight of the attribute.
+		//Ratio of the edge weight to the middle weight of the attribute.
 		var weightRatio : float;
 		if (averageValue <= 0) { //Don't deal with non-numbers or negatives. TODO: Reconsider ignoring negatives.
 			weightRatio = 1;
 		} else {
-			weightRatio = connectionAttributeWeight / averageValue;
+			weightRatio = edgeAttributeWeight / averageValue;
 			if (weightRatio == 0) {
 				weightRatio = 1;
 			}
@@ -190,9 +190,9 @@ class Node extends TimeObject {
 		if (GraphController.isGraphing() && GraphController.isForcingNodeSize()) {
 			size = GraphController.getForcedNodeSize();
 		} else {
-			if (sizing_type == 0){ //by # connections
-				//Only count connections in the current time.
-				var validCount = getConnections(true).Count;
+			if (sizing_type == 0){ //by # edges
+				//Only count edges in the current time.
+				var validCount = getEdges(true).Count;
 				size = validCount * 1.25 + 1.5;
 			} else if (sizing_type == 1) { //manual
 				size = manual_size;
@@ -287,7 +287,7 @@ class Node extends TimeObject {
 	}
 
 	function resetManualSizing(){
-		//set the sizing type to "by connections"
+		//set the sizing type to "by edges"
 		setSizingType(0);
 	}
 
@@ -321,15 +321,15 @@ class Node extends TimeObject {
 		Destroy(gameObject);
 	}
 
-	//deactivate connections that go to a certain file, presumably because you just deactivated it.
-	function DeactivateConnections(file : DataFile){
-		var entry = connections.First;
+	//deactivate edges that go to a certain file, presumably because you just deactivated it.
+	function DeactivateEdges(file : DataFile){
+		var entry = edges.First;
 		while (entry != null) {
 			var nextEntry = entry.Next;
-			var connection = entry.Value;
-			if (connection.to.source == file) {
-				connection.Deactivate();
-				connections.Remove(connection);
+			var edge = entry.Value;
+			if (edge.to.source == file) {
+				edge.Deactivate();
+				edges.Remove(edge);
 			}
 			entry = nextEntry;
 		}
@@ -337,14 +337,14 @@ class Node extends TimeObject {
 		UpdateSize();
 	}
 
-	function DeactivateConnections(foreignKey : ForeignKey) {
-		var entry = connections.First;
+	function DeactivateEdges(foreignKey : ForeignKey) {
+		var entry = edges.First;
 		while (entry != null) {
 			var nextEntry = entry.Next;
-			var connection = entry.Value;
-			if (connection.foreignKey == foreignKey) {
-				connection.Deactivate();
-				connections.Remove(connection);
+			var edge = entry.Value;
+			if (edge.foreignKey == foreignKey) {
+				edge.Deactivate();
+				edges.Remove(edge);
 			}
 			entry = nextEntry;
 		}
@@ -352,9 +352,9 @@ class Node extends TimeObject {
 		UpdateSize();
 	}
 
-	//called by connections to alert the node that they've been killed.
-	function alertConnectionDeactivated(connection : Connection){
-		connections.Remove(connection);
+	//called by edges to alert the node that they've been killed.
+	function alertEdgeDeactivated(edge : Edge){
+		edges.Remove(edge);
 	}
 
 	function Set(attribute : Attribute, value : String) {
@@ -371,8 +371,8 @@ class Node extends TimeObject {
 		//update its own date.
 		super.UpdateDate();
 		if (source.linking_table) {
-			for (var connection in connections) {
-				connection.UpdateDate();
+			for (var edge in edges) {
+				edge.UpdateDate();
 			}
 		}
 	}
@@ -382,8 +382,8 @@ class Node extends TimeObject {
 		//update its own date.
 		super.validateDate();
 		if (source.linking_table) {
-			for (var connection in connections) {
-				connection.validateDate();
+			for (var edge in edges) {
+				edge.validateDate();
 			}
 		}
 
@@ -392,15 +392,15 @@ class Node extends TimeObject {
 	}
 
 	//TODO: Cache this
-	function getConnections(respectTimeSeries : boolean) {
+	function getEdges(respectTimeSeries : boolean) {
 		if (!respectTimeSeries) {
-			return connections;
+			return edges;
 		}
 
-		var output = new LinkedList.<Connection>();
-		for (var connection in connections) {
-			if (connection.hasValidTime() && connection.to.hasValidTime()) {
-				output.AddLast(connection);
+		var output = new LinkedList.<Edge>();
+		for (var edge in edges) {
+			if (edge.hasValidTime() && edge.to.hasValidTime()) {
+				output.AddLast(edge);
 			}
 		}
 		return output;
