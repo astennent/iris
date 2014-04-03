@@ -149,25 +149,20 @@ class GraphMenu extends BaseMenu {
 			AxisController.setDrawingAxes(!isDrawingAxes);
 		}
 
-		if (!isDrawingAxes) {
-			GUI.color = Color.gray;
-		} else {
-			GUI.color = Color.white;
-		}
-
 		var gridRect = new Rect(x+width/2+30, cur_y+25, width/2-30, 20);
-		var isDrawingGrid = AxisController.isDrawingGrid();
-		if (GUI.Toggle(gridRect, isDrawingGrid, "Draw Grid") != isDrawingGrid && isDrawingAxes) {
-			AxisController.setDrawingGrid(!isDrawingGrid);
+		var wasDrawingGrid = AxisController.isDrawingGrid();
+		var isDrawingGrid = GuiPlus.LockableToggle(gridRect, wasDrawingGrid, "Draw Grid", !isDrawingAxes);
+		if (wasDrawingGrid != isDrawingGrid) {
+			AxisController.setDrawingGrid(isDrawingGrid);			
 		}
 
 		var labelsRect = new Rect(x+width/2+30, cur_y+45, width/2-30, 20);
-		var isDrawingLabels = AxisController.isDrawingLabels();
-		if (GUI.Toggle(labelsRect, isDrawingLabels, "Draw Labels") != isDrawingLabels && isDrawingAxes) {
-			AxisController.setDrawingLabels(!isDrawingLabels);
+		var wasDrawingLabels = AxisController.isDrawingLabels();
+		var isDrawingLabels = GuiPlus.LockableToggle(labelsRect, wasDrawingLabels, "Draw Labels", !isDrawingAxes);
+		if (wasDrawingLabels != isDrawingLabels) {
+			AxisController.setDrawingLabels(isDrawingLabels);			
 		}
 
-		GUI.color = Color.white;
 		return cur_y + 70;
 	}
 

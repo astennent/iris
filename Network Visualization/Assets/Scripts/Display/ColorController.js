@@ -312,6 +312,14 @@ static function randBinary(){ //true or false
 	return false;
 }
 
+static function darkenColor(input : Color) {
+	return new Color(input.r/2, input.g/2, input.b/2);
+}
+
+static function lightenColor(input : Color) {
+	return new Color( (input.r+1)/2, (input.g+1)/2, (input.b+1)/2);
+}
+
 static function handleDateChange() {
 	for (var rule in rules) {
 		

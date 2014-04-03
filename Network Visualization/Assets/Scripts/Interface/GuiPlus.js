@@ -37,4 +37,14 @@ public class GuiPlus extends MonoBehaviour {
 		}
 	}
 
+	static function LockableToggle(r : Rect, on : boolean, text : String, locked : boolean) {
+		var originalColor = GUI.color;
+		if (locked) {
+			GUI.color = ColorController.darkenColor(originalColor);
+		}
+		var result = GUI.Toggle(r, on, text);
+		GUI.color = originalColor;
+		return (locked) ? on : result;
+	}
+
 }

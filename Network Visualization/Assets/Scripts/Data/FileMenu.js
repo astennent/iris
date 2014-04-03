@@ -105,13 +105,13 @@ class FileMenu extends BaseMenu {
 		GUI.Box(menuRect, title);
 		cur_y += 20;
 		var toggle_box = new Rect(x+5, cur_y, 150, 25);
-		var using_headers = GUI.Toggle (toggle_box, file.using_headers, " File uses headers");
+		var using_headers = GuiPlus.LockableToggle(toggle_box, file.using_headers, " File uses headers", file.imported);
 		if (file.using_headers != using_headers){
 			file.ToggleUsingHeaders();
 		}
 		
 		toggle_box.x+=160;
-		file.linking_table = GUI.Toggle (toggle_box, file.linking_table, " Linking Table");
+		file.linking_table = GuiPlus.LockableToggle(toggle_box, file.linking_table, " Linking Table", file.imported);
 		
 		cur_y+=28;
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
@@ -161,7 +161,7 @@ class FileMenu extends BaseMenu {
 			if (attribute.is_pkey){ GUI.color = Attribute.pkeyColor; } 
 			else { GUI.color = Color.white; }		
 			var is_pkey_box = new Rect(63, attribute_y, 20, 20);
-			var pkey_value = GUI.Toggle (is_pkey_box, attribute.is_pkey, "");	
+			var pkey_value = GuiPlus.LockableToggle (is_pkey_box, attribute.is_pkey, "", file.imported);	
 			if (pkey_value != attribute.is_pkey){
 				attribute.TogglePkey();
 			}
