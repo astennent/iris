@@ -4,8 +4,6 @@ import System.IO;
 static var nodePrefab : GameObject;
 var instanceNodePrefab : GameObject;
 
-static var flatten = false;
-
 static var gameSpeed : float = 1;
 private static var paused : boolean = false;
 
@@ -46,23 +44,6 @@ static function TogglePause(){
 }
 static function isPaused() : boolean {
 	return (paused || GraphController.isGraphing());
-}
-
-function Update(){
-	if (Input.GetButtonDown("Scatter")){
-		for (var file in FileManager.files){
-			var nodes = file.getNodes();
-			for (node in nodes){ //loop over the node names
-				var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-				node.transform.position = randPos;
-			}
-		}
-	}
-	
-	if (Input.GetButtonDown("Flatten")){
-		flatten = !flatten;
-	}
-
 }
 
 static function getInstance() {

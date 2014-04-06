@@ -408,8 +408,6 @@ class DataFile extends LoadableFile {
 		
 	function GenerateEdgesForLinkingTable(){
 
-		Debug.Log(foreignKeys.Count);
-
 		var fileContents = getFileContents();
 		for (var row in fileContents) {
 

@@ -105,7 +105,10 @@ class NetworkCamera extends MonoBehaviour {
 			desired_distance = 15 + 2*node.getSize();
 		} 
 
-		CameraController.useNetwork();
+		// Don't switch with free camera or you can't drag.
+		if (!CameraController.isFree()) {
+			CameraController.useNetwork();
+		}
 	}
 
 	function CalculateSelectionCenter() {

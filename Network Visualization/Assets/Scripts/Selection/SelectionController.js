@@ -3,6 +3,8 @@
 private static var BOX_RANGE : float = 1000;
 
 static var dragging : boolean = false;
+private static var dragDistance : float = 30;
+
 static var boxing : boolean = false;
 
 //used to gracefully clear selected nodes when boxing starts
@@ -52,13 +54,11 @@ static function NodeClick(node : Node){
 		}
 		selectPrimaryNode(node); //make this your main node
 	}
-
+	dragDistance = Vector3.Distance(cameraTransform.position, node.transform.position);
 	dragging = true;
 }
 
-static var updated = false;
 function Update () {
-	updated = true;
 	if (dragging){
 		ProcessDrag();
 	}
@@ -71,10 +71,6 @@ function Update () {
     }
 }
 
-function LateUpdate(){
-	updated = false;
-}
-
 static function ProcessDrag(){
 	if(!Input.GetMouseButton(0)  || !CameraController.isFree()){
 		dragging = false;
@@ -82,36 +78,16 @@ static function ProcessDrag(){
 	}
 		
 	if (dragging){
-		var target = primaryNode.transform;
-		var original_position = target.position;
-		
 		var mouseCoords = Input.mousePosition;
-		var coordinates = Camera.main.WorldToScreenPoint(target.position);
-		var x1 = (mouseCoords.x - coordinates.x);
-		var y1 = (mouseCoords.y - coordinates.y);
+		var desiredTargetPosition = Camera.main.ScreenToWorldPoint(Vector3(mouseCoords.x, mouseCoords.y, dragDistance));
 
-		var dist = Vector3.Distance(cameraTransform.position, target.position);		
-		target.position += cameraTransform.right*x1*0.0005*dist;
-		target.position += cameraTransform.up*y1*0.0005*dist;
-		
-		//check the coords again to make sure you didn't pass the mouse
-		//this is to avoid the "shaking effect"
-		var new_coords = Camera.main.WorldToScreenPoint(target.position);
-		var x2 = (mouseCoords.x - new_coords.x);
-		var y2 = (mouseCoords.y - new_coords.y);
-		if (x1 > 0 && x2 < 0 || x1 < 0 && x2 > 0){
-			target.position -= cameraTransform.right*x1*0.0005*dist;
-		}
-		if (y1 > 0 && y2 < 0 || y1 < 0 && y2 > 0){
-			target.position -= cameraTransform.up*y1*0.0005*dist;
-		}	
+		//Determine the distance that the target node must be moved
+		var target = primaryNode.transform;
+		var positionDelta = desiredTargetPosition - target.position;
 
-		//move all selected nodes the same distance.
-		var positionDelta =  target.position - original_position;
-		for (var node in nodes){
-			if (node != primaryNode){
-				node.transform.position += positionDelta;
-			}
+		//move the other selected nodes the same distance.
+		for (var node in nodes) {
+			node.setDesiredPosition(node.transform.position + positionDelta);
 		}	
 	}
 }
@@ -129,7 +105,6 @@ private function ProcessBoxing(){
 }
 
 private function startBoxing() {
-	print("Start Boxing");
 	boxing = true;
 	clearedSelectionSinceBoxStart = false;
 	startCoords = Input.mousePosition;
@@ -139,6 +114,10 @@ private function startBoxing() {
 private function stopBoxing(){
 	boxing = false;
 	selectBoxedItems();
+}
+
+static function isDragging() {
+	return dragging;
 }
 
 function OnGUI(){

@@ -224,7 +224,7 @@ class GraphController extends MonoBehaviour {
 					desired_position[i] = coordinate;
 				}
 			}
-			node.transform.position = Vector3.Lerp(node.transform.position, desired_position, .3);
+			node.setDesiredPosition(desired_position);
 		}
 	}
 

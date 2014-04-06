@@ -15,7 +15,7 @@ class Node extends TimeObject {
 	private var reticle : Reticle; //singleton reticle, instantiated on target
 
 	var desiredDistance : float;
-
+	private var desiredPosition : Vector3;
 
 	var group_id :int = -1; //used by ClusterController to identify which group of edges it belongs to.
 	private var activated = true;
@@ -85,41 +85,53 @@ class Node extends TimeObject {
 	function Update() {
 		super.Update();
 
-		if (GraphController.isGraphing() && (!GraphController.isUsingMethodWithNodes() || GraphController.getFile() != source) || 
-				!hasValidTime()) {
+		//Stop immediately if the node should not be displayed
+		var notRendering = (GraphController.isGraphing() && (!GraphController.isUsingMethodWithNodes() ||
+				GraphController.getFile() != source) || !hasValidTime());
+		if (notRendering) {
 			setRender(false);
 			return;
+		} else {
+			setRender(true);
 		}
 
+		//Briefly activate colliders for mouse hit detection, only on click.
 		GetComponent(SphereCollider).enabled = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1);
 		
-		setRender(true);
-		var oldRotation = transform.rotation;
-		
-		for (var edge in edges) {
-			var other_node : Node = edge.to;
 
-			//Do not process the edge if the edge or node is not in the correct time.
-			if (!edge.hasValidTime() || !other_node.hasValidTime()) {
-				continue;
+		//Determine if movement is being controlled by outside sources (Graphing, Planarity, etc.)
+		var usingOtherMovement = (NetworkController.isPaused() || GraphController.isGraphing() || 
+				(SelectionController.isDragging() && isSelected()));
+
+		var originalPosition = transform.position;
+		if (!usingOtherMovement) {
+			var netMotion = Vector3.zero;
+			var oldRotation = transform.rotation;
+			for (var edge in edges) {
+				var other_node : Node = edge.to;
+
+				//Do not process the edge if the edge or node is not in the correct time.
+				if (!edge.hasValidTime() || !other_node.hasValidTime()) {
+					continue;
+				}
+
+				var motion = calculateMotionRelativeTo(other_node, other_node.size, null, edge);
+				netMotion += motion;
 			}
-
-			moveRelativeTo(other_node, other_node.size, null, edge);
+			
+		    desiredPosition = originalPosition + netMotion;
+	    	transform.rotation = oldRotation;
 		}
 	    
-	    transform.rotation = oldRotation;
-	    
-	    if (NetworkController.flatten){
-	    	transform.position.z/=1.1;
+	    transform.position = Vector3.Lerp(originalPosition, desiredPosition, 0.5);
+
+	    if (PlanarityController.isFlat()){
+	    	transform.position.z/=1.15;
 	    } 
 	
 	}
 
-	function moveRelativeTo(other_node : Node, other_size: float, original_node : Node, edge : Edge) {
-
-		if (NetworkController.isPaused()){
-			return;
-		}
+	function calculateMotionRelativeTo(other_node : Node, other_size: float, original_node : Node, edge : Edge) {
 
 		//Calculate the desired distance.
 		var foreignKey = edge.foreignKey;
@@ -163,12 +175,18 @@ class Node extends TimeObject {
 		var sizeCompensation = (size+other_size)/10;
 
 		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
-
-		speed = Mathf.Clamp(speed, -1, 1);
+		speed = Mathf.Max(speed, -1);
 		
 		transform.LookAt(target);
 		var motion : Vector3 = transform.forward*speed*NetworkController.gameSpeed;		
-		transform.position += motion;
+		return motion;
+	}
+
+	function setDesiredPosition(desiredPosition : Vector3) {
+		this.desiredPosition = desiredPosition;
+	}
+	function getDesiredPosition() {
+		return desiredPosition;
 	}
 
 	//called every frame, based on graphing.

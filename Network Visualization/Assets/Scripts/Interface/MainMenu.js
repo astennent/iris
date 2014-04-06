@@ -14,6 +14,7 @@ class MainMenu extends BaseMenu {
 	var zoom_to_fit : Texture;
 	var graph : Texture;
 	var clock : Texture;
+	var plane : Texture;
 
 	function Start() {
 		parent = null;
@@ -73,6 +74,14 @@ class MainMenu extends BaseMenu {
 			GUI.color = new Color(1, .7, 0);
 			if (GUI.Button(button_position, graph)){
 				chooseMenu(GraphMenu);
+			}
+			if (button_position.Contains(mousePosition)){}
+
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
+			GUI.color = new Color(.2, .7, .7);
+			if (GUI.Button(button_position, plane)){
+				chooseMenu(PlanarityMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
 
@@ -170,6 +179,12 @@ class MainMenu extends BaseMenu {
 			ToggleDisplay(TerminalMenu);
 		} else {
 			DisableDisplay(TerminalMenu);
+		}
+
+		if (chosenMenu == PlanarityMenu) {
+			ToggleDisplay(PlanarityMenu);
+		} else {
+			DisableDisplay(PlanarityMenu);
 		}
 
 	}
