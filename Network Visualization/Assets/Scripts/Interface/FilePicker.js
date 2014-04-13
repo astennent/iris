@@ -18,7 +18,7 @@ class FilePicker extends MonoBehaviour {
 	static var iconNameHeight = 45;
 	static var textRectHeight = 25;
 
-	static var selectedHeader = true;
+	static var headerRect : Rect;
 
 	private static var fileString = "";
 	private static var outerRect : Rect;
@@ -76,18 +76,13 @@ class FilePicker extends MonoBehaviour {
 		}
 
 		var textLeft = upRect.x+upRect.width+3;
-		var textRect = new Rect(textLeft, cur_y, headerWidth-upRect.width, textRectHeight);
+		headerRect = new Rect(textLeft, cur_y, headerWidth-upRect.width, textRectHeight);
 
 		GUI.SetNextControlName("fileheader");
-		var updatedFileString = GUI.TextField(textRect, fileString);
-		GUI.FocusControl("fileheader");
-		var controlID : int = GUIUtility.GetControlID(textRect.GetHashCode(), FocusType.Keyboard); 
-		var te : TextEditor = GUIUtility.GetStateObject(typeof(TextEditor), controlID -1);
-		if (te != null) {
-			te.MoveTextEnd();
-		} else {
-			print("No te");
-		}
+		var textFieldStyle : GUIStyle = new GUIStyle("textfield");
+		GUI.skin.settings.selectionColor = new Color(0, 0, 0, 1);
+		var updatedFileString = GUI.TextField(headerRect, fileString, textFieldStyle);
+		focusHeader();
 
 		if (updatedFileString != fileString) {
 			setFileString(updatedFileString);
@@ -171,7 +166,7 @@ class FilePicker extends MonoBehaviour {
 					//Render button
 					var pressedEnter = (selected && Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return);
 					if (GUI.Button(buttonRect, image) || pressedEnter) {
-						setFileString(info.FullName+"\\");
+						setFileString(icon.getFullName());
 						GUI.EndScrollView(); return;
 					}
 
@@ -185,6 +180,7 @@ class FilePicker extends MonoBehaviour {
 			}
 
 		GUI.EndScrollView();
+		focusHeader();
 
 
 	}
@@ -304,7 +300,6 @@ class FilePicker extends MonoBehaviour {
 			}
 			entry = nextEntry;
 		}
-
 	}
 
 	//Saves the current icons in a dictionary to preserve location for animation, 
@@ -358,6 +353,8 @@ class FilePicker extends MonoBehaviour {
 
 		} catch (e) {	Debug.Log("Error: " + e); }
 
+		focusHeader();
+
 	}
 
 
@@ -406,6 +403,15 @@ class FilePicker extends MonoBehaviour {
 		}
 	}
 
+	private static function focusHeader() {
+		GUI.FocusControl("fileheader");
+		var controlID : int = GUIUtility.GetControlID(headerRect.GetHashCode(), FocusType.Keyboard); 
+		var te : TextEditor = GUIUtility.GetStateObject(typeof(TextEditor), controlID -1);
+		if (te != null) {
+			te.MoveTextEnd();
+		} 
+	}
+
 	class Icon {
 		var isDir : boolean;
 		var di : DirectoryInfo;
@@ -433,6 +439,14 @@ class FilePicker extends MonoBehaviour {
 
 		function getName() {
 			return (isDir) ? di.Name : fi.Name;
+		}
+
+		function getFullName() {
+			var output = getInfo().FullName;
+			if (isDir) {
+				output += "\\";
+			}
+			return output;
 		}
 
 		function getColor() {

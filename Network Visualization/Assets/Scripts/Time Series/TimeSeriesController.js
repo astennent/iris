@@ -62,6 +62,7 @@ static function setCurrentDate(date : Date) {
 	if (!dates_equivalent && timeSeriesEnabled) {
 		validateAllTimeObjects();
 		FileManager.invalidateAllStats();
+		ColorController.ApplyRulesForDateChange();
 	}
 }
 

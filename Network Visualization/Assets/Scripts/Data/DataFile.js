@@ -479,8 +479,8 @@ class DataFile extends LoadableFile {
 			//TODO: make n-way edges.
 
 			if (matches.Count == 2){
-				for (from_node in matches[0]){
-					for (to_node in matches[1]){
+				for (var from_node in matches[0]){
+					for (var to_node in matches[1]){
 
 						//The first (outgoing) edge is the one that gets a copy of the data.
 						var first_edge = from_node.AddEdge(this, to_node, true, foreignKeys[0]);

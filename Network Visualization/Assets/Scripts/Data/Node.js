@@ -71,7 +71,7 @@ class Node extends TimeObject {
 	function AddEdge (edgeSource : DataFile, other : Node, isOutgoing : boolean, foreignKey : ForeignKey){
 		for (var edge in edges){
 			if (edge.to == other){
-				return;
+				return edge;
 			}
 		}
 		var newEdge = GameObject.Instantiate(edgePrefab).GetComponent(Edge);

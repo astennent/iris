@@ -44,6 +44,17 @@ static function moveRuleDown(i : int){
 	}
 }
 
+static function ApplyRulesForDateChange() {
+	var foundUpdatableRule = false;
+	for (var rule in rules){
+		if (foundUpdatableRule || //You've already found a rule and must reapply everything after it
+				rule.getRuleType() == 1 || //Coloring by cluster 
+				rule.getMethod() == 2 || rule.getMethod() == 3 //Coloring by centrality or continuous attribute
+			) {
+			ApplyRule(rule);
+		}
+	}
+}
 
 static function ApplyAllRules(){
 	//reset all halos.
@@ -53,8 +64,8 @@ static function ApplyAllRules(){
 		}
 	}
 
-	for (var x = 0; x < rules.Count ; x++){
-		ApplyRule(rules[x]);
+	for (var rule in rules){
+		ApplyRule(rule);
 	}
 }
 
