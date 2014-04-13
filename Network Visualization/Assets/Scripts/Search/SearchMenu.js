@@ -16,6 +16,11 @@ class SearchMenu extends BaseMenu {
 
 	function OnGUI(){
 		super.OnGUI();
+
+		if (!displaying) {
+			return;
+		}
+
 		GUI.SetNextControlName("searchbar");
 
 		var searchRect = new Rect(x+width*.05, 30, width*.9, 20);

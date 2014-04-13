@@ -9,14 +9,12 @@ class FileMenu extends BaseMenu {
 	var cross : Texture;
 
 	private static var cur_y : float;
-	private static var directoryScrollPosition : Vector2 = Vector2.zero;
 	private static var attributeScrollPosition : Vector2 = Vector2.zero;
 	private static var fileString : String = "";
 	static var error_message : String = "";
 
 	static var DROPDOWN_ID = "0";
 
-	
 	/*	Used to decide what to display below the line.
 		-1 : nothing
 		0+ : index in FileManager.files */
@@ -27,6 +25,7 @@ class FileMenu extends BaseMenu {
 		parent = GetComponent(MainMenu);
 		super.Start();
 		title = "File Manager";
+		fileString = Path.GetFullPath(".");
 	}
 
 	static function getSelectedFile() {
@@ -54,11 +53,16 @@ class FileMenu extends BaseMenu {
 
 	function OnGUI(){
 		super.OnGUI();
+
+		if (!displaying) {
+			return;
+		}
+
 		cur_y = 35;
 		
 		//Draw the file selection dropdown
 		var selection_rect = new Rect(x+10, cur_y, width-50, 30);
-		var dropHeight = 120;
+		var dropHeight = 200;
 		var filesList = new String[FileManager.files.Count];
 		for (var i = 0 ; i < FileManager.files.Count ; i++) {
 			filesList[i] = FileManager.files[i].shortName();
@@ -185,7 +189,7 @@ class FileMenu extends BaseMenu {
 			GUI.color = new Color(1, .7, 0);
 			cur_y += 30;
 			import_button = new Rect(x+10, MenuController.getScreenHeight()-40, width/2-10, 30);
-			if (GUI.Button(import_button, "Deavtivate File")){
+			if (GUI.Button(import_button, "Deactivate File")){
 				FileManager.DeactivateFile(selected_file_index);
 			}
 		} else {
@@ -216,16 +220,13 @@ class FileMenu extends BaseMenu {
 		GUI.Box(menuRect, "New File");
 		
 		cur_y+=30;
-		var sourceRect = new Rect(x+10, cur_y, 100, 20);
+		var sourceRect = new Rect(x+10, cur_y-10, 100, 30);
 		GUI.Label(sourceRect, "Source");
 		sourceRect.x+=50;
 		sourceRect.width = width-65;
 		
-		var newFileString : String = GUI.TextField(sourceRect, fileString, 100);
-		if (newFileString != fileString){
-			fileString = newFileString;
-			UpdateDirectoryData();
-		}
+		GUI.Label(sourceRect, fileString);
+
 		
 		cur_y+=20;
 		
@@ -235,8 +236,8 @@ class FileMenu extends BaseMenu {
 			GUI.Label(errorRect, error_message);
 			GUI.color = Color.white;
 		}
-		var loadRect = new Rect(x+200, cur_y, width- 220, 20);
-		
+
+		var loadRect = new Rect(x+200, cur_y, width- 220, 20);		
 		cur_y+=30;
 		
 		//Color the load button green if it's a csv
@@ -249,63 +250,17 @@ class FileMenu extends BaseMenu {
 			selected_file_index = FileManager.Load(fileString); //switches to loaded menu if successful.
 			AttributeMenu.setSelectedIndex(-1);
 		}
+
+
+
 		GUI.color = Color.white;
 		
-		DrawDirectoryData();
-		
+		fileString = FilePicker.PickFile(Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), fileString);
 		
 	}
 
-	function DrawDirectoryData(){
-		//loop over directories
-		directoryScrollPosition = GUI.BeginScrollView (Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), 
-			directoryScrollPosition, Rect (0, 0, width, 20*FileManager.dest_directories.Count + 20*FileManager.dest_files.Count));
-		cur_y = 0;
-		
-		GUI.color = new Color(0, .8, .8);
-		if (fileString.Contains("\\") || fileString.Contains("/")){
-			var buttonRect : Rect = new Rect(10, cur_y, width-20, 20);
-			if (GUI.Button(buttonRect, "<--")){
-				if (fileString.Contains("\\")){
-					fileString = fileString.Substring(0, fileString.LastIndexOf("\\"));
-				} else if (fileString.Contains("/")){
-					fileString = fileString.Substring(0, fileString.LastIndexOf("/"));
-				}
-				UpdateDirectoryData();
-			}
-		}
-		GUI.color = Color.cyan;
-		cur_y+=20;
-		for (var di:DirectoryInfo in FileManager.dest_directories){
-			buttonRect = new Rect(10, cur_y, width-20, 20);
-			if (GUI.Button(buttonRect, di.Name)){
-				fileString = di.FullName;
-				UpdateDirectoryData();
-			}
-			cur_y += 20;
-		}
-		//loop over files
-		for (var fi:FileInfo in FileManager.dest_files){
-			if (fi.Name.EndsWith(".csv")){
-				GUI.color = Color.green;
-			} else {
-				GUI.color = Color.yellow;
-			}
-			buttonRect = new Rect(10, cur_y, width-20, 20);
-			if (GUI.Button(buttonRect, fi.Name)){
-				fileString = fi.FullName;
-				UpdateDirectoryData();
-			}
-			cur_y += 20;
-		}
-		GUI.EndScrollView();
+	static function EnableDisplay(){
+		super.EnableDisplay(SearchMenu);
+		GUI.FocusControl("searchbar");	
 	}
-
-
-
-	static function UpdateDirectoryData(){
-		FileManager.UpdateDirectoryData(fileString);
-		error_message = "";
-	}
-
 }
