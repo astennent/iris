@@ -4,8 +4,10 @@ class FilePicker extends MonoBehaviour {
 
 	var folderTexture : Texture;
 	var fileTexture : Texture;
+	var upDirectoryTexture : Texture;
 	static var folderTexture_s : Texture;
 	static var fileTexture_s : Texture;
+	static var upDirectoryTexture_s : Texture;
 
 	private static var scrollPosition : Vector2 = Vector2.zero;
 
@@ -26,6 +28,7 @@ class FilePicker extends MonoBehaviour {
 	function Start() {
 		folderTexture_s = folderTexture;
 		fileTexture_s = fileTexture;
+		upDirectoryTexture_s = upDirectoryTexture;
 	}
 
 	//Called from GUI methods with the size of the rectangle to display.
@@ -71,7 +74,7 @@ class FilePicker extends MonoBehaviour {
 		var headerWidth = outerRect.width-margin;
 		var upRect = new Rect(outerRect.x+leftSide+5, cur_y, textRectHeight, textRectHeight);
 
-		if (GUI.Button(upRect, "^")) {
+		if (GUI.Button(upRect, upDirectoryTexture_s)) {
 			moveUpDirectory();
 		}
 

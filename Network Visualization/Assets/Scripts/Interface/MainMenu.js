@@ -81,7 +81,7 @@ class MainMenu extends BaseMenu {
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(.2, .7, .7);
 			if (GUI.Button(button_position, plane)){
-				chooseMenu(PlanarityMenu);
+				PlanarityController.toggleFlat();
 			}
 			if (button_position.Contains(mousePosition)){}
 
@@ -180,12 +180,5 @@ class MainMenu extends BaseMenu {
 		} else {
 			DisableDisplay(TerminalMenu);
 		}
-
-		if (chosenMenu == PlanarityMenu) {
-			ToggleDisplay(PlanarityMenu);
-		} else {
-			DisableDisplay(PlanarityMenu);
-		}
-
 	}
 }
