@@ -81,12 +81,14 @@ class FilePicker extends MonoBehaviour {
 		var textLeft = upRect.x+upRect.width+3;
 		headerRect = new Rect(textLeft, cur_y, headerWidth-upRect.width, textRectHeight);
 
-		GUI.SetNextControlName("fileheader");
-		var textFieldStyle : GUIStyle = new GUIStyle("textfield");
+		var oldSelectionColor = GUI.skin.settings.selectionColor;
 		GUI.skin.settings.selectionColor = new Color(0, 0, 0, 1);
-		var updatedFileString = GUI.TextField(headerRect, fileString, textFieldStyle);
-		focusHeader();
+		GUI.SetNextControlName("fileheader");
+		var updatedFileString = GUI.TextField(headerRect, fileString);
+		GUI.skin.settings.selectionColor = oldSelectionColor;
 
+		
+		focusHeader();
 		if (updatedFileString != fileString) {
 			setFileString(updatedFileString);
 		}

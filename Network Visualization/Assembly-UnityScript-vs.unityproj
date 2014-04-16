@@ -55,15 +55,11 @@
      <Compile Include="Assets\Scripts\Data\Attribute.js" />
      <Compile Include="Assets\Scripts\Data\AttributeMenu.js" />
      <Compile Include="Assets\Scripts\Data\Data.js" />
-     <Compile Include="Assets\Scripts\Data\DataFile.js" />
      <Compile Include="Assets\Scripts\Data\Datum.js" />
      <Compile Include="Assets\Scripts\Data\DrawLine.js" />
      <Compile Include="Assets\Scripts\Data\Edge.js" />
-     <Compile Include="Assets\Scripts\Data\FileManager.js" />
-     <Compile Include="Assets\Scripts\Data\FileMenu.js" />
      <Compile Include="Assets\Scripts\Data\FkeyMenu.js" />
      <Compile Include="Assets\Scripts\Data\ForeignKey.js" />
-     <Compile Include="Assets\Scripts\Data\LoadableFile.js" />
      <Compile Include="Assets\Scripts\Data\NetworkController.js" />
      <Compile Include="Assets\Scripts\Data\Node.js" />
      <Compile Include="Assets\Scripts\Display\ColorController.js" />
@@ -107,6 +103,11 @@
      <Compile Include="Assets\Scripts\Time Series\TimeParser.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeSeriesController.js" />
      <Compile Include="Assets\Scripts\Time Series\TimeSeriesMenu.js" />
+     <Compile Include="Assets\Scripts\Workspace\DataFile.js" />
+     <Compile Include="Assets\Scripts\Workspace\FileManager.js" />
+     <Compile Include="Assets\Scripts\Workspace\FileMenu.js" />
+     <Compile Include="Assets\Scripts\Workspace\LoadableFile.js" />
+     <Compile Include="Assets\Scripts\Workspace\WorkspaceManager.js" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>

@@ -87,12 +87,24 @@ static function Load(fname : String, isDemo : boolean) : int {
 	}
 }
 
-static function DeactivateFile(index : int){
+static function DeactivateFile(index : int) {
 	files[index].Deactivate();
 }
 
-static function ActivateFile(index : int){
+static function ActivateFile(index : int) {
 	files[index].Activate();
+}
+
+static function RemoveFile(index : int) {
+	//Only allow files to be deleted if they have no dependents
+	var dependent_files = files[index].determineDependents();
+	if (dependent_files.Count == 0) {
+		files[index].Deactivate();
+		files.RemoveAt(index);
+	} else {
+		Terminal.E("Cannot remove file with dependencies: There are " +
+				dependent_files.Count + " files dependent on " + files[index].shortName());
+	}
 }
 
 static function UpdateNodeSizes(){

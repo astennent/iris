@@ -103,6 +103,17 @@ class Dropdown extends MonoBehaviour {
 						GUI.Box(outerBox, "");
 						GUI.Box(outerBox, "");
 
+						// Check if the user has clicked outside to close the menu
+						if (Input.GetMouseButtonDown(0)) {
+							var mousePosition = Input.mousePosition;
+							mousePosition.y = Screen.height - mousePosition.y; 	
+
+							// The mouse is in neither the optionBox nor in any of the dropdown buttons
+							if (!outerBox.Contains(mousePosition) && !position.Contains(mousePosition)) {
+								optionBox.open = false;
+							} 
+						}
+
 						//Create a scroll pane the size of the outer box.
 						var innerBox = new Rect(0, 0, position.width-3, requiredHeight);
 						
@@ -195,7 +206,9 @@ class Dropdown extends MonoBehaviour {
 
 		public function resetOptionBoxes() {
 			var replacementList = new List.<OptionBox>();
+
 			for (var optionBox in optionBoxes) {
+
 				if (optionBox.open) {
 					replacementList.Add(optionBox);
 				}

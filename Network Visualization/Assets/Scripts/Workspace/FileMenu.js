@@ -206,10 +206,9 @@ class FileMenu extends BaseMenu {
 		GUI.color = Color.red;
 		cur_y += 30;
 		var remove_button = new Rect(x+width/2+5, MenuController.getScreenHeight()-40, width/2-12.5, 30);
-		if (GUI.Button(remove_button, "Remove File")){
-			//TODO: Removing files from workspace
-			//FileManager.removeFile(selected_file_index);
-			//selected_file_index = -1;
+		if (GUI.Button(remove_button, "Remove File")) {
+			FileManager.RemoveFile(selected_file_index);
+			selected_file_index = -1;
 		}
 		
 	}
