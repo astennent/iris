@@ -74,7 +74,7 @@ static function Load(fname : String, isDemo : boolean) : int {
 			}
 		}
 
-		var new_file = new DataFile(fname, isDemo);
+		var new_file = DataFile.Instantiate(fname, isDemo);
 		files.Add(new_file);	
 		return files.Count-1;
 

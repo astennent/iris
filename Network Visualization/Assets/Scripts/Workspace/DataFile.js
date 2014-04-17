@@ -5,34 +5,52 @@
 import System.IO;
 import System.Collections.Generic;
 
-var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
-
-var imported : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
-
-var linking_table : boolean = false;
-
-var pkey_indices : int[];
-var shown_indices : int[];
-
-var first_row : String[]; 
-
-private var nodes = new Dictionary.<String, Node>();
-private var nodeListCache : LinkedList.<Node>;
-private var nodeListCacheTimed : LinkedList.<Node>;
-private var hasValidNodeLists = false;
-
-var timeFrame : TimeFrame;
-
-private var foreignKeys = new List.<ForeignKey>();
-
 class DataFile extends LoadableFile {
 
+	//Used to ensure that files are loaded in the correct order after being activated.
+	static var activationQueue = new LinkedList.<DataFile>();
+
+	var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
+
+	private var activated : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
+
+	// Used for loading a file across multiple frames.
+	private var activatingNodes : boolean = false;
+	private var activating : boolean = false;
+	private var contentIndex : int;
+
+	var linking_table : boolean = false;
+
+	var pkey_indices : int[];
+	var shown_indices : int[];
+
+	var first_row : String[]; 
+
+	private var nodes = new Dictionary.<String, Node>();
+	private var nodeListCache : LinkedList.<Node>;
+	private var nodeListCacheTimed : LinkedList.<Node>;
+	private var hasValidNodeLists = false;
+
+	var timeFrame : TimeFrame;
+
+	private var foreignKeys = new List.<ForeignKey>();
+
+
 	//Constructor
-	public function DataFile(fname : String, isDemo : boolean){
-		this.fname = fname; 
-		this.isDemoFile = isDemo;
-		generateAttributes();
-	    timeFrame = new TimeFrame(this);
+	public static function Instantiate(fname : String, isDemo : boolean) {
+		var dataFile = (new GameObject()).AddComponent(DataFile);
+		dataFile.fname = fname; 
+		dataFile.isDemoFile = isDemo;
+		dataFile.generateAttributes();
+	    dataFile.timeFrame = new TimeFrame(dataFile);
+	    return dataFile;
+	}
+
+	function Update() {
+		if (activationQueue.Count > 0 && activationQueue.First.Value == this) {
+			activationQueue.RemoveFirst();
+			ProcessActivate();
+		}
 	}
 
 	//Computes header names, guesses shown/pkey information, and creates attributes
@@ -194,34 +212,64 @@ class DataFile extends LoadableFile {
 		return foreignKeys;
 	}
 
-	function Activate() {
-		Activate(true);
+	function isActivated() {
+		return activated;
 	}
 
-	private function Activate(checkDependencies : boolean){
+	function Activate() {
+		activationQueue.AddLast(this);
+	}
+
+	private function ProcessActivate(){
 		//Do nothing if the file has already been .
-		if (imported) {
+		if (isActivated()) {
 			return;
 		}
 
-		//Process dependencies 
-		if (checkDependencies) {
-			var required_files = determineDependencies(); 
-			for (var required_file in required_files){
-				required_file.Activate(false); //Do not recalculate dependencies.
+		// Only do this the first time you try to call Activate here.
+		if (!activating) {
+
+			//Process possible unactivated dependencies 
+			var requiredFiles = determineDependencies(); 
+			var queued = false;
+
+			//Check if there are any files that must be activated before this one.
+			var requiredQueue = new LinkedList.<DataFile>();
+			for (var requiredFile in requiredFiles) {
+				if (!requiredFile.isActivated()) {
+					requiredQueue.AddFirst(requiredFile);
+				}
 			}
+
+			// Update the queue so that it will process dependencies in order.
+			if (requiredQueue.Count > 0) {
+				activationQueue.AddFirst(this);
+				for (var requiredFile in requiredFiles) {
+					activationQueue.AddFirst(requiredFile);
+				}
+				return; //Stop and let the next Update() take care of it.
+			}
+
+
+			// Prepare for actual activation.
+			activating = true;
+			contentIndex = 0;
+			activatingNodes = !linking_table; //Skip nodes if linking table.
+			nodes = new Dictionary.<String, Node>();
+
 		}
 
-		//Process self.
-		if (!linking_table) {
+		if (!linking_table && activatingNodes) {
 			GenerateNodes();
 		}
-		GenerateEdges();
-		
-		SearchController.ReInit();
-		ClusterController.ReInit();
+		if (!activatingNodes) {
+			GenerateEdges();
+		}
 
-		imported = true;
+		if (activated) {
+			SearchController.ReInit();
+			ClusterController.ReInit();
+		}
 	}
 
 	function Deactivate() {
@@ -229,7 +277,7 @@ class DataFile extends LoadableFile {
 	}
 
 	private function Deactivate(checkDependents : boolean) {
-		if (!imported) {
+		if (!isActivated()) {
 			return;
 		}
 
@@ -262,7 +310,9 @@ class DataFile extends LoadableFile {
 		nodes = new Dictionary.<String, Node>();
 		SearchController.ReInit();
 		ClusterController.ReInit();
-		imported = false;
+		activated = false;
+		contentIndex = 0;
+
 	}
 
 	//called by linking table files, executed by non-linking tables.
@@ -323,16 +373,14 @@ class DataFile extends LoadableFile {
 	}
 
 	function GenerateNodes(){
-		//TODO: destroy nodes and edges.
-		nodes = new Dictionary.<String, Node>();
 		UpdatePKeyIndices();
 		UpdateShownIndices();
 
 		var fileContents = getFileContents();
-		var max = 5;
-		var cur = 0;
-	    for (var row in fileContents) {
-	    	
+		for (var rowIndex = contentIndex; rowIndex < fileContents.Count && rowIndex < contentIndex+20; rowIndex++) {
+
+			var row = fileContents[rowIndex];
+
 		    var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
 			var node : Node = GameObject.Instantiate(NetworkController.nodePrefab, randPos, new Quaternion(0,0,0,0)).GetComponent(Node);
 
@@ -354,13 +402,22 @@ class DataFile extends LoadableFile {
 	    	}
 	    	nodes[key.toString()] = node;
 	    	node.UpdateName();
+
+
+	    	ProgressBar.setProgress(rowIndex * 1.0 / fileContents.Count);
 	    }
 
-	    cur++;
-	    if (cur > max ) {
-	    	i = 0;
-	    	var x = 5/i;
-	    }	
+   	    contentIndex = rowIndex;
+	    
+	    //You finished loading nodes!
+	    if (contentIndex == fileContents.Count) {
+	    	activatingNodes = false;
+	    	contentIndex = 0;
+	    } else {
+	    	//You didn't finish, stick in back in the queue. :(
+	    	activationQueue.AddFirst(this);
+	    }
+
 	    invalidateListCache();  
 	}
 
@@ -404,12 +461,17 @@ class DataFile extends LoadableFile {
 				}				
 			}
 		}
+
+		//TODO: Make this work with progress bar.
+		StopActivating();
 	}
 		
-	function GenerateEdgesForLinkingTable(){
+	function GenerateEdgesForLinkingTable() {
 
 		var fileContents = getFileContents();
-		for (var row in fileContents) {
+		for (var rowIndex = contentIndex ; rowIndex < fileContents.Count && rowIndex < contentIndex+20; rowIndex++) {
+
+			var row = fileContents[rowIndex];
 
 			//Create a template Object as a Data holder.
 			var templateObject = new GameObject();
@@ -432,7 +494,7 @@ class DataFile extends LoadableFile {
 				var these_matches = new List.<Node>();
 
 				//check if the foreign key maps directly onto the target table's primary key.
-				if (foreignKey.mapsToPrimary()){					
+				if (foreignKey.mapsToPrimary()) {					
 					//convert the values of the current line to an array key into the other file's nodes.
 					var node_values = new Array();
 					for (pair in keyPairs) {
@@ -477,7 +539,6 @@ class DataFile extends LoadableFile {
 			foreignKeys[1].setLinkedFKey(foreignKeys[0]);
 			
 			//TODO: make n-way edges.
-
 			if (matches.Count == 2){
 				for (var from_node in matches[0]){
 					for (var to_node in matches[1]){
@@ -488,16 +549,34 @@ class DataFile extends LoadableFile {
 						//The second (incoming) edge references the data of the first edge.
 						var second_edge = to_node.AddEdge(this, from_node, false, foreignKeys[1]);
 						second_edge.setDataSource(data);
-
 					}
 				}
 			}
 
 			//Remove the template used to make those edges.
 			MonoBehaviour.Destroy(data);
+			ProgressBar.setProgress(rowIndex * 1.0 / fileContents.Count);
+	    }
+
+	    contentIndex = rowIndex;
+
+	    //You finished loading!
+	    if (contentIndex == fileContents.Count) {
+	    	StopActivating();
+	    } else {
+	    	//You didn't finish, stick in back in the queue. :(
+	    	activationQueue.AddFirst(this);
 	    }
 		   
 	}		
+
+	private function StopActivating() {
+		activating = false;
+		activated = true;
+		contentIndex = 0;
+		ProgressBar.setProgress(1);
+		print("Done: " + shortName());
+	}
 
 	function UpdateShownIndices(){
 		var output = new Array();

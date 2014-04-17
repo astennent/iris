@@ -1,6 +1,6 @@
 ﻿#pragma strict
 
-class LoadableFile { 
+class LoadableFile extends MonoBehaviour { 
 
 	var using_headers : boolean = true;
 	var fname : String = "";
