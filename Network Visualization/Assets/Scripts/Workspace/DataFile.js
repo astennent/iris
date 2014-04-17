@@ -15,8 +15,8 @@ class DataFile extends LoadableFile {
 	private var activated : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
 
 	// Used for loading a file across multiple frames.
-	private var activatingNodes : boolean = false;
 	private var activating : boolean = false;
+	private var activatingNodes : boolean = false;
 	private var contentIndex : int;
 
 	var linking_table : boolean = false;
@@ -214,6 +214,10 @@ class DataFile extends LoadableFile {
 
 	function isActivated() {
 		return activated;
+	}
+
+	function isActivating() {
+		return activating;
 	}
 
 	function Activate() {
@@ -468,6 +472,7 @@ class DataFile extends LoadableFile {
 		
 	function GenerateEdgesForLinkingTable() {
 
+
 		var fileContents = getFileContents();
 		for (var rowIndex = contentIndex ; rowIndex < fileContents.Count && rowIndex < contentIndex+20; rowIndex++) {
 
@@ -524,11 +529,13 @@ class DataFile extends LoadableFile {
 							
 							if (from_attribute_value != to_attribute_value){
 								matching = false;
+								break;
 							} 
 						}
 						if (matching){
 							these_matches.Add(node);
 						}
+
 					}
 					matches.Add(these_matches);
 				}
@@ -575,7 +582,6 @@ class DataFile extends LoadableFile {
 		activated = true;
 		contentIndex = 0;
 		ProgressBar.setProgress(1);
-		print("Done: " + shortName());
 	}
 
 	function UpdateShownIndices(){

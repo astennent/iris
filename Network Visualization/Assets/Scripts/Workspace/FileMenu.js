@@ -103,19 +103,21 @@ class FileMenu extends BaseMenu {
 		var menuRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);
 		if (file.isActivated()){
 			var title = "Activated File";
+		} else if (file.isActivating()) {
+			title = "Loading File...";
 		} else {
 			title = "Loaded File";
 		}
 		GUI.Box(menuRect, title);
 		cur_y += 20;
 		var toggle_box = new Rect(x+5, cur_y, 150, 25);
-		var using_headers = GuiPlus.LockableToggle(toggle_box, file.using_headers, " File uses headers", file.isActivated());
+		var using_headers = GuiPlus.LockableToggle(toggle_box, file.using_headers, " File uses headers", file.isActivated() || file.isActivating());
 		if (file.using_headers != using_headers){
 			file.ToggleUsingHeaders();
 		}
 		
 		toggle_box.x+=160;
-		file.linking_table = GuiPlus.LockableToggle(toggle_box, file.linking_table, " Linking Table", file.isActivated());
+		file.linking_table = GuiPlus.LockableToggle(toggle_box, file.linking_table, " Linking Table", file.isActivated() || file.isActivating());
 		
 		cur_y+=28;
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
@@ -165,7 +167,7 @@ class FileMenu extends BaseMenu {
 			if (attribute.is_pkey){ GUI.color = Attribute.pkeyColor; } 
 			else { GUI.color = Color.white; }		
 			var is_pkey_box = new Rect(63, attribute_y, 20, 20);
-			var pkey_value = GuiPlus.LockableToggle (is_pkey_box, attribute.is_pkey, "", file.isActivated());	
+			var pkey_value = GuiPlus.LockableToggle (is_pkey_box, attribute.is_pkey, "", file.isActivated() || file.isActivating());	
 			if (pkey_value != attribute.is_pkey){
 				attribute.TogglePkey();
 			}

@@ -69,8 +69,9 @@ class ForeignKey {
 					return false;
 				}
 			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	function getWeightModifier() {
