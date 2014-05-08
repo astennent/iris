@@ -32,12 +32,12 @@ class SelectionMenu extends BaseMenu {
 				enumerator.MoveNext();
 				title = enumerator.Current.getDisplayName() + "";
 			}
-			var menuRect = new Rect(x, 0, width, MenuController.getScreenHeight());
+			var menuRect = new Rect(x, MenuController.getScreenTop(), width, MenuController.getScreenHeight());
 			GuiPlus.Box(menuRect, title);
 			
 			//"More" button
 			//var button_position : Rect = new Rect(Screen.width, 5, 35, 35);
-			var handlePosition : Rect = new Rect(x-15, 0, 15, MenuController.getScreenHeight());
+			var handlePosition : Rect = new Rect(x-15, MenuController.getScreenTop(), 15, MenuController.getScreenHeight());
 			GuiPlus.Box(handlePosition, ""); //capture mouse clicks so menu isn't closed.
 			if (GUI.Button(handlePosition, more)){
 				ToggleDisplay(SelectionMenu);

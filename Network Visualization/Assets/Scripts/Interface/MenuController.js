@@ -24,11 +24,17 @@ static function handleEscapePress() {
 
 //Should be respected by all menus except Main and TimeSeries
 static function getScreenHeight() {
+	var output = Screen.height;// - getScreenTop();
+
 	if (getInstance(TimeSeriesMenu).displaying) {
-		return Screen.height - TimeSeriesMenu.height;
-	} else {
-		return Screen.height;
+		output -= TimeSeriesMenu.height;
 	}
+
+	return output;
+}
+
+static function getScreenTop() {
+	return ProgressBar.getBottom();
 }
 
 static function getInstance(menuClass : System.Type) : BaseMenu {

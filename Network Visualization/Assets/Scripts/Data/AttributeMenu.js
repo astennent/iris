@@ -74,7 +74,7 @@ class AttributeMenu extends BaseMenu {
 		toggle_box.y += 20;
 		if (attribute.is_pkey){ GUI.color = Attribute.pkeyColor; } 
 		else { GUI.color = Color.white; }
-		attribute.is_pkey = GUI.Toggle (toggle_box, attribute.is_pkey, " Part of Primary Key");		
+		attribute.is_pkey = GuiPlus.LockableToggle (toggle_box, attribute.is_pkey, " Part of Primary Key", file.isActivated() || file.isActivating());		
 
 		return cur_y + large_box.height;
 	}

@@ -25,7 +25,7 @@ class MainMenu extends BaseMenu {
 	}
 
 	function OnGUI() {
-		var menuRect = new Rect(x, 0, width, Screen.height);
+		var menuRect = new Rect(x, MenuController.getScreenTop(), width, Screen.height - MenuController.getScreenTop());
 		GuiPlus.Box(menuRect, title);
 		
 		var centeredStyle = GUI.skin.GetStyle("Label");
@@ -37,14 +37,14 @@ class MainMenu extends BaseMenu {
 		var label_position : Rect = new Rect(50, 0, 100, 35);
 		
 		GUI.color = Color.white;
-		var button_position : Rect = new Rect(5, 5, 35, 35);
+		var button_position : Rect = new Rect(5, MenuController.getScreenTop()+5, 35, 35);
 		if (GUI.Button(button_position, more)){
 			DisableDisplay(TimeSeriesMenu);
 			ToggleDisplay(MainMenu);
 		}	
 			
 		if (displaying) {
-			var cur_y = 60;
+			var cur_y = 60 + MenuController.getScreenTop();
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){

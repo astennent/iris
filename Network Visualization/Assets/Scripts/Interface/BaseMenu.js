@@ -39,10 +39,10 @@ class BaseMenu extends MonoBehaviour {
 	}
 
 	function OnGUI() {
-		var menuRect = new Rect(x, 0, width, MenuController.getScreenHeight());
+		var menuRect = new Rect(x, MenuController.getScreenTop(), width, MenuController.getScreenHeight());
 		GuiPlus.Box(menuRect, title);
 
-		var box = new Rect(x+width-30, 4, 26, 26);
+		var box = new Rect(x+width-30, MenuController.getScreenTop()+4, 26, 26);
 		if (GUI.Button(box, "X")){
 			DisableDisplay();
 		};
