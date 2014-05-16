@@ -51,9 +51,9 @@ class CameraController extends MonoBehaviour {
 
 	static function toggleFree() {
 		if (style == NETWORK || style == GRAPHING) {
-			style = FREE;
+			setStyle(FREE);
 		} else {
-			style = (GraphController.isGraphing()) ? GRAPHING : NETWORK; 
+			setStyle( (GraphController.isGraphing()) ? GRAPHING : NETWORK ); 
 		}
 	}
 

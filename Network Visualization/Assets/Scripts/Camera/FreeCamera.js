@@ -7,8 +7,10 @@ class FreeCamera extends MonoBehaviour {
 	var y : float = 0;
 	var r : float = 0;
 
-	static function StartCamera() {
+	private static var transitionTime : float;
 
+	static function StartCamera() {
+		transitionTime = Time.time;
 	}
 
 	function Update() {
@@ -41,6 +43,13 @@ class FreeCamera extends MonoBehaviour {
 		transform.position += f*transform.forward;
 		transform.position += h*transform.right;
 		transform.position += v*transform.up;
+
+		//Orient the camera to always be right side up
+		var oldRotation = transform.rotation;
+		transform.LookAt(transform.position + transform.forward, Vector3.up);
+		if (Time.time - transitionTime < 1) {
+			transform.rotation = Quaternion.Lerp(oldRotation, transform.rotation, 0.3);
+		}
 
 	}
 
