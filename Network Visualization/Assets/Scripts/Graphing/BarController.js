@@ -65,8 +65,6 @@ class BarController extends MonoBehaviour {
 
 		//Update the bars array to use the correct number of bars.
 		updateBarArray(axisIndex);
-
-		HistogramController.updateHistogram();
 	}
 
 	static function isRepresentative(axisIndex : int) {	

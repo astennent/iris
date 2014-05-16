@@ -73,6 +73,7 @@
      <Compile Include="Assets\Scripts\Graphing\BarController.js" />
      <Compile Include="Assets\Scripts\Graphing\GraphController.js" />
      <Compile Include="Assets\Scripts\Graphing\GraphMenu.js" />
+     <Compile Include="Assets\Scripts\Graphing\HeightMap.js" />
      <Compile Include="Assets\Scripts\Graphing\HistogramController.js" />
      <Compile Include="Assets\Scripts\Interface\BaseMenu.js" />
      <Compile Include="Assets\Scripts\Interface\ColorPicker.js" />
@@ -91,6 +92,7 @@
      <Compile Include="Assets\Scripts\Search\SearchMenu.js" />
      <Compile Include="Assets\Scripts\Selection\SelectionController.js" />
      <Compile Include="Assets\Scripts\Selection\SelectionMenu.js" />
+     <Compile Include="Assets\Scripts\Statistics\CountCache.js" />
      <Compile Include="Assets\Scripts\Statistics\Stats.js" />
      <Compile Include="Assets\Scripts\StreamReader\DefaultStreamReader.js" />
      <Compile Include="Assets\Scripts\StreamReader\DemoStreamReader.js" />
@@ -110,6 +112,7 @@
      <Compile Include="Assets\Scripts\Workspace\LoadableFile.js" />
      <Compile Include="Assets\Scripts\Workspace\WorkspaceManager.js" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
+     <None Include="Assets\Materials\HeightDependentTint.shader" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">

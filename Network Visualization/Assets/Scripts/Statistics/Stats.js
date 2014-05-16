@@ -168,12 +168,25 @@ class Stats {
 		return getFraction(data.GetNumeric(attribute));
 	}
 
+	//Returns a value between 0 and 1.
 	public function getFraction(num : float) {
 		if (getRange() == 0) {
 			return 0;
 		} else {
 			return ( num-getMin() ) / getRange();
 		}
+	}
+
+	// Calculates which "bucket" or "bar" is associated with a certain value. 
+	// Return value will be between 0 and numBuckets-1 inclusive.
+	public function getBucket(num : float, numBuckets : int) {
+		
+		// Avoid overflow on the very last node.
+		if (num == getMax()) {
+			return numBuckets - 1;
+		}
+
+		return getFraction(num) * numBuckets;
 	}
 
 }

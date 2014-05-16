@@ -13,9 +13,10 @@ class GraphController extends MonoBehaviour {
 	private static var forcingNodeSize : boolean = true;
 	private static var forcedNodeSize : float = 2.5;
 
-	private static var methods = ["Scatterplot", "Histogram"];
+	private static var methods = ["Scatterplot", "Histogram", "Height Map"];
 	static var SCATTERPLOT = 0;
 	static var HISTOGRAM = 1;
+	static var HEIGHTMAP = 2;
 	private static var method = 0;
 
 	//Used in the histogram method to determine if an extra axis should be used to scale vertically.
@@ -52,9 +53,11 @@ class GraphController extends MonoBehaviour {
 		}
 
 		//TODO: Make this update all controllers when scatter is refactored out.
-		updateMethodController(0);
-		updateMethodController(1);
-		updateMethodController(2);
+		BarController.updateBars(0);
+		BarController.updateBars(1);
+		BarController.updateBars(2);
+
+		updateMethodController();
 	}
 
 	//called by Node to decide if it should ignore its rules.
@@ -168,7 +171,16 @@ class GraphController extends MonoBehaviour {
 
 		}
 
-		updateValues(axis_index, attribute);
+		//Send a message to the axis controller to update the number of ticks.
+		AxisController.updateAxis(axis_index);
+		
+		BarController.updateBars(axis_index);
+
+		//Update the appropriate controller.
+		updateMethodController();
+
+		//Update the axes tick marks.
+		AxisController.Redraw();
 	}
 
 	static function getSpecialRowAxis() {
@@ -189,18 +201,12 @@ class GraphController extends MonoBehaviour {
 		}
 	}
 
-	//Called by setAxis when an attribute is changed
-	private static function updateValues(axis_index : int, attribute : Attribute) {
-		
-		//Send a message to the axis controller to update the number of ticks.
-		AxisController.updateAxis(axis_index);
-		
-		//Update the appropriate controller.
-		updateMethodController(axis_index);
-
-
-		//Update the axes tick marks.
-		AxisController.Redraw();
+	private static function updateMethodController() {
+		if (method == HISTOGRAM) {
+			HistogramController.updateHistogram();
+		} else if (method == HEIGHTMAP) {
+			HeightMap.updateHeightmap();
+		}
 	}
 
 
@@ -228,13 +234,12 @@ class GraphController extends MonoBehaviour {
 		}
 	}
 
-	static function updateMethodController(axis_index : int) {
-		// Note that these methods rely on axis controller so it must be 
-		// the case that axisController is notified of the change first.
-		if (method == HISTOGRAM) {
-			BarController.updateBars(axis_index);
-		}
-	}
+	// static function updateMethodController(axis_index : int) {
+	// 	// Note that these methods rely on axis controller so it must be 
+	// 	// the case that axisController is notified of the change first.
+	// 	BarController.updateBars(axis_index);
+
+	// }
 
 	static function isUsingMethodWithNodes() {
 		return (method == 0);
@@ -246,12 +251,12 @@ class GraphController extends MonoBehaviour {
 
 	//Used by the menu to decide if it should be drawn
 	static function methodRequiresSpecialRow() {
-		return (method == 1);
+		return (method == 1 || method == 2);
 	}
 
 	//Used to decide if other axes should be cleared if they occupy the value of the special row
 	static function methodRequiresAxisOverwrite() {
-		return (method == 1);
+		return (method == 1 || method == 2);
 	}
 
 	//Used to determine if the special row can be turned all the way off
@@ -261,7 +266,11 @@ class GraphController extends MonoBehaviour {
 
 	//Used to determine if tick marks should be squashed to line up with bars.
 	static function methodRequiresTickSquash() {
-		return (method == 1);
+		return (method == 1); //TODO: 2?
+	}
+
+	static function methodLimitsSpecialAxisToY() {
+		return (method == 2);
 	}
 
 }

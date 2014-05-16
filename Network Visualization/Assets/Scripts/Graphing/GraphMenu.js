@@ -243,7 +243,7 @@ class GraphMenu extends BaseMenu {
 		var usedAxisCount = 0;
 		for (var a = 0 ; a < 3 ; a++) { if (axes[a] != null) usedAxisCount++; }
 
-		for (var i = 0 ; i < 3 ; i++) {
+		for (var i = 0 ; i < 3 ; i++) { //x, y, z axes
 
 			if (usingSpecialRow) {
 				var alreadySelected = (i == GraphController.getSpecialRowAxis());
@@ -252,22 +252,20 @@ class GraphMenu extends BaseMenu {
 			}
 
 			//Turn gray if you won't be able to select because of graphing method
-			if (attribute == null) {
-				GUI.color = Color.white;
-			} else {
-				
-				if (GraphController.methodRequiresOneSpecialRow() && //the method requires that somethign always be filled and...
-						usedAxisCount == 2 && //There are already two axes being used and...
-						GraphController.getSpecialRowAxis() == i &&  //the method is using the axis and...
-						axes[0] != attribute && axes[1] != attribute && axes[2] != attribute) { //this row is not used (it can't be swapped)
-					GUI.color = Color.gray;
-				} else {
-					GUI.color = getColorForAttribute(attribute, axes);
-				}
-			}
 
-			var newlySelected = GUI.Toggle (attrRect, alreadySelected, "");
+			var locked = ( 	
 
+				(GraphController.methodRequiresOneSpecialRow() && //the method requires that somethign always be filled and...
+				usedAxisCount == 2 && //There are already two axes being used and...
+				GraphController.getSpecialRowAxis() == i &&  //the method is using the axis and...
+				axes[0] != attribute && axes[1] != attribute && axes[2] != attribute) ||
+
+				(usingSpecialRow && GraphController.methodLimitsSpecialAxisToY() && i != 1)
+
+			); //this row is not used (it can't be swapped)
+
+			GUI.color = (attribute == null) ? Color.white : getColorForAttribute(attribute, axes);
+			var newlySelected = GuiPlus.LockableToggle(attrRect, alreadySelected, "", locked);
 
 			if (newlySelected != alreadySelected) {
 				if (usingSpecialRow) {
