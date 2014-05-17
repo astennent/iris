@@ -22,18 +22,21 @@ function Start () {
 }
 
 static function updateHeightmap() {
-	print("Updating Heightmap");
 	var attrX = GraphController.getAxis(0);
 	var attrZ = GraphController.getAxis(2);
 	var numBucketsX = BarController.getNumBars(0);
 	var numBucketsZ = BarController.getNumBars(2);
-	var maxCount = CountCache.getMaxCount(attrX, attrZ, numBucketsX, numBucketsZ);
+	var maxCount = 0;
+	var numNodes = (attrX != null) ? attrX.file.getNodes(true).Count : (attrZ != null) ? attrZ.file.getNodes(true).Count : 1;
 	for (var x = 0 ; x < numBucketsX ; x++) {
 		for (var z = 0 ; z < numBucketsZ ; z++) {
 			var height = CountCache.getCount(attrX, attrZ, numBucketsX, numBucketsZ, x, z);
-			instance.setHeight(x, z, height * 1.0 / maxCount, numBucketsX, numBucketsZ);
+			instance.setHeight(x, z, height * 1.0 / numNodes, numBucketsX, numBucketsZ);
+			maxCount = Mathf.Max(maxCount, height);
 		}
 	}
+
+	instance.GetComponent(Terrain).materialTemplate.SetFloat("_HeightMax", GraphController.getScale() * maxCount / numNodes);
 
 	//Ensure that the borders are all zero so you can see the faces.
 	var borderX = new float[1,resolution];
@@ -58,5 +61,5 @@ function setHeight(x : int, z : int, height : float, numBucketsX : int, numBucke
 		}
 	}
 
-	terrainData.SetHeights(x * chunkSizeX, z * chunkSizeZ, heights);
+	terrainData.SetHeights(x * chunkSizeX + 1, z * chunkSizeZ + 1, heights);
 }

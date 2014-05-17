@@ -29,12 +29,19 @@ class BarController extends MonoBehaviour {
 			numBars = bars[0][0].Count;
 		}
 
-		if (numBars > 1 && isRepresentative(axisIndex)) {
-			numBars -= 1;
-		}
+		// if (numBars > 1 && isRepresentative(axisIndex)) {
+		//  	numBars -= 1;
+		// }
 
 		return numBars;
 	}
+
+	// static function getBucket(val : float, axisIndex : int) {
+
+	// 	var numBars = getNumBars(axisIndex);
+	// 	var attribute = GraphController.getAxis(axisIndex);
+	// 	return attribute.getBucket(val, numBars);	
+	// }
 
 	// Called when the axis selecctions change.
 	static function updateBars(axisIndex : int) {

@@ -71,13 +71,13 @@ class HistogramController extends MonoBehaviour {
 				var attribute = axes[axisIndex];
 				if (attribute != null) {
 					var val = node.GetNumeric(attribute);
-					var bucketVal = getBucket(val, axisIndex, attribute);
-					bucket[axisIndex] = bucketVal;
+					var bucketIndex = attribute.getBucket(val, BarController.getNumBars(axisIndex));
+					bucket[axisIndex] = bucketIndex;
 				}
 			}
 
 			try {
-			counts[bucket[0], bucket[1], bucket[2]] += 1;
+				counts[bucket[0], bucket[1], bucket[2]] += 1;
 			} catch(e) {
 				//print(bucket[0] + " " + bucket[1] + " " + bucket[2]);
 			}
@@ -108,19 +108,4 @@ class HistogramController extends MonoBehaviour {
 		}
 
 	}
-
-	private static function getBucket(val : float, axisIndex : int, attribute : Attribute) {
-
-		var numBars = BarController.getNumBars(axisIndex);
-
-		// Avoid overflow on the very last node.
-		if (!BarController.isRepresentative(axisIndex) && val == attribute.getMax()) {
-			return numBars - 1;
-		}
-
-		var bucket = attribute.getFraction(val) * numBars;	
-
-		return bucket;
-	}
-
 }

@@ -17,7 +17,7 @@ class GraphController extends MonoBehaviour {
 	static var SCATTERPLOT = 0;
 	static var HISTOGRAM = 1;
 	static var HEIGHTMAP = 2;
-	private static var method = 0;
+	private static var method = 2;
 
 	//Used in the histogram method to determine if an extra axis should be used to scale vertically.
 	private static var histogramCountAxis : int = 1;
@@ -234,13 +234,6 @@ class GraphController extends MonoBehaviour {
 		}
 	}
 
-	// static function updateMethodController(axis_index : int) {
-	// 	// Note that these methods rely on axis controller so it must be 
-	// 	// the case that axisController is notified of the change first.
-	// 	BarController.updateBars(axis_index);
-
-	// }
-
 	static function isUsingMethodWithNodes() {
 		return (method == 0);
 	}
@@ -266,7 +259,7 @@ class GraphController extends MonoBehaviour {
 
 	//Used to determine if tick marks should be squashed to line up with bars.
 	static function methodRequiresTickSquash() {
-		return (method == 1); //TODO: 2?
+		return (method == 1 || method == 2);
 	}
 
 	static function methodLimitsSpecialAxisToY() {
