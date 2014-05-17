@@ -36,6 +36,7 @@ class GraphController extends MonoBehaviour {
 		return method;
 	}
 	static function setMethodIndex(method : int) {
+
 		this.method = method;
 		
 		// Deal with the special row axis being used by a different attribute.
@@ -100,6 +101,8 @@ class GraphController extends MonoBehaviour {
 		if (graphing) {
 			CameraController.useGraphing();
 		}
+
+		HeightMap.refreshHeightmap();
 	}
 
 	static function setFileIndex(file_index : int) {
@@ -110,6 +113,7 @@ class GraphController extends MonoBehaviour {
 			this.file = null;
 		}
 		resetAxes();
+		HeightMap.refreshHeightmap();
 	}
 	static function getFile() {
 		return file;
@@ -204,9 +208,9 @@ class GraphController extends MonoBehaviour {
 	private static function updateMethodController() {
 		if (method == HISTOGRAM) {
 			HistogramController.updateHistogram();
-		} else if (method == HEIGHTMAP) {
-			HeightMap.updateHeightmap();
-		}
+		} 
+
+		HeightMap.refreshHeightmap();
 	}
 
 

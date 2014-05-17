@@ -7,12 +7,10 @@ class CountCache {
 	// Used for single attribute counts
 	// attribute -> numBuckets -> countArray
 	private static var small_cache = new Dictionary.<Attribute, Dictionary.<int, int[]> >();
-	private static var small_max_cache = new Dictionary.<Attribute, Dictionary.<int, int> >();
 
 	// Used for double attribute counts
 	// attribute -> attribute -> numBuckets -> numBuckets -> countMatrix
 	private static var cache = new Dictionary.<Attribute, Dictionary.<Attribute, Dictionary.<int, Dictionary.<int, int[,] > > > >();
-	private static var max_cache = new Dictionary.<Attribute, Dictionary.<Attribute, Dictionary.<int, Dictionary.<int, int > > > >();
 
 	static function invalidateCache(attribute : Attribute) {
 
@@ -30,16 +28,18 @@ class CountCache {
 		}
 	}
 
-	private static function getCount(attr : Attribute, numBuckets : int, bucket : int) {
-		return getCount(attr, null, numBuckets, 0, bucket, 0);
-	}
-
 	// Returns the number of matching nodes with the specified coordinates
-	static function getCount(attribute1 : Attribute, attribute2 : Attribute, numBuckets1 : int, numBuckets2 : int, bucket1 : int, bucket2 : int) : int{
+	static function getCount(attribute1 : Attribute, attribute2 : Attribute, numberBuckets1 : int, numberBuckets2 : int, bucketIndex1 : int, bucketIndex2 : int) : int{
 		
 		//"Sort" the attributes to avoid reflected matrices
-		var attr1 = chooseAttribute(attribute1, attribute2, true);
-		var attr2 = chooseAttribute(attribute1, attribute2, false);
+		var inOrder = attributesAreInOrder(attribute1, attribute2);
+		var attr1 = (inOrder) ? attribute1 : attribute2;
+		var attr2 = (inOrder) ? attribute2 : attribute1;
+		var numBuckets1 = (inOrder) ? numberBuckets1 : numberBuckets2;
+		var numBuckets2 = (inOrder) ? numberBuckets2 : numberBuckets1;
+		var bucket1 = (inOrder) ? bucketIndex1 : bucketIndex2;
+		var bucket2 = (inOrder) ? bucketIndex2 : bucketIndex1;
+
 	
 		// attr1 is only null if both are null. Exit immediately.
 		if (attr1 == null) {
@@ -52,7 +52,7 @@ class CountCache {
 			if (!small_cache.ContainsKey(attr1) || !small_cache[attr1].ContainsKey(numBuckets1)) {
 				calculateCountArray(attr1, numBuckets1);
 			}
-			Debug.Log(attr1 + " " + attr2 + " " + numBuckets1 + " " + numBuckets2);
+			Debug.Log(attr1.column_index + " " + " " + numBuckets1);
 			return small_cache[attr1][numBuckets1][bucket1];
 		}
 		
@@ -66,49 +66,14 @@ class CountCache {
 		return cache[attr1][attr2][numBuckets1][numBuckets2][bucket1,bucket2];
 	}
 
-	// static function getMaxCount(attribute1 : Attribute, attribute2 : Attribute, numBuckets1 : int, numBuckets2 : int) : int {
-	// 	//"Sort" the attributes to avoid reflected matrices
-	// 	var attr1 = chooseAttribute(attribute1, attribute2, true);
-	// 	var attr2 = chooseAttribute(attribute1, attribute2, false);
-
-	// 	if (attr1 == null) {
-	// 		return 0;
-	// 	}
-
-	// 	// only attr2 is null, so use the small cache.
-	// 	if (attr2 == null) {
-	// 		if (!small_max_cache.ContainsKey(attr1) || !small_max_cache[attr1].ContainsKey(numBuckets1)) {
-	// 			calculateMaxCount(attr1, numBuckets1);
-	// 		}
-	// 		print(small_max_cache[attr1][numBuckets1] + " " + )
-	// 		return small_max_cache[attr1][numBuckets1];
-	// 	}
-
-	// 	//Calculate if the values are unknown
-	// 	if (!max_cache.ContainsKey(attr1) || !max_cache[attr1].ContainsKey(attr2) || !max_cache[attr1][attr2].ContainsKey(numBuckets1) ||
-	// 			!max_cache[attr1][attr2][numBuckets1].ContainsKey(numBuckets2)) {
-	// 		calculateMaxCount(attr1, attr2, numBuckets1, numBuckets2);
-	// 	}
-
-	// 	return max_cache[attr1][attr2][numBuckets1][numBuckets2];
-	// }
-
-	private static function chooseAttribute(attr1 : Attribute, attr2 : Attribute, first : boolean) {
-		
-		//if both are null return null. 
-		if (attr1 == null && attr2 ==null) {
-			return null;
+	private static function attributesAreInOrder(attr1 : Attribute, attr2 : Attribute) {
+		if (attr2 == null) {
+			return true;
+		} else if (attr1 == null) {
+			return false;
+		} else {
+			return (attr1.column_index < attr2.column_index);
 		}
-
-		if (attr1 != null && attr2 == null) {
-			return (first) ? attr1 : attr2;
-		}
-
-		if (attr1 == null && attr2 != null) {
-			return (first) ? attr2 : attr1;
-		}
-
-		return ( (first && attr1.column_index < attr2.column_index) ||  (!first && attr1.column_index > attr2.column_index)) ? attr1 : attr2;
 	}
 
 	// Used for calculating small_cache
@@ -131,11 +96,14 @@ class CountCache {
 	}
 
 	// Used for calculating cache
-	private static function calculateCountMatrix(attribute1 : Attribute, attribute2 : Attribute, numBuckets1 : int, numBuckets2 : int) {
+	private static function calculateCountMatrix(attribute1 : Attribute, attribute2 : Attribute, numberBuckets1 : int, numberBuckets2 : int) {
 
 		//"Sort" the attributes to avoid reflected matrices
-		var attr1 = chooseAttribute(attribute1, attribute2, true);
-		var attr2 = chooseAttribute(attribute1, attribute2, false);
+		var inOrder = attributesAreInOrder(attribute1, attribute2);
+		var attr1 = (inOrder) ? attribute1 : attribute2;
+		var attr2 = (inOrder) ? attribute2 : attribute1;
+		var numBuckets1 = (inOrder) ? numberBuckets1 : numberBuckets2;
+		var numBuckets2 = (inOrder) ? numberBuckets2 : numberBuckets1;
 
 		//Ensure that there is a dictionary for attr1.
 		if (!cache.ContainsKey(attr1)) {
@@ -166,58 +134,4 @@ class CountCache {
 			cache[attr1][attr2][numBuckets1][numBuckets2][bucket1,bucket2]++;
 		}
 	}
-
-
-	// // Used for calculating small_max_cache
-	// private static function calculateMaxCount(attr : Attribute, numBuckets : int) {
-	// 	if (!small_max_cache.ContainsKey(attr)) {
-	// 		small_max_cache[attr] = new Dictionary.<int, int>();
-	// 	}
-
-	// 	var max = 0;
-	// 	for (var bucket = 0 ; bucket < numBuckets ; bucket++) {
-	// 		var cur_count = getCount(attr, numBuckets, bucket);
-	// 		max = Mathf.Max(cur_count, max);
-	// 	}
-
-	// 	small_max_cache[attr][numBuckets] = max;
-	// }
-
-	// // Used for calculating max_cache
-	// private static function calculateMaxCount(attribute1 : Attribute, attribute2 : Attribute, numBuckets1 : int, numBuckets2 : int) {
-	// 	//"Sort" the attributes to avoid reflected matrices
-	// 	var attr1 = chooseAttribute(attribute1, attribute2, true);
-	// 	var attr2 = chooseAttribute(attribute1, attribute2, false);
-
-	// 	//Ensure that there is a dictionary for attr1.
-	// 	if (!max_cache.ContainsKey(attr1)) {
-	// 		max_cache[attr1] = new Dictionary.<Attribute, Dictionary.<int, Dictionary.<int, int > > >();
-	// 	}
-
-	// 	//Ensure that there is a nested dictionary for attr2 in attr1
-	// 	if (!max_cache[attr1].ContainsKey(attr2)) {
-	// 		max_cache[attr1][attr2] = new Dictionary.<int, Dictionary.<int, int > >();
-	// 	}
-
-	// 	//Ensure that these numbers of buckets has been made
-	// 	if (!max_cache[attr1][attr2].ContainsKey(numBuckets1)) {
-	// 		max_cache[attr1][attr2][numBuckets1] = new Dictionary.<int, int>();
-	// 	}
-
-
-	// 	var max = 0;
-	// 	for (var bucket1 = 0 ; bucket1 < numBuckets1 ; bucket1++) {
-	// 		for (var bucket2 = 0 ; bucket2 < numBuckets2 ; bucket2++) {
-	// 			var cur_count = getCount(attr1, attr2, numBuckets1, numBuckets2, bucket1, bucket2);
-	// 			max = Mathf.Max(cur_count, max);
-	// 		}
-	// 	}
-
-	// 	max_cache[attr1][attr2][numBuckets1][numBuckets2] = max;
-	// }
-
-
-
-
-
 }

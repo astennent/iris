@@ -10,6 +10,7 @@ private static var instance : HeightMap;
 function Start () {
 
 	instance = this;
+	instance.gameObject.SetActive(false);
 
 	terrainData = new TerrainData();
 	GetComponent(Terrain).terrainData = terrainData;	
@@ -18,10 +19,18 @@ function Start () {
 	terrainData.heightmapResolution = resolution; 
 
 	terrainData.size = Vector3.one * GraphController.getScale(); //real world size
-	
 }
 
-static function updateHeightmap() {
+static function refreshHeightmap() {
+
+	// Disable the heightmap and do not update if you shouldn't show it.
+	if (!GraphController.isGraphing() || GraphController.getMethodIndex() != GraphController.HEIGHTMAP) {
+		instance.gameObject.SetActive(false);
+		return;
+	}
+
+	instance.gameObject.SetActive(true);
+
 	var attrX = GraphController.getAxis(0);
 	var attrZ = GraphController.getAxis(2);
 	var numBucketsX = BarController.getNumBars(0);
