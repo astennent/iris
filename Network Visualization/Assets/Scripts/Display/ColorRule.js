@@ -18,6 +18,15 @@ class ColorRule {
 
 	private var continuous_attribute : Attribute;
 
+	static var sizing_types = [" By Edges", " Fixed", " By Attribute"];
+	static var SIZING_EDGES = 0;
+	static var SIZING_FIXED = 1;
+	static var SIZING_ATTRIBUTE = 2;
+	
+	private var sizing_type = 0;
+	private var sizing_scale : float = 2.5;
+	private var changing_size = false;
+
 	var is_fallback : boolean; //is this the "default" rule?
 
 	var color : Color;
@@ -28,10 +37,7 @@ class ColorRule {
 
 	var scheme_button_color : Color; //used for coloring the scheme button so it doesn't flash.
 
-	var uses_manual_size = false;
-	var manual_size : float = 2.5;
-
-	//0:custom, 1:scheme, 2:centrality
+	//0:custom, 1:scheme, 2:centrality, 3:continuous attribute
 	private var method : int = 0;
 	private var scheme_index : int;
 
@@ -220,14 +226,14 @@ class ColorRule {
 	function getAttribute(){
 		return attribute;
 	}
-	function setAttribute(input : Attribute){
-		attribute = input;
+	function setAttribute(attribute : Attribute){
+		this.attribute = attribute;
 	}
 	function getAttributeValue(){
 		return attribute_value;
 	}
-	function setAttributeValue(input : String) {
-		attribute_value = input;
+	function setAttributeValue(attribute_value : String) {
+		this.attribute_value = attribute_value;
 	}
 	
 
@@ -235,12 +241,43 @@ class ColorRule {
 		return continuous_attribute;
 	}
 
-	function setContinuousAttribute(input : Attribute) {
-		this.continuous_attribute = input;
+	function setContinuousAttribute(continuous_attribute : Attribute) {
+		this.continuous_attribute = continuous_attribute;
 
 		//Automatically switch to coloring the file of the selected attribute.
 		sources = new HashSet.<DataFile>();
-		sources.Add(input.file); 
+		sources.Add(continuous_attribute.file); 
 		this.setRuleType(0); //switch to coloring by source
 	}
+
+
+	/* ******** Node Sizing ********** */
+
+
+	function isChangingSize() {
+		return changing_size;
+	}
+
+	function setChangingSize(changing_size : boolean) {
+		this.changing_size = changing_size;
+		print("Cjecl");
+	}
+
+	function getSizingType() {
+		return sizing_type;
+	}
+
+	function setSizingType(sizing_type : int) {
+		this.sizing_type = sizing_type;
+	}
+
+	function getSizingScale() {
+		return sizing_scale;
+	}
+
+	function setSizingScale(sizing_scale : float) {
+		this.sizing_scale = sizing_scale;
+	}
+
+
 }

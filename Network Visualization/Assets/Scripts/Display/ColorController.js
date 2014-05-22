@@ -17,6 +17,7 @@ static function Init(){
 	createRule();
 	rules[0].is_fallback = true;
 	rules[0].setMethod(1);
+	rules[0].setChangingSize(true);
 }
 
 static function createRule() : ColorRule {
@@ -57,6 +58,10 @@ static function ApplyRulesForDateChange() {
 }
 
 static function ApplyAllRules(){
+	ApplyAllRules(true, true);
+}
+
+static function ApplyAllRules(change_color : boolean, change_size : boolean) {
 	//reset all halos.
 	for (var file : DataFile in FileManager.files){
 		for (var node in file.getNodes()){
@@ -65,10 +70,9 @@ static function ApplyAllRules(){
 	}
 
 	for (var rule in rules){
-		ApplyRule(rule);
+		ApplyRule(rule, change_color, change_size);
 	}
 }
-
 
 static function ApplyRule(rule: ColorRule) {
 	//Note that change_color and change_size are for small changes in the menu.
@@ -182,9 +186,8 @@ static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, c
 			node.setColor(NudgeColor(color, adjusted_variation), true);
 		}
 	}
-	if (change_size && rule.uses_manual_size) {
-		node.setManualSize(rule.manual_size);
-		node.setSizingType(1); //manual size
+	if (change_size && rule.isChangingSize()) {
+		node.setSizingInfo(rule.getSizingScale(), rule.getSizingType(), rule.getContinuousAttribute());
 	}
 }
 

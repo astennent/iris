@@ -20,10 +20,10 @@ class Node extends TimeObject {
 	var group_id :int = -1; //used by ClusterController to identify which group of edges it belongs to.
 	private var activated = true;
 
-	var sizing_types = ["By Edges", "Manual", "By Attribute"];
 	private var sizing_type = 0;
-	private var manual_size : float = 10.0;
-	private var size : float = 2.5; //2.5 is the minimum
+	private var sizing_scale : float = 10.0;
+	private var sizing_attribute : Attribute;
+	private var desired_size : float = 2.5; //2.5 is the minimum
 
 
 	private var haloColor : Color;
@@ -115,7 +115,7 @@ class Node extends TimeObject {
 					continue;
 				}
 
-				var motion = calculateMotionRelativeTo(other_node, other_node.size, null, edge);
+				var motion = calculateMotionRelativeTo(other_node, other_node.desired_size, null, edge);
 				netMotion += motion;
 			}
 			
@@ -124,6 +124,8 @@ class Node extends TimeObject {
 		}
 	    
 	    transform.position = Vector3.Lerp(originalPosition, desiredPosition, 0.5);
+	    var size = Mathf.Lerp(transform.localScale.x, desired_size, 0.5);
+		transform.localScale = new Vector3(size, size, size);
 
 	    if (PlanarityController.isFlat()){
 	    	transform.position.z/=1.15;
@@ -172,7 +174,7 @@ class Node extends TimeObject {
 		}
 		
 		var target = other_node.transform.position;
-		var sizeCompensation = (size+other_size)/10;
+		var sizeCompensation = (desired_size+other_size)/10;
 
 		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
 		speed = Mathf.Max(speed, -1);
@@ -197,43 +199,52 @@ class Node extends TimeObject {
 		}
 	}
 
-	function setSizingType(type_index : int){
-		sizing_type = type_index;
-		UpdateSize();
-	}
-
-	function UpdateSize(){
+	function UpdateSize() {
 
 		//override other rules when graphing.
 		if (GraphController.isGraphing() && GraphController.isForcingNodeSize()) {
-			size = GraphController.getForcedNodeSize();
+			desired_size = GraphController.getForcedNodeSize();
 		} else {
-			if (sizing_type == 0){ //by # edges
+			if (sizing_type == ColorRule.SIZING_EDGES){ 
 				//Only count edges in the current time.
 				var validCount = getEdges(true).Count;
-				size = validCount * 1.25 + 1.5;
-			} else if (sizing_type == 1) { //manual
-				size = manual_size;
-			} else if (sizing_type == 2) { //by attribute
-				//TODO
+				desired_size = validCount * 1.25 + 1.5;
+			} else if (sizing_type == ColorRule.SIZING_FIXED) { //manual
+				desired_size = sizing_scale;
+			} else if (sizing_type == ColorRule.SIZING_ATTRIBUTE) { //by attribute
+				var attrAdjust : float = (sizing_attribute != null) ? GetNumeric(sizing_attribute) : 1.0;
+				desired_size = attrAdjust * sizing_scale;
 			}
 		}
 
-		size = Mathf.Max(2.5, size);
-		transform.localScale = new Vector3(size, size, size);
+		desired_size = Mathf.Max(2.5, desired_size);
 	}
 
+	function setSizingInfo(sizing_scale : float, sizing_type : int, sizing_attribute : Attribute) {
+		this.sizing_scale = sizing_scale;
+		this.sizing_type = sizing_type;
 
-	function getManualSize(){
-		return manual_size;
+		// Only use this sizing attribute if it's the correct source file.
+		if (sizing_attribute != null && sizing_attribute.file == this.source) {
+			this.sizing_attribute = sizing_attribute;
+		} else {
+			this.sizing_attribute = null;
+		}
+		UpdateSize();
 	}
-	function setManualSize(s : float){
-		manual_size = s;
+
+	function getSizingScale(){
+		return sizing_scale;
 	}
 
 	function getSize() {
-		return size;
+		return desired_size;
 	}
+
+	function getSizingType() {
+		return sizing_type;
+	}
+
 
 	function UpdateName(){
 		var shown_indices = source.shown_indices;
@@ -273,7 +284,7 @@ class Node extends TimeObject {
 	function LateUpdate () {
 		if (renderer.isVisible && !GraphController.isGraphing()){
 			label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
-			var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*size/10;
+			var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*desired_size/10;
 			label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 3.0, 20.0);
 			label.GetComponent(GUIText).text = display_name;
 		}	else {
@@ -301,12 +312,12 @@ class Node extends TimeObject {
 
 	function resetColorRules(){
 		resetHaloColor();
-		resetManualSizing();
+		resetSizing();
 	}
 
-	function resetManualSizing(){
+	function resetSizing(){
 		//set the sizing type to "by edges"
-		setSizingType(0);
+		sizing_type = 0;
 	}
 
 	function resetHaloColor(){
