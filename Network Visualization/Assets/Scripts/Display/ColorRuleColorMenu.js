@@ -205,10 +205,6 @@ class ColorRuleColorMenu extends BaseMenu {
 
 		rule.coloring_node = GUI.Toggle (Rect (x+width/2+10, cur_y, width/2-10, 20), rule.coloring_node, " Color Node");
 		rule.coloring_halo = GUI.Toggle (Rect (x+10, cur_y, width/2-10, 20), rule.coloring_halo, " Color Halo");
-		
-		// if (rule.coloring_halo != original_halo || rule.coloring_node != original_node) {
-		// 	ColorController.ApplyRule(rule);
-		// }
 
 		if ( (!rule.coloring_halo && original_halo) || (!rule.coloring_node && original_node)) {
 			ColorController.ApplyAllRules(true, false);
