@@ -440,29 +440,59 @@ class DataFile extends LoadableFile {
 			for (var foreignKey in foreignKeys) {
 				var other_file : DataFile = foreignKey.to_file;
 				var fkeyPairs = foreignKey.getKeyPairs();
-				//TODO: special case when the foreign key points exactly to the other file's primary keys.
-				
-				//loop over other file's nodes. This is n^2 argh
-				for (var to_node in other_file.getNodes()){
-		
-					for (var pair in fkeyPairs){					
+				var matches = new List.<Node>();
 
-						var from_attribute_index = pair[0].column_index;	
-						var from_attribute_value = from_node.Get(from_attribute_index);					
-						
-						var to_attribute_index = pair[1].column_index;
-						var to_attribute_value = to_node.Get(to_attribute_index);							
-						
-						//You found a match. Generate a edge.
-						if (from_attribute_value == to_attribute_value){
-							var newConn = from_node.AddEdge(this, to_node, true, foreignKey); 
-							//Data should be stored in the node.
-							newConn.setDataSource(from_node);
-						}
-						
+				/*	This function checks the other node's primary key to potentially speed up 
+					node matching. If there is a perfect mapping, the matching operation will 
+					run in O(1) time. If it is not, it loops over the other file's nodes in
+					O(n) time. */
+
+				if (foreignKey.mapsToPrimary()) {
+					// Use the other file's node dict to map directly to the matching node.
+
+					//Create the string key from the current line.
+					var node_values = new Array();
+					for (pair in fkeyPairs) {
+						node_values.Push(from_node.Get(pair[0])); // Get the from_attribute of the from_node.
 					}
-				
-				}				
+					var node_values_string = node_values.toString();
+					
+					// Find the node that the key corresponds to and create the edge.
+					if (other_file.nodes.ContainsKey(node_values_string)) {
+						var other_node : Node = other_file.nodes[node_values_string];
+						matches.Add(other_node);
+					}
+
+				} else {				
+					// Loop over the other file's nodes to find matches.
+					for (var to_node in other_file.getNodes()){
+						var is_match = true;
+						for (var pair in fkeyPairs){					
+
+							var from_attribute_index = pair[0].column_index;	
+							var from_attribute_value = from_node.Get(from_attribute_index);					
+							
+							var to_attribute_index = pair[1].column_index;
+							var to_attribute_value = to_node.Get(to_attribute_index);							
+							
+							//You found a match. Generate a edge.
+							if (from_attribute_value != to_attribute_value){
+								is_match = false;
+								break;
+							}							
+						}
+						if (is_match) {
+							matches.Add(to_node);
+						}
+					
+					}
+				}	
+
+				for (var matching_node in matches) {
+					var newConn = from_node.AddEdge(this, matching_node, true, foreignKey); 
+					//Data should be stored in the node.
+					newConn.setDataSource(from_node);
+				}			
 			}
 		}
 
@@ -498,9 +528,17 @@ class DataFile extends LoadableFile {
 				var keyPairs = foreignKey.getKeyPairs();
 				var these_matches = new List.<Node>();
 
+				/*	This function checks the other node's primary key to potentially speed up 
+					node matching. If there is a perfect mapping, the matching operation will 
+					run in O(1) time. If it is not, it loops over the other file's nodes in
+					O(n) time. Note that since this is a linking table, there is a potential
+					linear time increase for both directions of the foreign key, so it could 
+					run in O(1) if both directions map perfectly, O(n) if just one maps perfectly, 
+					or O(n^2) if neither map perfectly. */
+
 				//check if the foreign key maps directly onto the target table's primary key.
 				if (foreignKey.mapsToPrimary()) {					
-					//convert the values of the current line to an array key into the other file's nodes.
+					// Use the other file's node dict to map directly to the matching node.
 					var node_values = new Array();
 					for (pair in keyPairs) {
 						var from_attribute_index = pair[0].column_index;
@@ -514,8 +552,7 @@ class DataFile extends LoadableFile {
 					}
 					matches.Add(these_matches);
 				} else {
-					//VERY COMPUTATIONALLY EXPENSIVE
-					//loops over the nodes in the other file. This makes the operation n^2 	
+					// Loop over the other file's nodes to find matches.
 					for (var entry in other_file.nodes) {
 						node = entry.Value;
 						var matching = true;

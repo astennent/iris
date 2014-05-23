@@ -48,8 +48,9 @@ class Attribute extends Stats {
 	}
 
 	function TogglePkey(){
-		//TODO runtime pkey switching.
-		is_pkey = !is_pkey;
+		if (!file.isActivated() && !file.isActivating()) {
+			is_pkey = !is_pkey;
+		}
 	}
 
 	function getRestrictedName(pixels : int) {
