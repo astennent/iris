@@ -1,7 +1,11 @@
 #pragma strict
 
-class ColorRule {
+import System.Xml;
+import System.Xml.Serialization;
+import System.Xml.Schema.XmlAtomicValue;
 
+@XmlRoot("ColorRule")
+class ColorRule {
 	private var rule_type : int;
 
 	private var centrality_type : int; //corresponds to ColorController.centrality_types
@@ -260,7 +264,6 @@ class ColorRule {
 
 	function setChangingSize(changing_size : boolean) {
 		this.changing_size = changing_size;
-		print("Cjecl");
 	}
 
 	function getSizingType() {

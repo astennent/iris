@@ -25,7 +25,7 @@ class FileMenu extends BaseMenu {
 		parent = GetComponent(MainMenu);
 		super.Start();
 		title = "File Manager";
-		fileString = Path.GetFullPath(".");
+		fileString = Path.GetFullPath(".") + "\\";
 	}
 
 	static function getSelectedFile() {
@@ -256,7 +256,8 @@ class FileMenu extends BaseMenu {
 
 		GUI.color = Color.white;
 		
-		fileString = FilePicker.PickFile(Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), fileString);
+		//fileString = FilePicker.PickFile(Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), fileString);
+		fileString = FilePicker.PickFile(Rect ( (Screen.width-600)/2,(MenuController.getScreenHeight()-400)/2,600,400), fileString);
 		
 	}
 

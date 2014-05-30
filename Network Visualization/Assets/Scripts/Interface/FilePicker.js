@@ -122,11 +122,14 @@ class FilePicker extends MonoBehaviour {
 		var scrollInnerRect = new Rect(0, 0, innerWidth, innerHeight);
 
 		//Process up/left/down/right strokes
-		processKeyStrokes(numIcons, iconsPerRow);
+		var selectionChanged = processKeyStrokes(numIcons, iconsPerRow);
 
-		//loop over current filtered directory
-		scrollPosition = GUI.BeginScrollView (scrollOuterRect, scrollPosition, scrollInnerRect);
-			
+
+		// Keep track of the current selection rectangle so you can scroll to it later.
+		var selectionTop = 0;
+		var selectionBottom = 0;
+
+		scrollPosition = GUI.BeginScrollView (scrollOuterRect, scrollPosition, scrollInnerRect);			
 
 			var bothLists = new List.<LinkedList.<Icon> >();
 			bothLists.Add(matching_directories); 
@@ -163,6 +166,9 @@ class FilePicker extends MonoBehaviour {
 						selectRect.width += 4;
 						selectRect.y -= 2;
 						GUI.Box(selectRect, "");
+
+						selectionTop = selectRect.y;
+						selectionBottom = selectionTop + selectRect.height;
 					}
 
 					//Render label
@@ -185,32 +191,54 @@ class FilePicker extends MonoBehaviour {
 			}
 
 		GUI.EndScrollView();
+
+		if (selectionChanged) {
+			// Decide if you need to scroll to see the selection.
+			var viewTop = scrollPosition.y;
+			var viewBottom = viewTop + scrollOuterRect.height;
+
+			if (selectionBottom > viewBottom) {
+				//scroll down to fit the selection.
+				scrollPosition.y = selectionBottom-scrollOuterRect.height;
+			} else if (selectionTop < viewTop) {
+				scrollPosition.y = selectionTop;
+			}
+		}
+
 		focusHeader();
-
-
 	}
 
 	static function processKeyStrokes(numIcons : int, iconsPerRow : int) {
+		var selectionChanged = false;
 		var e = Event.current;
 		if (e.type == EventType.KeyDown) {
 			switch(e.keyCode) {
 			case KeyCode.RightArrow:
 				selectedIndex++;
+				selectionChanged = true;
 				break;
 			case KeyCode.LeftArrow:
 				selectedIndex--;
+				selectionChanged = true;
 				break;
 			case KeyCode.DownArrow:
-				selectedIndex+=iconsPerRow;
+				if (selectedIndex < numIcons-iconsPerRow) {
+					selectedIndex+=iconsPerRow;
+				}
+				selectionChanged = true;
 				break;
 			case KeyCode.UpArrow:
-				selectedIndex-=iconsPerRow;
+				if (selectedIndex >= iconsPerRow) {
+					selectedIndex-=iconsPerRow;
+				}
+				selectionChanged = true;
+				break;
 			default:
 				break;
 			}
-		}
-		selectedIndex = Mathf.Clamp(selectedIndex, 0, numIcons-1);
-
+			selectedIndex = Mathf.Clamp(selectedIndex, 0, numIcons-1);
+		} 
+		return selectionChanged;
 	}
 
 	static function moveUpDirectory() {

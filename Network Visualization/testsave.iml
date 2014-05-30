@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ColorRule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <is_fallback>true</is_fallback>
+  <color>
+    <r>0</r>
+    <g>1</g>
+    <b>0.5936093</b>
+    <a>0.5</a>
+  </color>
+  <variation>0.3</variation>
+  <coloring_halo>true</coloring_halo>
+  <coloring_node>true</coloring_node>
+  <scheme_button_color>
+    <r>0</r>
+    <g>1</g>
+    <b>0.5936093</b>
+    <a>1</a>
+  </scheme_button_color>
+</ColorRule>
