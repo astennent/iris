@@ -133,6 +133,15 @@ class BaseMenu extends MonoBehaviour {
 		return false;
 	}
 
+	function getRightSideOfMenus() : float {
+		for (var subMenu in children) {
+			if (subMenu.displaying){
+				return subMenu.getRightSideOfMenus();
+			}
+		}
+		return x+width;
+	}
+
 	//Overwritten by derived classes if they need to do something special
 	static function OnDisableDisplay() {}
 

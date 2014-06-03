@@ -4,6 +4,8 @@ function Update() {
 	handleEscapePress();
 }
 
+static var gameController : GameObject;
+
 static function handleEscapePress() {
 
 	//Escape priority in order: Popup, MainMenu children, Selected Nodes, TimeSeries, MainMenu (Toggles)
@@ -37,8 +39,18 @@ static function getScreenTop() {
 	return ProgressBar.getBottom();
 }
 
+static function getScreenLeft() {
+	return gameController.GetComponent(MainMenu).getRightSideOfMenus();
+}
+
+static function getScreenRight() {
+	return SelectionMenu.getLeftSide();
+}
+
 static function getInstance(menuClass : System.Type) : BaseMenu {
-	var instance = GameObject.FindGameObjectWithTag("GameController").GetComponent(menuClass);
-	return instance;
+	if (!gameController) {
+		gameController = GameObject.FindGameObjectWithTag("GameController");
+	}
+	return gameController.GetComponent(menuClass);
 }
 

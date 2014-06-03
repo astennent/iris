@@ -23,7 +23,7 @@ function Start(){
 	cameraTransform = networkCamera.transform;
 }
 
-static function getPrimaryNode() {
+static function getPrimaryNode() : Node {
 	if (primaryNode != null) {
 		return primaryNode;
 	} else if (primaryNode == null && nodes.Count == 0) {

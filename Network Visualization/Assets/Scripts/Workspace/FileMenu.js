@@ -11,6 +11,9 @@ class FileMenu extends BaseMenu {
 	private static var cur_y : float;
 	private static var attributeScrollPosition : Vector2 = Vector2.zero;
 	private static var fileString : String = "";
+
+	static var fileStringWindow : Window;
+
 	static var error_message : String = "";
 
 	static var DROPDOWN_ID = "0";
@@ -21,11 +24,16 @@ class FileMenu extends BaseMenu {
 	static var selected_file_index : int = -1; //used to decide what to display below the line.
 	static var creating_file : boolean = false;
 
+	private static var fileStringWindowWidth = 620;
+	private static var fileStringWindowHeight = 400;
+
 	function Start(){
 		parent = GetComponent(MainMenu);
 		super.Start();
 		title = "File Manager";
 		fileString = Path.GetFullPath(".") + "\\";
+		fileStringWindow = Window.Instantiate(new Rect((Screen.width-fileStringWindowWidth)/2, 
+				(MenuController.getScreenHeight()-fileStringWindowHeight)/2, fileStringWindowWidth, fileStringWindowHeight));
 	}
 
 	static function getSelectedFile() {
@@ -42,6 +50,7 @@ class FileMenu extends BaseMenu {
 			AttributeMenu.setSelectedIndex(-1);
 			FkeyMenu.resetCreation();
 			creating_file = false;
+			Dropdown.reset(DROPDOWN_ID);
 		}
 	}
 
@@ -49,6 +58,17 @@ class FileMenu extends BaseMenu {
 		creating_file = !creating_file;
 		AttributeMenu.setSelectedIndex(-1);
 		FkeyMenu.resetCreation();
+
+		if (creating_file) {
+			var openSpaceCenter = (MenuController.getScreenLeft() + MenuController.getScreenRight())/2;
+
+			var windowX = openSpaceCenter - fileStringWindowWidth/2;
+			var windowY = (MenuController.getScreenHeight()-fileStringWindowHeight)/2;
+
+			print(openSpaceCenter + " " + windowY + " " + windowX + " ----- " +MenuController.getScreenLeft() + " " + MenuController.getScreenRight() );
+
+			fileStringWindow.setPosition(new Vector2(windowX, windowY));
+		}
 	}
 
 	function OnGUI(){
@@ -62,7 +82,7 @@ class FileMenu extends BaseMenu {
 		
 		//Draw the file selection dropdown
 		var selection_rect = new Rect(x+10, cur_y, width-50, 30);
-		var dropHeight = 200;
+		var dropHeight = 500;
 		var filesList = new String[FileManager.files.Count];
 		for (var i = 0 ; i < FileManager.files.Count ; i++) {
 			filesList[i] = FileManager.files[i].shortName();
@@ -210,7 +230,7 @@ class FileMenu extends BaseMenu {
 		var remove_button = new Rect(x+width/2+5, MenuController.getScreenHeight()-40, width/2-12.5, 30);
 		if (GUI.Button(remove_button, "Remove File")) {
 			FileManager.RemoveFile(selected_file_index);
-			selected_file_index = -1;
+			setSelectedFile(-1);
 		}
 		
 	}
@@ -256,8 +276,8 @@ class FileMenu extends BaseMenu {
 
 		GUI.color = Color.white;
 		
-		//fileString = FilePicker.PickFile(Rect (x,cur_y,width,MenuController.getScreenHeight()-cur_y), fileString);
-		fileString = FilePicker.PickFile(Rect ( (Screen.width-600)/2,(MenuController.getScreenHeight()-400)/2,600,400), fileString);
+		fileString = fileStringWindow.Render(FilePicker.PickFile, 
+				[Rect (0, 0, fileStringWindowWidth, fileStringWindowHeight), fileString]);		
 		
 	}
 

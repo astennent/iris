@@ -3,8 +3,8 @@
 class SelectionMenu extends BaseMenu {
 	private var dataScrollPosition : Vector2 = Vector2.zero;
 	private var nodeScrollPosition : Vector2 = Vector2.zero;
+	private static var handlePosition : Rect;
 	var more : Texture;
-
 
 	function Start() {
 		super.Start();
@@ -37,19 +37,19 @@ class SelectionMenu extends BaseMenu {
 			
 			//"More" button
 			//var button_position : Rect = new Rect(Screen.width, 5, 35, 35);
-			var handlePosition : Rect = new Rect(x-15, MenuController.getScreenTop(), 15, MenuController.getScreenHeight());
+			handlePosition = new Rect(x-15, MenuController.getScreenTop(), 15, MenuController.getScreenHeight());
 			GuiPlus.Box(handlePosition, ""); //capture mouse clicks so menu isn't closed.
 			if (GUI.Button(handlePosition, more)){
 				ToggleDisplay(SelectionMenu);
 			}	
 
-			var cur_y = 30;
+			var cur_y = 30.0;
 			cur_y = DrawNodeList(cur_y);
 			DrawPrimaryNode(cur_y+5);
 		}
 	}
 
-	function DrawNodeList(cur_y : int) {
+	function DrawNodeList(cur_y : int) : float {
 
 		var numNodes = SelectionController.getNumSelected();
 		var nodeButtonHeight = 30;
@@ -173,5 +173,14 @@ class SelectionMenu extends BaseMenu {
 			}
 
 		GUI.EndScrollView();
+	}
+
+	// Used by menu controller to find the right side of the screen.
+	static function getLeftSide() {
+		if (SelectionController.getNumSelected() > 0 && handlePosition != null) {
+			return handlePosition.x;
+		} else {
+			return Screen.width;
+		}
 	}
 }

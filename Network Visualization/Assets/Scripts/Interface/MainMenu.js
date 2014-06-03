@@ -42,6 +42,9 @@ class MainMenu extends BaseMenu {
 			DisableDisplay(TimeSeriesMenu);
 			ToggleDisplay(MainMenu);
 		}	
+
+		//Make sure that clicking the button when the menu is hidden doesn't trigger a click.
+		GuiPlus.Box(button_position, "", false);
 			
 		if (displaying) {
 			var cur_y = 60 + MenuController.getScreenTop();

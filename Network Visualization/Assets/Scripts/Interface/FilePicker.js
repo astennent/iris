@@ -222,9 +222,7 @@ class FilePicker extends MonoBehaviour {
 				selectionChanged = true;
 				break;
 			case KeyCode.DownArrow:
-				if (selectedIndex < numIcons-iconsPerRow) {
-					selectedIndex+=iconsPerRow;
-				}
+				selectedIndex+=iconsPerRow;
 				selectionChanged = true;
 				break;
 			case KeyCode.UpArrow:

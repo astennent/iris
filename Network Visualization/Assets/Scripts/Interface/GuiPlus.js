@@ -6,8 +6,13 @@ public class GuiPlus extends MonoBehaviour {
 
 	// Draw a GuiBox which prevents the Selection
 	// Controller from interacting with nodes
-	static function Box(r : Rect, text:String){
-		GUI.Box(r, text);
+	static function Box(r : Rect, text : String) {
+		Box(r, text, true);
+	}
+	static function Box(r : Rect, text:String, drawBox : boolean){
+		if (drawBox) {
+			GUI.Box(r, text);
+		}
 		boxes.Add(r);
 	}
 

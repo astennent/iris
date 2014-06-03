@@ -75,7 +75,7 @@ static function Load(fname : String, isDemo : boolean) : int {
 		}
 
 		var new_file = DataFile.Instantiate(fname, isDemo);
-		files.Add(new_file);	
+		files.Add(new_file);
 		return files.Count-1;
 
 	} else if (Directory.Exists(fname)){

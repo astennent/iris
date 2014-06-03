@@ -87,6 +87,7 @@
      <Compile Include="Assets\Scripts\Interface\ProgressBar.js" />
      <Compile Include="Assets\Scripts\Interface\RightClickController.js" />
      <Compile Include="Assets\Scripts\Interface\RightClickMenu.js" />
+     <Compile Include="Assets\Scripts\Interface\Window.js" />
      <Compile Include="Assets\Scripts\Planarity\PlanarityController.js" />
      <Compile Include="Assets\Scripts\Search\SearchController.js" />
      <Compile Include="Assets\Scripts\Search\SearchMenu.js" />
