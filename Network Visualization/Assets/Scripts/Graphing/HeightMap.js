@@ -8,9 +8,7 @@ private static var resolution : float = 128;
 private static var instance : HeightMap;
 
 function Start () {
-
 	instance = this;
-	instance.gameObject.SetActive(false);
 
 	terrainData = new TerrainData();
 	GetComponent(Terrain).terrainData = terrainData;	
@@ -60,8 +58,8 @@ static function refreshHeightmap() {
 }
 
 function setHeight(x : int, z : int, height : float, numBucketsX : int, numBucketsZ : int) {
-	var chunkSizeX : int = resolution/numBucketsX;
-	var chunkSizeZ : int = resolution/numBucketsZ;
+	var chunkSizeX : int = Mathf.Round(resolution/numBucketsX);
+	var chunkSizeZ : int = Mathf.Round(resolution/numBucketsZ);
 
 	var heights = new float[chunkSizeZ, chunkSizeX];
 	for (var i = 0 ; i < chunkSizeZ ; i++) {
@@ -70,5 +68,17 @@ function setHeight(x : int, z : int, height : float, numBucketsX : int, numBucke
 		}
 	}
 
-	terrainData.SetHeights(x * chunkSizeX + 1, z * chunkSizeZ + 1, heights);
+	var xStart = x * chunkSizeX;
+	var zStart = z * chunkSizeZ;
+
+	var xOverflow = xStart + chunkSizeX -resolution;
+	if (xOverflow > 0) {
+		xStart -= xOverflow;
+	} 
+	var zOverflow = zStart + chunkSizeZ -resolution;
+	if (zOverflow > 0) {
+		zStart -= zOverflow;
+	}
+
+	terrainData.SetHeights(xStart, zStart, heights);
 }

@@ -17,7 +17,7 @@ class GraphController extends MonoBehaviour {
 	static var SCATTERPLOT = 0;
 	static var HISTOGRAM = 1;
 	static var HEIGHTMAP = 2;
-	private static var method = 2;
+	private static var method = 0;
 
 	//Used in the histogram method to determine if an extra axis should be used to scale vertically.
 	private static var histogramCountAxis : int = 1;

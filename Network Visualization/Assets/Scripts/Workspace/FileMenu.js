@@ -65,8 +65,6 @@ class FileMenu extends BaseMenu {
 			var windowX = openSpaceCenter - fileStringWindowWidth/2;
 			var windowY = (MenuController.getScreenHeight()-fileStringWindowHeight)/2;
 
-			print(openSpaceCenter + " " + windowY + " " + windowX + " ----- " +MenuController.getScreenLeft() + " " + MenuController.getScreenRight() );
-
 			fileStringWindow.setPosition(new Vector2(windowX, windowY));
 		}
 	}

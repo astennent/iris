@@ -52,7 +52,6 @@ class CountCache {
 			if (!small_cache.ContainsKey(attr1) || !small_cache[attr1].ContainsKey(numBuckets1)) {
 				calculateCountArray(attr1, numBuckets1);
 			}
-			Debug.Log(attr1.column_index + " " + " " + numBuckets1);
 			return small_cache[attr1][numBuckets1][bucket1];
 		}
 		

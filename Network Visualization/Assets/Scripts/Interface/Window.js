@@ -17,20 +17,27 @@ class Window extends MonoBehaviour {
 	private var dragging = false;
 	private var lastMousePosition = Vector2.zero;
 
-	//TODO: Don't duplicate constructors.
 	public static function Instantiate(bounds : Rect) {
 		var instance = (new GameObject()).AddComponent(Window);
 		instance.bounds = bounds;
 		return instance;
 	}
 
+	// Manually sets the position of the window
 	function setPosition(position : Vector2) {
 		bounds.x = position.x;
 		bounds.y = position.y;
 	}
 
-	function Render(drawFunc : Function, params : Array) {
-		
+	/* 
+		Draws the provided GUI function, but with parameters passed in as an array
+		Usage:
+		GUI.Button(myRectangle, "test") becomes
+		myWindow.Render(GUI.Button, [ myRectangle, "test" ])
+
+		Returns the value returned by drawFunc
+	*/
+	function Render(drawFunc : Function, params : Array) {		
 		var result = null;
 
 		var previousDepth = GUI.depth;
@@ -58,7 +65,7 @@ class Window extends MonoBehaviour {
 					result = render2(drawFunc, params[0], params[1]);
 					break;
 				default:
-					throw("I don't support that many arguments!");		
+					throw("I don't support that many arguments! If you want to add that function, just edit this class.");		
 			}
 		GUI.EndScrollView();
 
@@ -79,6 +86,7 @@ class Window extends MonoBehaviour {
 		return drawFunc(param1, param2);
 	}
 
+	//Responsible for Drawing the header bar that can be clicked to drag the window around
 	private function RenderDraggableHeader() {
 		var headerRect = bounds;
 		var headerHeight = 20;
