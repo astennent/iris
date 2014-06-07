@@ -14,16 +14,16 @@ function Start(){
 		var full_group_attrs : DataFile = files[0];
 		var alliance_edge_list : DataFile = files[1];
 		
-		var fga_id : Attribute = full_group_attrs.attributes[0];
-		var fga_name : Attribute = full_group_attrs.attributes[1];
+		var fga_id : Attribute = full_group_attrs.getAttribute(0);
+		var fga_name : Attribute = full_group_attrs.getAttribute(1);
 		fga_id.is_shown = false;
 		fga_id.is_pkey = false;
 		fga_name.is_pkey = true;
 
 		full_group_attrs.Activate();
 		
-		var ael_ego : Attribute = alliance_edge_list.attributes[0];
-		var ael_alter : Attribute = alliance_edge_list.attributes[1];
+		var ael_ego : Attribute = alliance_edge_list.getAttribute(0);
+		var ael_alter : Attribute = alliance_edge_list.getAttribute(1);
 		ael_alter.is_pkey = false;
 		ael_ego.is_shown = false;
 		ael_alter.is_shown = false;
@@ -35,21 +35,27 @@ function Start(){
 		//Guatamala
 		Load("Guatamala", true);
 		var guatamala = files[2];
-		guatamala.attributes[0].is_shown = false;
-		guatamala.attributes[0].is_pkey = false;
-		guatamala.attributes[2].is_pkey = true;
-		guatamala.attributes[3].is_pkey = true;
-		guatamala.createSimpleFkey(full_group_attrs,  guatamala.attributes[4], fga_name);
+		guatamala.getAttribute(0).is_shown = false;
+		guatamala.getAttribute(0).is_pkey = false;
+		guatamala.getAttribute(2).is_pkey = true;
+		guatamala.getAttribute(3).is_pkey = true;
+		guatamala.createSimpleFkey(full_group_attrs,  guatamala.getAttribute(4), fga_name);
 		guatamala.Activate();
 
 		//TimeFrame
-		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[2], true);
+		full_group_attrs.timeFrame.addColumn(full_group_attrs.getAttribute(2), true);
 		full_group_attrs.timeFrame.getColumns(true)[0].setTimeFrameFormat("yyyy");
-		full_group_attrs.timeFrame.addColumn(full_group_attrs.attributes[3], false);
+		full_group_attrs.timeFrame.addColumn(full_group_attrs.getAttribute(3), false);
 		full_group_attrs.timeFrame.getColumns(false)[0].setTimeFrameFormat("yyyy");
-		guatamala.timeFrame.addColumn(guatamala.attributes[1], true);
+		guatamala.timeFrame.addColumn(guatamala.getAttribute(1), true);
 		guatamala.timeFrame.getColumns(true)[0].setTimeFrameFormat("MM/dd/yyyy");
 
+	}
+}
+
+function Update() {
+	for (var file in files) {
+		file.Update();
 	}
 }
 
@@ -74,7 +80,9 @@ static function Load(fname : String, isDemo : boolean) : int {
 			}
 		}
 
-		var new_file = DataFile.Instantiate(fname, isDemo);
+		var new_file = new DataFile(fname, isDemo);
+		//var new_file = DataFile.Instantiate(fname, isDemo);
+
 		files.Add(new_file);
 		return files.Count-1;
 

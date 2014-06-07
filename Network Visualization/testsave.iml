@@ -1,19 +1,119 @@
 <?xml version="1.0" encoding="Windows-1252"?>
-<ColorRule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <is_fallback>true</is_fallback>
-  <color>
-    <r>0</r>
-    <g>1</g>
-    <b>0.7042631</b>
-    <a>0.5</a>
-  </color>
-  <variation>0.3</variation>
-  <coloring_halo>true</coloring_halo>
-  <coloring_node>true</coloring_node>
-  <scheme_button_color>
-    <r>0</r>
-    <g>1</g>
-    <b>0.7042631</b>
-    <a>1</a>
-  </scheme_button_color>
-</ColorRule>
+<SaveState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Version>1</Version>
+  <ColorRules>
+    <ColorRule>
+      <is_fallback>true</is_fallback>
+      <color>
+        <r>1</r>
+        <g>0</g>
+        <b>0.906603</b>
+        <a>0.5</a>
+      </color>
+      <variation>0.3</variation>
+      <coloring_halo>true</coloring_halo>
+      <coloring_node>true</coloring_node>
+      <scheme_button_color>
+        <r>1</r>
+        <g>0</g>
+        <b>0.906603</b>
+        <a>1</a>
+      </scheme_button_color>
+    </ColorRule>
+  </ColorRules>
+  <DataFiles>
+    <DataFile>
+      <using_headers>true</using_headers>
+      <fname>Full Group Attributes</fname>
+      <isDemoFile>true</isDemoFile>
+      <delimiter>44</delimiter>
+      <linking_table>false</linking_table>
+      <pkey_indices>
+        <int>1</int>
+      </pkey_indices>
+      <shown_indices>
+        <int>1</int>
+      </shown_indices>
+      <first_row>
+        <string>id</string>
+        <string>name</string>
+        <string>start data</string>
+        <string>end date</string>
+        <string>age</string>
+        <string>active</string>
+        <string>size</string>
+        <string>size.1</string>
+        <string>goal</string>
+        <string>scope</string>
+        <string>sponsor</string>
+        <string>ended</string>
+        <string>victory</string>
+        <string>income</string>
+        <string>gdp</string>
+        <string>physint</string>
+        <string>averagepts</string>
+        <string>primary.base</string>
+        <string>region</string>
+        <string>mideast</string>
+        <string>bases.of.operation</string>
+        <string>polity2</string>
+        <string>classification.1</string>
+        <string>classification.2</string>
+        <string>classification.3</string>
+        <string>classification.4</string>
+        <string>nationalist</string>
+        <string>religious</string>
+        <string>anti.globalization</string>
+        <string>anarchist</string>
+        <string>communist.socialist</string>
+        <string>environmental</string>
+        <string>leftist</string>
+        <string>racist</string>
+        <string>right.wing.conservative</string>
+        <string>right.wing.reactionary</string>
+        <string>other</string>
+        <string>count</string>
+        <string>1+.ally</string>
+        <string>&gt;1.ally</string>
+        <string>betweeness</string>
+        <string>eigenvector</string>
+        <string>attempted.attacks</string>
+        <string>attacks</string>
+        <string>success.rate</string>
+        <string>closeness</string>
+      </first_row>
+      <timeFrame />
+    </DataFile>
+    <DataFile>
+      <using_headers>true</using_headers>
+      <fname>Alliance Edge List - Names</fname>
+      <isDemoFile>true</isDemoFile>
+      <delimiter>44</delimiter>
+      <linking_table>true</linking_table>
+      <first_row>
+        <string>Ego</string>
+        <string>Alter</string>
+        <string>Weight</string>
+      </first_row>
+      <timeFrame />
+    </DataFile>
+    <DataFile>
+      <using_headers>true</using_headers>
+      <fname>Guatamala</fname>
+      <isDemoFile>true</isDemoFile>
+      <delimiter>44</delimiter>
+      <linking_table>false</linking_table>
+      <first_row>
+        <string>GTD ID</string>
+        <string>DATE</string>
+        <string>COUNTRY</string>
+        <string>CITY</string>
+        <string>PERPETRATOR</string>
+        <string>FATALITIES</string>
+        <string>INJURED</string>
+        <string>TARGET TYPE</string>
+      </first_row>
+      <timeFrame />
+    </DataFile>
+  </DataFiles>
+</SaveState>

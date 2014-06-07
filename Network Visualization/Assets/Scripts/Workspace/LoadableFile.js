@@ -1,6 +1,10 @@
 ﻿#pragma strict
 
-class LoadableFile extends MonoBehaviour { 
+import System.IO;
+import System.Collections.Generic;
+
+@XmlRoot("LoadableFile")
+class LoadableFile { 
 
 	var using_headers : boolean = true;
 	var fname : String = "";
@@ -20,7 +24,7 @@ class LoadableFile extends MonoBehaviour {
 	}
 
 	function getFileContents() : List.<List.<String> > {
-		
+
 		//If you've already loaded it, use that instead.
 		if (cachedFileContents != null) {
 			return cachedFileContents;
@@ -56,7 +60,6 @@ class LoadableFile extends MonoBehaviour {
 
 		//cache for later use.
 		cachedFileContents = output;
-		
 		return output;
 	}
 

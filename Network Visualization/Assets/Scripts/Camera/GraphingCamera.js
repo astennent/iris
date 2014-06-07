@@ -14,7 +14,7 @@ class GraphingCamera extends MonoBehaviour {
 		positions.Add(new Vector3(110, 80, 280));
 		positions.Add(new Vector3(-80, 80, 110));
 
-		rotations.Add(new Quaternion(-0.2, -0.3, 0.1, -0.9));
+		rotations.Add(new Quaternion(-0.3, -0.3, 0.1, -0.9));
 		rotations.Add(new Quaternion(.1, 0, 0, 1));
 		rotations.Add(new Quaternion(.1, -.7, .1, .7));
 		rotations.Add(new Quaternion(0, 1, -.1, 0));

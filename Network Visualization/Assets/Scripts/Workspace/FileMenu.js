@@ -162,15 +162,17 @@ class FileMenu extends BaseMenu {
 
 		cur_y += 25;
 
+		var file_attributes = file.getAttributes();
+
 		//File Attributes (columns)
 		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,MenuController.getScreenHeight()-cur_y-50), 
-			attributeScrollPosition, Rect (0, 0, width-30, 20*file.attributes.Count+20));
+			attributeScrollPosition, Rect (0, 0, width-30, 20*file_attributes.Count+20));
 		
 		
 		var attribute_y = 0;
 		
-		for (var i = 0 ; i < file.attributes.Count ; i++){
-			var attribute = file.attributes[i];
+		for (var i = 0 ; i < file_attributes.Count ; i++){
+			var attribute = file_attributes[i];
 						
 			//is shown toggles
 			if (attribute.is_shown){ GUI.color = Attribute.shownColor; } 

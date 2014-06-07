@@ -5,25 +5,34 @@ import System.Xml.Serialization;
 import System.IO;
 
 class WorkspaceManager extends MonoBehaviour {
-
 	var printed = false;
 	function LateUpdate() {
 		if (!printed) {
 			if (ColorController.rules.Count > 0) {
-				SerializeColorRule(ColorController.rules[0]);
 				printed = true;
+				(new SaveState()).Serialize();
 			}
 		}
 	}
 
-	function SerializeColorRule(rule : ColorRule) {
-		var serializer = new XmlSerializer(typeof(ColorRule));
-		var stream = new FileStream(Path.GetFullPath(".")+"/testsave.iml", FileMode.Create);
-		serializer.Serialize(stream, rule);
-		stream.Close();
-	}
+	class SaveState {
 
-	function DeSerializeColorRules(rules : String) {
+		var Version = 1;
+		var ColorRules : List.<ColorRule>;
+		var DataFiles : List.<DataFile>;
 
-	}
+		// Constructor aggregates the static values
+		function SaveState(){
+			ColorRules = ColorController.rules;
+			DataFiles = FileManager.files;
+		}
+
+		function Serialize() {
+			var serializer = new XmlSerializer(typeof(SaveState));
+			var stream = new FileStream(Path.GetFullPath(".")+"/testsave.iml", FileMode.Create);
+			serializer.Serialize(stream, this);
+			stream.Close();
+		}
+	} 
+
 }

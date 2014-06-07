@@ -91,16 +91,16 @@ class FkeyMenu extends BaseMenu {
 			var weightLabelRect = new Rect(x+10, cur_y, weightLabelWidth, 20);
 			GUI.Label(weightLabelRect, "Weight Attribute: ");
 
-
-
 			//Draw the dropdown for choosing the weight attribute
 			var weightWidth = width-weightLabelWidth-20;
 
+			var file_attributes = file.getAttributes();
+
 			//populate the weight options with the attributes of the current (from) file.
-			var file_attribute_count = file.attributes.Count;
+			var file_attribute_count = file_attributes.Count;
 			var weightDropdownOptions = new String[file_attribute_count];
 			for (var i =0 ; i < file_attribute_count ; i++) {
-				weightDropdownOptions[i] = file.attributes[i].getRestrictedName(weightWidth-10);
+				weightDropdownOptions[i] = file_attributes[i].getRestrictedName(weightWidth-10);
 			}
 
 			var weightRect = new Rect(weightLabelRect.x+weightLabelWidth, cur_y, weightWidth, 20);
@@ -192,9 +192,9 @@ class FkeyMenu extends BaseMenu {
 					reference_box.height -= 30;
 					reference_box.y+= 30;
 					tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
-						tempFileScrollPosition, Rect (0, 0, width-10, 20*file.attributes.Count));			
+						tempFileScrollPosition, Rect (0, 0, width-10, 20*file_attributes.Count));			
 					file_box = new Rect(0, 0, width-20, 20);
-					for (var attr : Attribute in file.attributes){
+					for (var attr : Attribute in file_attributes){
 						if (GUI.Button(file_box, attr.getColumnName())){
 							adding_from_attr = attr;
 						}
@@ -203,17 +203,19 @@ class FkeyMenu extends BaseMenu {
 					GUI.EndScrollView();
 					
 				} else { //need to add a "to" index		
+
+					var to_file_attributes = foreignKey.to_file.getAttributes();
 					
 					//select a referenced attribute
 					GUI.Box(reference_box, "From " + adding_from_attr.getColumnName() + " to Attribute:");
 					reference_box.height -= 30;
 					reference_box.y+= 30;
 					tempFileScrollPosition = GUI.BeginScrollView (reference_box, 
-						tempFileScrollPosition, Rect (0, 0, width-10, 20*foreignKey.to_file.attributes.Count));			
+						tempFileScrollPosition, Rect (0, 0, width-10, 20*to_file_attributes.Count));			
 					
 					file_box = new Rect(0, 0, width-20, 20);
-					for (i = 0 ; i < foreignKey.to_file.attributes.Count ; i++){
-						var attr : Attribute = foreignKey.to_file.attributes[i];
+					for (i = 0 ; i < to_file_attributes.Count ; i++){
+						var attr : Attribute = to_file_attributes[i];
 						if (GUI.Button(file_box, attr.getColumnName())){
 							foreignKey.addKeyPair(adding_from_attr, attr);
 							resetCreation();

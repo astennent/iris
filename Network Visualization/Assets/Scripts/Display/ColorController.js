@@ -148,7 +148,7 @@ static function ColorBySource(file : DataFile, rule  : ColorRule, change_color :
 static function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
 	var file : DataFile = attribute.file;
-	var attr_index : int = file.attributes.IndexOf(attribute);
+	var attr_index : int = file.getAttributes().IndexOf(attribute);
 
 	for (var node in file.getNodes()){
 		if (node.Get(attr_index) == value) { 

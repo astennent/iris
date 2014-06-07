@@ -169,7 +169,7 @@ class ColorRuleColorMenu extends BaseMenu {
 		var line_count = 0;
 
 		for (var file : DataFile in FileManager.files){
-			line_count += file.attributes.Count + 2;
+			line_count += file.getAttributeCount() + 2;
 		}
 
 		var innerBoxWidth = (line_count*20 + 20 < scrollBoxHeight) ? outerBox.width-5 : outerBox.width-23;
@@ -181,7 +181,7 @@ class ColorRuleColorMenu extends BaseMenu {
 				GUI.Label(Rect (5, scroll_y, width-5, 20), file.shortName() + ":");
 				scroll_y += 20;
 
-				for (var attribute in file.attributes){
+				for (var attribute in file.getAttributes()){
 					if (GUI.Toggle (Rect (5, scroll_y, width-5, 20), (attribute == rule.getContinuousAttribute()), attribute.getColumnName())){
 						if (rule.getContinuousAttribute() != attribute) {
 							rule.setContinuousAttribute(attribute);

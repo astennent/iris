@@ -64,7 +64,7 @@ class ForeignKey {
 		if (other_file_pkey_indices.length == keyPairs.Count) {
 			for (var attr_index = 0 ; attr_index < other_file_pkey_indices.length; attr_index++) {
 				var fkey_to_attribute = keyPairs[attr_index][1];
-				var other_attribute = to_file.attributes[other_file_pkey_indices[attr_index]]; //oof
+				var other_attribute = to_file.getAttribute(other_file_pkey_indices[attr_index]); //oof
 				if (fkey_to_attribute != other_attribute) {
 					return false;
 				}
@@ -100,7 +100,7 @@ class ForeignKey {
 		if (weightAttributeIndex == -1) {
 			this.weightAttribute = null;
 		} else {
-			this.weightAttribute = from_file.attributes[weightAttributeIndex];
+			this.weightAttribute = from_file.getAttribute(weightAttributeIndex);
 		}
 
 		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {

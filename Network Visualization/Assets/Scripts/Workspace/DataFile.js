@@ -2,15 +2,19 @@
 
 #pragma strict
 
-import System.IO;
-import System.Collections.Generic;
+import System.Xml;
+import System.Xml.Serialization;
+import System.Xml.Schema.XmlAtomicValue;
 
 class DataFile extends LoadableFile {
 
 	//Used to ensure that files are loaded in the correct order after being activated.
 	static var activationQueue = new LinkedList.<DataFile>();
 
-	var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
+	//The maximum number of nodes/edges to generate before moving on with the thread
+	static var activationCutoff = 10;
+
+	private var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
 
 	private var activated : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
 
@@ -35,17 +39,26 @@ class DataFile extends LoadableFile {
 
 	private var foreignKeys = new List.<ForeignKey>();
 
+	public function DataFile(){};	//Default Constructor for serialization; should not be used.
 
 	//Constructor
-	public static function Instantiate(fname : String, isDemo : boolean) {
-		var dataFile = (new GameObject()).AddComponent(DataFile);
-		dataFile.fname = fname; 
-		dataFile.isDemoFile = isDemo;
-		dataFile.generateAttributes();
-	    dataFile.timeFrame = new TimeFrame(dataFile);
-	    return dataFile;
+	public function DataFile(fname : String, isDemo : boolean) {
+		this.fname = fname; 
+		this.isDemoFile = isDemo;
+		generateAttributes();
+	    this.timeFrame = new TimeFrame(this);
 	}
 
+	// public static function Instantiate(fname : String, isDemo : boolean) {
+	// 	var file = (new GameObject()).AddComponent(DataFile);
+	// 	file.fname = fname;
+	// 	file.isDemoFile = isDemo;
+	// 	file.generateAttributes();
+	// 	file.timeFrame = new TimeFrame(file);
+	// 	return file;
+	// }
+
+	// This is manually called by the FileManager because DataFile is not a MonoBehaviour.
 	function Update() {
 		if (activationQueue.Count > 0 && activationQueue.First.Value == this) {
 			activationQueue.RemoveFirst();
@@ -86,6 +99,20 @@ class DataFile extends LoadableFile {
 			attributes.Add(attribute);
 	    } 	
 	}
+
+	function getAttributes() {
+		return attributes;
+	}
+	function getAttribute(index : int) {
+		return attributes[index];
+	}
+	function setAttribute(index : int, attribute : Attribute) {
+		attributes[index] = attribute;
+	}
+	function getAttributeCount() {
+		return attributes.Count;
+	}
+
 
 	function ToggleUsingHeaders() {
 		using_headers = !using_headers;	
@@ -381,7 +408,7 @@ class DataFile extends LoadableFile {
 		UpdateShownIndices();
 
 		var fileContents = getFileContents();
-		for (var rowIndex = contentIndex; rowIndex < fileContents.Count && rowIndex < contentIndex+20; rowIndex++) {
+		for (var rowIndex = contentIndex; rowIndex < fileContents.Count && rowIndex < contentIndex+activationCutoff; rowIndex++) {
 
 			var row = fileContents[rowIndex];
 
@@ -504,7 +531,7 @@ class DataFile extends LoadableFile {
 
 
 		var fileContents = getFileContents();
-		for (var rowIndex = contentIndex ; rowIndex < fileContents.Count && rowIndex < contentIndex+20; rowIndex++) {
+		for (var rowIndex = contentIndex ; rowIndex < fileContents.Count && rowIndex < contentIndex+activationCutoff; rowIndex++) {
 
 			var row = fileContents[rowIndex];
 

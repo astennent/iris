@@ -183,7 +183,7 @@ class TimeFrameMenu extends BaseMenu {
 		if (creating) {
 			cur_y += 15;
 
-			var attributes = cur_file.attributes;
+			var attributes = cur_file.getAttributes();
 			var attributes_box = new Rect(x+10, cur_y, width-20, 100);
 
 			attrScrollPosition = GUI.BeginScrollView (attributes_box, 

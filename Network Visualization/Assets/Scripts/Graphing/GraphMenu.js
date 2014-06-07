@@ -170,7 +170,7 @@ class GraphMenu extends BaseMenu {
 		cur_y +=5;
 
 		var file = GraphController.getFile();
-		var attrs = file.attributes;
+		var attrs = file.getAttributes();
 
 		var axesRect = new Rect(x+5, cur_y, width-10, MenuController.getScreenHeight()-cur_y-5);
 		GUI.Box(axesRect, "Select Axes");

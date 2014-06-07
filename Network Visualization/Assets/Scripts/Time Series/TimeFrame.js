@@ -11,6 +11,8 @@ class TimeFrame {
 	private var validEnd = true;
 	private var invalidMessages = ["",""];
 
+	public function TimeFrame(){};	//Default Constructor for serialization; should not be used.
+
 	public function TimeFrame(file : DataFile) {
 		this.file = file;
 	}

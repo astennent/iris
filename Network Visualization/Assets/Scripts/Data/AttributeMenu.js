@@ -22,7 +22,7 @@ class AttributeMenu extends BaseMenu {
 			super.EnableDisplay(AttributeMenu);
 			file = FileManager.files[FileMenu.selected_file_index];
 			selected_index = index;
-			attribute = file.attributes[selected_index];
+			attribute = file.getAttribute(selected_index);
 			Dropdown.reset(getDropdownId(attribute));
 		} 
 	}
@@ -216,10 +216,12 @@ class AttributeMenu extends BaseMenu {
 		var fkeyRect = new Rect(5, 20, innerBoxWidth-10, 70);
 
 		//populate the weight options with the attributes of the current (from) file.
-		var file_attribute_count = file.attributes.Count;
+		var file_attributes = file.getAttributes();
+
+		var file_attribute_count = file_attributes.Count;
 		var weightDropdownOptions = new String[file_attribute_count];
 		for (var i =0 ; i < file_attribute_count ; i++) {
-			weightDropdownOptions[i] = file.attributes[i].getRestrictedName(weightWidth-10);
+			weightDropdownOptions[i] = file_attributes[i].getRestrictedName(weightWidth-10);
 		}
 
 		fkeyScrollPosition = GUI.BeginScrollView (outerBox, 

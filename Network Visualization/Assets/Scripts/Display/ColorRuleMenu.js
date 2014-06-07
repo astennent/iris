@@ -150,7 +150,7 @@ class ColorRuleMenu extends BaseMenu {
 		} else if (rule_type == 3) {
 			line_count = 0;
 			for (var file : DataFile in FileManager.files){
-				line_count += file.attributes.Count + 1;
+				line_count += file.getAttributeCount() + 1;
 			}
 
 			attributeScrollPosition = GUI.BeginScrollView (scrollBox, 
@@ -161,7 +161,7 @@ class ColorRuleMenu extends BaseMenu {
 				GUI.Label(Rect (5, temp_y, width-5, 20), file.shortName() + ":");
 				temp_y += 20;
 
-				for (var attribute in file.attributes){
+				for (var attribute in file.getAttributes()){
 					if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.getAttribute()), attribute.getColumnName())){
 						if (attribute != rule.getAttribute()) {
 							updateCachedAttributeValues(attribute);
@@ -223,8 +223,9 @@ class ColorRuleMenu extends BaseMenu {
 		attributeValueCache = new HashSet.<String>();
 		var file = attribute.file;
 		var attribute_index : int = -1;
-		for (var i : int = 0 ; i < file.attributes.Count; i++){
-			if (file.attributes[i] == attribute) {
+		var file_attributes = file.getAttributes();
+		for (var i : int = 0 ; i < file_attributes.Count ; i++){
+			if (file_attributes[i] == attribute) {
 				attribute_index = i;
 				break;
 			}

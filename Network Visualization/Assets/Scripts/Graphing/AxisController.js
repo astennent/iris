@@ -19,7 +19,7 @@ private static var TICK_HEIGHT_SCALE : float = .05;
 private static var directions = [Vector3.right, Vector3.up, Vector3.forward];
 
 private static var draw_axes : boolean = true;
-private static var draw_gridlines : boolean = true;
+private static var draw_gridlines : boolean = false;
 private static var draw_tick_labels : boolean = true;
 
 static var redAxis : Material;
@@ -114,14 +114,12 @@ function Start () {
 	axes[2].material = blueAxis;
 	ticks[2].material = blueAxis;
 
-	draw_tick_labels = true;
-	draw_axes = true;
-	draw_gridlines = true;
-
 	initialized = true;
 }
 
 function DrawAxes() {
+
+	//TODO: Find a better way to render the grid. It costs 10fps to render.
 
 	var should_draw = GraphController.isGraphing() && draw_axes;
 
@@ -197,7 +195,7 @@ function DrawGridlines() {
 			var tickCount2 = tickCounts[(i+1)%3];
 			var tickCount3 = tickCounts[(i+2)%3];
 
-			var vertexCount = 20000; //TODO
+			var vertexCount = 16000; //TODO
 			gridRenderer.SetVertexCount(2); //clear vertices TODO: there's a better way to do this.
 			gridRenderer.SetVertexCount(vertexCount);
 			var vertex = 0;

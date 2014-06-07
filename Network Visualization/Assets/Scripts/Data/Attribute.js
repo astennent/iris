@@ -10,7 +10,7 @@ var is_pkey : boolean = false;
 
 var file : DataFile; //the file to which this attribute belongs
 
-var restrictedNameCache = new Dictionary.<int, String>();
+private var restrictedNameCache = new Dictionary.<int, String>();
 
 static var FOREIGN_KEY = 0;
 static var TIME_SERIES = 1;
@@ -31,6 +31,7 @@ static var pkeyColor = new Color(1, .5, .5);
 private var timeFrameFormat : String = "";
 private var validTimeFrameFormat : boolean = false;
 private var timeFrameFormatWarning : String = "";
+
 
 class Attribute extends Stats {
 
