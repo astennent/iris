@@ -71,26 +71,27 @@ static function getFileNames() : String[]{
 static function Load(fname : String) : int {
     return Load(fname, false);
 }
+
+//TODO: Make these print statements pop up dialogs.
 static function Load(fname : String, isDemo : boolean) : int {
 	if (isDemo || File.Exists(fname)){
 		for (var file : DataFile in files){
 			if (file.fname == fname){
-				FileMenu.error_message = "You've already loaded that file.";
+				print("You've already loaded that file.");
 				return -2;
 			}
 		}
 
 		var new_file = new DataFile(fname, isDemo);
-		//var new_file = DataFile.Instantiate(fname, isDemo);
 
 		files.Add(new_file);
 		return files.Count-1;
 
 	} else if (Directory.Exists(fname)){
-		FileMenu.error_message = "That's a directory. Select a file.";
+		print("That's a directory. Select a file.");
 		return -2;
 	} else {
-		FileMenu.error_message = "File not found.";
+		print("File not found.");
 		return -2;
 	}
 }

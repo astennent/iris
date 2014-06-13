@@ -29,6 +29,11 @@ class Window extends MonoBehaviour {
 		bounds.y = position.y;
 	}
 
+	// Returns the upper left corner
+	function getPosition() {
+		return new Vector2(bounds.x, bounds.y);
+	}
+
 	/* 
 		Draws the provided GUI function, but with parameters passed in as an array
 		Usage:
@@ -37,6 +42,9 @@ class Window extends MonoBehaviour {
 
 		Returns the value returned by drawFunc
 	*/
+	function Render(drawFunc) { //Render with no parameters.
+		return Render(drawFunc, []);
+	} 
 	function Render(drawFunc : Function, params : Array) {		
 		var result = null;
 

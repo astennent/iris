@@ -45,9 +45,19 @@ class MainMenu extends BaseMenu {
 
 		//Make sure that clicking the button when the menu is hidden doesn't trigger a click.
 		GuiPlus.Box(button_position, "", false);
+
+
+		if (button_position.Contains(mousePosition)){}
 			
 		if (displaying) {
 			var cur_y = 60 + MenuController.getScreenTop();
+			button_position = new Rect(x+5, cur_y, 35, 35);
+			GUI.color = Color.white;
+			if (GUI.Button(button_position, upload)){
+				chooseMenu(FileMenu);
+			}		
+
+			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){
@@ -135,13 +145,7 @@ class MainMenu extends BaseMenu {
 				NetworkController.gameSpeed=next_speed;
 			}
 				
-			cur_y += 40;
-			button_position = new Rect(x+5, cur_y, 35, 35);
-			GUI.color = Color.white;
-			if (GUI.Button(button_position, upload)){
-				chooseMenu(FileMenu);
-			}
-			if (button_position.Contains(mousePosition)){}
+
 
 			button_position = new Rect(x+5, Screen.height-50, 35, 35);
 			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];

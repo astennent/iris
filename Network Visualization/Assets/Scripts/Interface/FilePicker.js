@@ -1,5 +1,7 @@
 ﻿#pragma strict
 
+import System.IO;
+
 class FilePicker extends MonoBehaviour {
 
 	var folderTexture : Texture;
@@ -8,6 +10,7 @@ class FilePicker extends MonoBehaviour {
 	static var folderTexture_s : Texture;
 	static var fileTexture_s : Texture;
 	static var upDirectoryTexture_s : Texture;
+
 
 	private static var scrollPosition : Vector2 = Vector2.zero;
 
@@ -20,27 +23,68 @@ class FilePicker extends MonoBehaviour {
 	static var iconNameHeight = 45;
 	static var textRectHeight = 25;
 
+	static var selectButtonsHeight = 40;
+
 	static var headerRect : Rect;
 
-	private static var fileString = "";
 	private static var outerRect : Rect;
+
+	private static var rendering = false; //Should the file picker be rendered right now?
+	private static var fileString : String;
+	static var fileStringWindow : Window;
+	private static var windowWidth = 620;
+	private static var windowHeight = 440;
+
+		//Filled in by GUI calls of other menus.
+	static var onSelectFunction : Function;
+	static var onCancelFunction : Function;
 
 	function Start() {
 		folderTexture_s = folderTexture;
 		fileTexture_s = fileTexture;
 		upDirectoryTexture_s = upDirectoryTexture;
+		fileString = Path.GetFullPath(".") + "\\";
+		outerRect = new Rect(0, 0, windowWidth, windowHeight);
+		fileStringWindow = Window.Instantiate(new Rect((Screen.width-windowWidth)/2, 
+				(MenuController.getScreenHeight()-windowHeight)/2, windowWidth, windowHeight));
 	}
 
-	//Called from GUI methods with the size of the rectangle to display.
-	static function PickFile(outerRect : Rect, fileString : String) {
-		return PickFile(outerRect, fileString, false);
+	function LateUpdate() {
+		rendering = false;
 	}
 
-	static function PickFile(outerRect : Rect, fileString : String, shouldDrawSidebar : boolean) {
-		
-		//Save this window area so it doesn't need to be passed around
-		this.outerRect = outerRect;
+	function OnGUI() {
+		if (rendering) {
+			fileString = "" + fileStringWindow.Render(RenderFilePicker);		
+		}
+	}
 
+	static function setPosition(point : Vector2) {
+		fileStringWindow.setPosition(point);
+	}
+
+	static function centerWindow() {
+		var openSpaceCenter = (MenuController.getScreenLeft() + MenuController.getScreenRight())/2;
+		var windowX = openSpaceCenter - windowWidth/2;
+		var windowY = (MenuController.getScreenHeight()-windowHeight)/2;
+
+		setPosition(new Vector2(windowX, windowY));
+	}
+
+	//Called from other menu's GUI methods
+	static function PickFile(selectionFunction : Function, cancelFunction : Function) {
+		onSelectFunction = selectionFunction;
+		onCancelFunction = cancelFunction;
+		rendering = true;
+		return fileString;
+	}
+
+	//Get the last file string selected by the file picker. Does not render the GUI.
+	static function getFileString() {
+		return fileString;
+	}
+
+	private static function RenderFilePicker() : String {		
 		GUI.Box(outerRect, "");
 
 		//Update directory contents if the string has changed.
@@ -48,11 +92,8 @@ class FilePicker extends MonoBehaviour {
 			setFileString(fileString);
 		}
 
-		//Draw the shortcut bar on the left side.
+		//TODO: Draw the shortcut bar on the left side.
 		var leftSide = 0;
-		if (shouldDrawSidebar) {
-			leftSide = DrawSideBar();
-		}
 
 		//Draw the field of icons with folder and file images
 		DrawIconField(leftSide, textRectHeight + outerRect.y + 10);
@@ -61,11 +102,9 @@ class FilePicker extends MonoBehaviour {
 		//Note: Header is drawn second so that you can capture keypress events before they're consumed by the textfield.
 		DrawHeader(leftSide, outerRect.y + 5);
 
-		return this.fileString;
-	}
+		DrawSelectButtons(outerRect.y + outerRect.height - selectButtonsHeight + 5);
 
-	static function DrawSideBar() {
-		return 0;
+		return this.fileString;
 	}
 
 	static function DrawHeader(leftSide : int, cur_y : int) {
@@ -95,7 +134,7 @@ class FilePicker extends MonoBehaviour {
 	}
 
 	static function DrawIconField(leftSide : int, cur_y : int) {
-		var scrollOuterRect = new Rect(outerRect.x+leftSide, cur_y, outerRect.width-leftSide, outerRect.height-5-cur_y+outerRect.y);
+		var scrollOuterRect = new Rect(outerRect.x+leftSide, cur_y, outerRect.width-leftSide, outerRect.height-5-cur_y+outerRect.y-selectButtonsHeight);
 
 		// Constants for icon size and spacing 
 		var margin = 10;
@@ -138,6 +177,16 @@ class FilePicker extends MonoBehaviour {
 			var scroll_y = 0;
 			var colIndex = 0;
 			var iconIndex = 0;
+
+			var pressedEnter = (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return);
+			var clicked = Input.GetMouseButtonDown(0);
+			var mousePosition = Input.mousePosition;
+			var windowPosition = fileStringWindow.getPosition();
+			mousePosition.x -= windowPosition.x;
+			mousePosition.y += windowPosition.y;
+			mousePosition.y = Screen.height - mousePosition.y;
+
+
 			for (var currentList in bothLists) {
 				for (var icon in currentList) {
 					var info = icon.getInfo();
@@ -158,15 +207,22 @@ class FilePicker extends MonoBehaviour {
 					//Determine the color of the button
 					GUI.color = icon.getColor();
 
+					// Calculate the size of the box around the icon.
+					var selectRect = buttonRect;
+					selectRect.height+=textRect.height+4;
+					selectRect.x -= 2;
+					selectRect.width += 4;
+					selectRect.y -= 2;
+
+					// Select the icon if the user clicks the button, it will change the folder and override this. 
+					if (clicked && selectRect.Contains(mousePosition)) {
+						selectedIndex = iconIndex;
+						selected = true;
+					}
+
 					//Render box if selected
 					if (selected) {
-						var selectRect = buttonRect;
-						selectRect.height+=textRect.height+4;
-						selectRect.x -= 2;
-						selectRect.width += 4;
-						selectRect.y -= 2;
 						GUI.Box(selectRect, "");
-
 						selectionTop = selectRect.y;
 						selectionBottom = selectionTop + selectRect.height;
 					}
@@ -175,8 +231,7 @@ class FilePicker extends MonoBehaviour {
 					GUI.Label(textRect, text);
 
 					//Render button
-					var pressedEnter = (selected && Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return);
-					if (GUI.Button(buttonRect, image) || pressedEnter) {
+					if (GUI.Button(buttonRect, image) || (selected && pressedEnter) ) {
 						setFileString(icon.getFullName());
 						GUI.EndScrollView(); return;
 					}
@@ -207,6 +262,19 @@ class FilePicker extends MonoBehaviour {
 
 		focusHeader();
 	}
+
+	static function DrawSelectButtons(cur_y : float) {
+		var buttonWidth = 80;
+		var buttonRect = new Rect(outerRect.width-175, cur_y, buttonWidth, selectButtonsHeight-10);
+		if (GUI.Button(buttonRect, "Select")) {
+			onSelectFunction();
+		}
+
+		buttonRect.x += buttonWidth+10;
+		if (GUI.Button(buttonRect, "Cancel")) {
+			onCancelFunction();
+		}
+	} 
 
 	static function processKeyStrokes(numIcons : int, iconsPerRow : int) {
 		var selectionChanged = false;

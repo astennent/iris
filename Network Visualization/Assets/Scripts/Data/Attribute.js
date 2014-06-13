@@ -35,6 +35,9 @@ private var timeFrameFormatWarning : String = "";
 
 class Attribute extends Stats {
 
+	//Default Constructor required for serialization
+	public function Attribute(){}
+
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
 		this.file = file;

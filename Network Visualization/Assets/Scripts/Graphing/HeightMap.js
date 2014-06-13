@@ -17,6 +17,8 @@ function Start () {
 	terrainData.heightmapResolution = resolution; 
 
 	terrainData.size = Vector3.one * GraphController.getScale(); //real world size
+
+	instance.gameObject.SetActive(false);
 }
 
 static function refreshHeightmap() {

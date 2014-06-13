@@ -1,8 +1,6 @@
 //TODO: tooltips over all buttons
 #pragma strict 
 
-import System.IO;
-
 class FileMenu extends BaseMenu {
 
 	var plus : Texture;
@@ -10,11 +8,6 @@ class FileMenu extends BaseMenu {
 
 	private static var cur_y : float;
 	private static var attributeScrollPosition : Vector2 = Vector2.zero;
-	private static var fileString : String = "";
-
-	static var fileStringWindow : Window;
-
-	static var error_message : String = "";
 
 	static var DROPDOWN_ID = "0";
 
@@ -24,16 +17,10 @@ class FileMenu extends BaseMenu {
 	static var selected_file_index : int = -1; //used to decide what to display below the line.
 	static var creating_file : boolean = false;
 
-	private static var fileStringWindowWidth = 620;
-	private static var fileStringWindowHeight = 400;
-
 	function Start(){
 		parent = GetComponent(MainMenu);
 		super.Start();
 		title = "File Manager";
-		fileString = Path.GetFullPath(".") + "\\";
-		fileStringWindow = Window.Instantiate(new Rect((Screen.width-fileStringWindowWidth)/2, 
-				(MenuController.getScreenHeight()-fileStringWindowHeight)/2, fileStringWindowWidth, fileStringWindowHeight));
 	}
 
 	static function getSelectedFile() {
@@ -44,7 +31,7 @@ class FileMenu extends BaseMenu {
 		}
 	}
 
-	static function setSelectedFile(index : int) {
+	static function setSelectedFileIndex(index : int) {
 		if (selected_file_index != index) {
 			selected_file_index = index;
 			AttributeMenu.setSelectedIndex(-1);
@@ -60,12 +47,7 @@ class FileMenu extends BaseMenu {
 		FkeyMenu.resetCreation();
 
 		if (creating_file) {
-			var openSpaceCenter = (MenuController.getScreenLeft() + MenuController.getScreenRight())/2;
-
-			var windowX = openSpaceCenter - fileStringWindowWidth/2;
-			var windowY = (MenuController.getScreenHeight()-fileStringWindowHeight)/2;
-
-			fileStringWindow.setPosition(new Vector2(windowX, windowY));
+			FilePicker.centerWindow();
 		}
 	}
 
@@ -87,7 +69,7 @@ class FileMenu extends BaseMenu {
 		}
 		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, filesList, selected_file_index, DROPDOWN_ID, "Select a File");
 		if (new_selected_index != selected_file_index) {
-			setSelectedFile(new_selected_index);
+			setSelectedFileIndex(new_selected_index);
 		}
 
 		
@@ -107,9 +89,11 @@ class FileMenu extends BaseMenu {
 		GUI.color = Color.white;			
 		cur_y += 37;
 		
-		if (creating_file){
-			DrawNewFileDetails();	
-		} else if (selected_file_index >= 0){
+		if (creating_file) {
+			FilePicker.PickFile(FilePickerSelectFunction, FilePickerCancelFunction);
+		}
+
+		if (selected_file_index >= 0){
 			DrawLoadedFileDetails();
 		}
 	}
@@ -230,55 +214,17 @@ class FileMenu extends BaseMenu {
 		var remove_button = new Rect(x+width/2+5, MenuController.getScreenHeight()-40, width/2-12.5, 30);
 		if (GUI.Button(remove_button, "Remove File")) {
 			FileManager.RemoveFile(selected_file_index);
-			setSelectedFile(-1);
+			setSelectedFileIndex(-1);
 		}
 		
 	}
 
-	//displays information / actions for a new file.
-	function DrawNewFileDetails(){
-		var menuRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);
-		GUI.Box(menuRect, "New File");
-		
-		cur_y+=30;
-		var sourceRect = new Rect(x+10, cur_y-10, 100, 30);
-		GUI.Label(sourceRect, "Source");
-		sourceRect.x+=50;
-		sourceRect.width = width-65;
-		
-		GUI.Label(sourceRect, fileString);
+	static function FilePickerSelectFunction() {
+		setSelectedFileIndex(FileManager.Load(FilePicker.getFileString()));
+	}
 
-		
-		cur_y+=20;
-		
-		if (error_message != ""){
-			GUI.color = new Color(1.0, 0.7, 0.7);
-			var errorRect = new Rect(x+10, cur_y, width-20, 20);
-			GUI.Label(errorRect, error_message);
-			GUI.color = Color.white;
-		}
-
-		var loadRect = new Rect(x+200, cur_y, width- 220, 20);		
-		cur_y+=30;
-		
-		//Color the load button green if it's a csv
-		if (fileString.EndsWith(".csv")){
-			GUI.color = Color.green;
-		} else {
-			GUI.color = Color.white;
-		}
-		if (GUI.Button(loadRect, "Load")){
-			selected_file_index = FileManager.Load(fileString); //switches to loaded menu if successful.
-			AttributeMenu.setSelectedIndex(-1);
-		}
-
-
-
-		GUI.color = Color.white;
-		
-		fileString = fileStringWindow.Render(FilePicker.PickFile, 
-				[Rect (0, 0, fileStringWindowWidth, fileStringWindowHeight), fileString]);		
-		
+	static function FilePickerCancelFunction() {
+		toggleCreatingFile();
 	}
 
 	static function EnableDisplay(){

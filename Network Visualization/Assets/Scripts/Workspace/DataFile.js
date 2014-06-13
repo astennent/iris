@@ -28,7 +28,7 @@ class DataFile extends LoadableFile {
 	var pkey_indices : int[];
 	var shown_indices : int[];
 
-	var first_row : String[]; 
+	private var first_row : String[]; 
 
 	private var nodes = new Dictionary.<String, Node>();
 	private var nodeListCache : LinkedList.<Node>;
@@ -48,15 +48,6 @@ class DataFile extends LoadableFile {
 		generateAttributes();
 	    this.timeFrame = new TimeFrame(this);
 	}
-
-	// public static function Instantiate(fname : String, isDemo : boolean) {
-	// 	var file = (new GameObject()).AddComponent(DataFile);
-	// 	file.fname = fname;
-	// 	file.isDemoFile = isDemo;
-	// 	file.generateAttributes();
-	// 	file.timeFrame = new TimeFrame(file);
-	// 	return file;
-	// }
 
 	// This is manually called by the FileManager because DataFile is not a MonoBehaviour.
 	function Update() {
