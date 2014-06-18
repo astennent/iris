@@ -15,6 +15,8 @@ class MainMenu extends BaseMenu {
 	var graph : Texture;
 	var clock : Texture;
 	var plane : Texture;
+	var save : Texture;
+	var load : Texture;
 
 	function Start() {
 		parent = null;
@@ -55,9 +57,25 @@ class MainMenu extends BaseMenu {
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, upload)){
 				chooseMenu(FileMenu);
-			}		
+			}	
 
 			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
+			GUI.color = Color.white;
+			if (GUI.Button(button_position, save)){
+				WorkspaceManager.toggleSelectingSaveFile();
+			}
+			if (button_position.Contains(mousePosition)){} //TODO: tooltips
+
+			cur_y += 40;
+			button_position = new Rect(x+5, cur_y, 35, 35);
+			GUI.color = Color.white;
+			if (GUI.Button(button_position, load)){
+				WorkspaceManager.toggleSelectingLoadFile();				
+			}
+			if (button_position.Contains(mousePosition)){} //TODO: tooltips
+
+			cur_y += 80;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
 			if (GUI.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){

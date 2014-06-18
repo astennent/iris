@@ -72,7 +72,7 @@ class FilePicker extends MonoBehaviour {
 	}
 
 	//Called from other menu's GUI methods
-	static function PickFile(selectionFunction : Function, cancelFunction : Function) {
+	static function PickFile(selectionFunction : Function, cancelFunction : Function) : String {
 		onSelectFunction = selectionFunction;
 		onCancelFunction = cancelFunction;
 		rendering = true;
