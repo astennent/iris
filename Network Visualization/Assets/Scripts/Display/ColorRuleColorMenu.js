@@ -37,7 +37,8 @@ class ColorRuleColorMenu extends BaseMenu {
 	}
 
 	function DrawMethod(cur_y : int) {
-		var boxHeight = (rule.is_fallback) ? 80 : 100;
+		var is_fallback = rule.isFallback();
+		var boxHeight = (is_fallback) ? 80 : 100;
 		GUI.Box(Rect(x+5, cur_y, width-10, boxHeight), "");
 		var toggle_rect = new Rect(x+20, cur_y+10, width, 20);
 		var method = rule.getMethod();
@@ -53,7 +54,7 @@ class ColorRuleColorMenu extends BaseMenu {
 			rule.setMethod(2);
 		} 
 		toggle_rect.y+=20;
-		if (!rule.is_fallback) {
+		if (!is_fallback) {
 			if (GUI.Toggle(toggle_rect, method==3, " Continuous Attribute") && method != 3){
 				rule.setMethod(3);
 			} 

@@ -15,7 +15,6 @@ static function getSchemeNames() {
 //Called by Display Menu or Axis Controller.
 static function Init(){
 	createRule();
-	rules[0].is_fallback = true;
 	rules[0].setMethod(1);
 	rules[0].setChangingSize(true);
 }
@@ -81,7 +80,7 @@ static function ApplyRule(rule: ColorRule) {
 
 
 static function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
-	if (rule.is_fallback) {
+	if (rule.isFallback()) {
 		ApplyFallbackRule(rule, change_color, change_size);
 		return;
 	}

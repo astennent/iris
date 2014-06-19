@@ -31,8 +31,6 @@ class ColorRule {
 	private var sizing_scale : float = 2.5;
 	private var changing_size = false;
 
-	var is_fallback : boolean; //is this the "default" rule?
-
 	var color : Color;
 	var variation : float;
 
@@ -54,6 +52,10 @@ class ColorRule {
 		color = ColorController.GenRandomColor(scheme_index); //BRIGHT
 		setScheme(0, false);  //bright
 		variation = 0.3;
+	}
+
+	function isFallback() {
+		return (this == ColorController.rules[0]);
 	}
 
 	function getMethod() {

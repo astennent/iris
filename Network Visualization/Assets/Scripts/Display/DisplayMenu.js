@@ -98,50 +98,47 @@ class DisplayMenu extends BaseMenu {
 					setRuleIndex(i);
 				}
 			}
-
 		
-			if (!rule.is_fallback) {
-				var upRect = new Rect(5, buttonRect.y, 30, 15);
-				var downRect = new Rect(5, buttonRect.y+15, 30, 15);
+			var upRect = new Rect(5, buttonRect.y, 30, 15);
+			var downRect = new Rect(5, buttonRect.y+15, 30, 15);
 
-				if (GUI.Button(upRect, "")) { //TODO make graphics for these.
-					if (i > 1) {
-						ColorController.moveRuleUp(i);
-						if (rule_index == i) {
-							setRuleIndex(rule_index - 1);
-						} else if (rule_index == i-1) {
-							setRuleIndex(rule_index + 1);
-						}
+			if (GUI.Button(upRect, "")) { //TODO make graphics for these.
+				if (i > 1) {
+					ColorController.moveRuleUp(i);
+					if (rule_index == i) {
+						setRuleIndex(rule_index - 1);
+					} else if (rule_index == i-1) {
+						setRuleIndex(rule_index + 1);
 					}
 				}
-				if (GUI.Button(downRect, "")) {
-					if (i < rules.Count - 1) {
-						ColorController.moveRuleDown(i);
-						if (rule_index == i) {
-							setRuleIndex(rule_index + 1);
-						} else if (rule_index == i+1) {
-							setRuleIndex(rule_index - 1);
-						}
-					}
-				}
-	
-				//only color the Xs if it's selected.
-				if (i == rule_index){
-					GUI.color = rule.color;
-				} else {
-					GUI.color = Color.white;
-				}
-
-				if (GUI.Button(new Rect(width-50, buttonRect.y, 35, 30), "X")){
-					ColorController.removeRule(i);
-					if (i == rule_index){
-						setRuleIndex(-1);
-					} else if (i < rule_index) {
-						setRuleIndex(rule_index-1);
+			}
+			if (GUI.Button(downRect, "")) {
+				if (i < rules.Count - 1) {
+					ColorController.moveRuleDown(i);
+					if (rule_index == i) {
+						setRuleIndex(rule_index + 1);
+					} else if (rule_index == i+1) {
+						setRuleIndex(rule_index - 1);
 					}
 				}
 			}
 
+			//only color the Xs if it's selected.
+			if (i == rule_index){
+				GUI.color = rule.color;
+			} else {
+				GUI.color = Color.white;
+			}
+
+			if (GUI.Button(new Rect(width-50, buttonRect.y, 35, 30), "X")){
+				ColorController.removeRule(i);
+				if (i == rule_index){
+					setRuleIndex(-1);
+				} else if (i < rule_index) {
+					setRuleIndex(rule_index-1);
+				}
+			}
+			
 
 
 			temp_y+=30;
