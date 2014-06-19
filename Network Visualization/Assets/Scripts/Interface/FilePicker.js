@@ -73,10 +73,24 @@ class FilePicker extends MonoBehaviour {
 
 	//Called from other menu's GUI methods
 	static function PickFile(selectionFunction : Function, cancelFunction : Function) : String {
+
+		// The current file picking operation has changed. Cancel the first one.
+		if (selectionFunction != onSelectFunction) {
+			if (onCancelFunction != null) {
+				onCancelFunction();
+			}
+			clearFunctions();
+		}
+
 		onSelectFunction = selectionFunction;
 		onCancelFunction = cancelFunction;
 		rendering = true;
 		return fileString;
+	}
+
+	static function clearFunctions() {
+		onSelectFunction = null;
+		onCancelFunction = null;
 	}
 
 	//Get the last file string selected by the file picker. Does not render the GUI.
@@ -268,11 +282,13 @@ class FilePicker extends MonoBehaviour {
 		var buttonRect = new Rect(outerRect.width-175, cur_y, buttonWidth, selectButtonsHeight-10);
 		if (GUI.Button(buttonRect, "Select")) {
 			onSelectFunction();
+			clearFunctions();
 		}
 
 		buttonRect.x += buttonWidth+10;
 		if (GUI.Button(buttonRect, "Cancel")) {
 			onCancelFunction();
+			clearFunctions();
 		}
 	} 
 

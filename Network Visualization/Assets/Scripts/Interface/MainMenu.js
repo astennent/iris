@@ -61,7 +61,7 @@ class MainMenu extends BaseMenu {
 
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
-			GUI.color = Color.white;
+			GUI.color = new Color(.7, .7, .4);
 			if (GUI.Button(button_position, save)){
 				WorkspaceManager.toggleSelectingSaveFile();
 			}
