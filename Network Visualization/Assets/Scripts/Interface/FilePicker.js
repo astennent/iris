@@ -196,13 +196,6 @@ class FilePicker extends MonoBehaviour {
 			var iconIndex = 0;
 
 			var pressedEnter = (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return);
-			var clicked = Input.GetMouseButtonDown(0);
-			var mousePosition = Input.mousePosition;
-			var windowPosition = fileStringWindow.getPosition();
-			mousePosition.x -= windowPosition.x;
-			mousePosition.y += windowPosition.y;
-			mousePosition.y = Screen.height - mousePosition.y;
-
 
 			for (var currentList in bothLists) {
 				for (var icon in currentList) {
@@ -232,10 +225,12 @@ class FilePicker extends MonoBehaviour {
 					selectRect.y -= 2;
 
 					// Select the icon if the user clicks the button, it will change the folder and override this. 
-					if (clicked && selectRect.Contains(mousePosition)) {
+					GUI.color.a = 0.5;
+					if (GUI.Button(selectRect, "")) {
 						selectedIndex = iconIndex;
 						selected = true;
 					}
+					GUI.color.a = 1;
 
 					//Render box if selected
 					if (selected) {
