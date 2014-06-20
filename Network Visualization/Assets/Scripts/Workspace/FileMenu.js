@@ -90,7 +90,7 @@ class FileMenu extends BaseMenu {
 		cur_y += 37;
 		
 		if (creating_file) {
-			FilePicker.PickFile(FilePickerSelectFunction, FilePickerCancelFunction);
+			FilePicker.PickFile(FilePickerSelectFunction, FilePickerCancelFunction, "Open File");
 		}
 
 		if (selected_file_index >= 0){

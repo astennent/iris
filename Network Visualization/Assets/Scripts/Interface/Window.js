@@ -11,11 +11,13 @@ class Window extends MonoBehaviour {
 
 	var bounds : Rect;
 
+	var title : String = "";
 	var params : int = defaultParams;
 	var depth = 3;
 
 	private var dragging = false;
 	private var lastMousePosition = Vector2.zero;
+
 
 	public static function Instantiate(bounds : Rect) {
 		var instance = (new GameObject()).AddComponent(Window);
@@ -101,7 +103,7 @@ class Window extends MonoBehaviour {
 		headerRect.y -= headerHeight;
 		headerRect.height = headerHeight;
 
-		GuiPlus.Box(headerRect, "");
+		GuiPlus.Button(headerRect, title);
 
 		var currentMousePosition = Input.mousePosition;
 		currentMousePosition.y = Screen.height - currentMousePosition.y;

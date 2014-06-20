@@ -47,9 +47,9 @@ class WorkspaceManager extends MonoBehaviour {
 
 	function OnGUI() {
 		if (is_selecting_load_file) {
-			FilePicker.PickFile(loadWorkspace, stopSelectingLoadFile);
+			FilePicker.PickFile(loadWorkspace, stopSelectingLoadFile,"Open Workspace");
 		} else if (is_selecting_save_file) {
-			FilePicker.PickFile(saveWorkspace, stopSelectingSaveFile);
+			FilePicker.PickFile(saveWorkspace, stopSelectingSaveFile,"Save As...");
 		}
 	}
 

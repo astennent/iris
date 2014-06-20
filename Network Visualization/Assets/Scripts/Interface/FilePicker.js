@@ -38,6 +38,7 @@ class FilePicker extends MonoBehaviour {
 		//Filled in by GUI calls of other menus.
 	static var onSelectFunction : Function;
 	static var onCancelFunction : Function;
+	static var title : String;
 
 	function Start() {
 		folderTexture_s = folderTexture;
@@ -72,7 +73,7 @@ class FilePicker extends MonoBehaviour {
 	}
 
 	//Called from other menu's GUI methods
-	static function PickFile(selectionFunction : Function, cancelFunction : Function) : String {
+	static function PickFile(selectionFunction : Function, cancelFunction : Function, title:String) : String {
 
 		// The current file picking operation has changed. Cancel the first one.
 		if (selectionFunction != onSelectFunction) {
@@ -84,6 +85,7 @@ class FilePicker extends MonoBehaviour {
 
 		onSelectFunction = selectionFunction;
 		onCancelFunction = cancelFunction;
+		this.title = title;
 		rendering = true;
 		return fileString;
 	}
@@ -91,6 +93,7 @@ class FilePicker extends MonoBehaviour {
 	static function clearFunctions() {
 		onSelectFunction = null;
 		onCancelFunction = null;
+		replaceDirectoryData(fileString);
 	}
 
 	//Get the last file string selected by the file picker. Does not render the GUI.
@@ -278,6 +281,10 @@ class FilePicker extends MonoBehaviour {
 	}
 
 	static function DrawSelectButtons(cur_y : float) {
+
+		var titleRect = new Rect(10, cur_y, 500, selectButtonsHeight-10);
+		GUI.Label(titleRect, title);
+
 		var buttonWidth = 80;
 		var buttonRect = new Rect(outerRect.width-175, cur_y, buttonWidth, selectButtonsHeight-10);
 		if (GUI.Button(buttonRect, "Select")) {
