@@ -224,6 +224,20 @@ class FilePicker extends MonoBehaviour {
 					selectRect.width += 4;
 					selectRect.y -= 2;
 
+					//Render box if selected
+					if (selected) {
+						GUI.Box(selectRect, "");
+						selectionTop = selectRect.y;
+						selectionBottom = selectionTop + selectRect.height;
+					}
+
+
+					//Render button
+					if (GUI.Button(buttonRect, image) || (selected && pressedEnter) ) {
+						setFileString(icon.getFullName());
+						GUI.EndScrollView(); return;
+					}
+
 					// Select the icon if the user clicks the button, it will change the folder and override this. 
 					GUI.color.a = 0.5;
 					if (GUI.Button(selectRect, "")) {
@@ -232,21 +246,11 @@ class FilePicker extends MonoBehaviour {
 					}
 					GUI.color.a = 1;
 
-					//Render box if selected
-					if (selected) {
-						GUI.Box(selectRect, "");
-						selectionTop = selectRect.y;
-						selectionBottom = selectionTop + selectRect.height;
-					}
 
 					//Render label
 					GUI.Label(textRect, text);
 
-					//Render button
-					if (GUI.Button(buttonRect, image) || (selected && pressedEnter) ) {
-						setFileString(icon.getFullName());
-						GUI.EndScrollView(); return;
-					}
+
 
 					iconIndex++;
 					colIndex++;
