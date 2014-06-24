@@ -1,22 +1,46 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <SaveState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Version>1</Version>
+  <MajorVersion>0</MajorVersion>
+  <MinorVersion>1</MinorVersion>
   <ColorRules>
     <ColorRule>
-      <is_fallback>true</is_fallback>
+      <sources />
+      <clusters />
       <color>
-        <r>0.325441182</r>
-        <g>0</g>
-        <b>1</b>
+        <r>0.37180835</r>
+        <g>1</g>
+        <b>0</b>
         <a>0.5</a>
       </color>
       <variation>0.3</variation>
       <coloring_halo>true</coloring_halo>
       <coloring_node>true</coloring_node>
       <scheme_button_color>
-        <r>0.325441182</r>
-        <g>0</g>
-        <b>1</b>
+        <r>0.37180835</r>
+        <g>1</g>
+        <b>0</b>
+        <a>1</a>
+      </scheme_button_color>
+    </ColorRule>
+    <ColorRule>
+      <sources>
+        <int>1</int>
+        <int>2</int>
+      </sources>
+      <clusters />
+      <color>
+        <r>0.566666663</r>
+        <g>1</g>
+        <b>0</b>
+        <a>1</a>
+      </color>
+      <variation>0.3</variation>
+      <coloring_halo>true</coloring_halo>
+      <coloring_node>true</coloring_node>
+      <scheme_button_color>
+        <r>0.550036967</r>
+        <g>1</g>
+        <b>0</b>
         <a>1</a>
       </scheme_button_color>
     </ColorRule>
@@ -35,6 +59,7 @@
         <int>1</int>
       </shown_indices>
       <timeFrame />
+      <id>1</id>
     </DataFile>
     <DataFile>
       <using_headers>true</using_headers>
@@ -43,6 +68,7 @@
       <delimiter>44</delimiter>
       <linking_table>true</linking_table>
       <timeFrame />
+      <id>2</id>
     </DataFile>
     <DataFile>
       <using_headers>true</using_headers>
@@ -56,6 +82,8 @@
       </pkey_indices>
       <shown_indices />
       <timeFrame />
+      <id>3</id>
     </DataFile>
   </DataFiles>
+  <current_id>4</current_id>
 </SaveState>

@@ -6,7 +6,9 @@ private static var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight
 static var rules : List.<ColorRule> = new List.<ColorRule>();
 
 //Determines which nodes to apply a rule to.
-static var rule_types = ["Source", "Cluster", "Node", "Attribute"];; 
+//TODO: Rename this to "filter types", and make the menus "ColorRuleFilterMenu" and "ColorRuleMethodMenu"
+static var rule_types = ["Source", "Cluster", "Node", "Attribute"];
+//TODO: Name these static indices (like in ColorRule) and get rid of magic numbers.
 
 static function getSchemeNames() {
 	return schemes;
@@ -87,7 +89,8 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 
 	var rule_type = rule.getRuleType();
 	if (rule_type == 0) {  //source
-		for (var source : DataFile in rule.getSources()) {
+		for (var source_id : int in rule.getSources()) {
+			var source = FileManager.getFileFromId(source_id);
 			ColorBySource(source, rule, change_color, change_size);
 		}
 	} else if (rule_type == 1) { //cluster

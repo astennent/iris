@@ -2,8 +2,9 @@ import System.IO;
 
 #pragma strict
 
-static var files = new List.<DataFile>(); //holds File objects.
+static var files = new List.<DataFile>();
 static var demoMode = true;
+static var current_id = 1;
 
 function Start(){
 	if (demoMode){
@@ -110,6 +111,7 @@ static function RemoveFile(index : int) {
 	if (dependent_files.Count == 0) {
 		files[index].Deactivate();
 		files.RemoveAt(index);
+
 	} else {
 		Terminal.E("Cannot remove file with dependencies: There are " +
 				dependent_files.Count + " files dependent on " + files[index].shortName());
@@ -134,8 +136,22 @@ static function getFileIndex(file : DataFile) {
 	return -1;
 }
 
+//TODO: If this is used often enough, it should be a hashset.
+static function getFileFromId(id : int) {
+	for (var file in files) {
+		if (file.id == id) {
+			return file;
+		}
+	}
+	return null;
+}
+
 static function invalidateAllStats() {
 	for (var file in files) {
 		file.invalidateAllStats();
 	}
+}
+
+static function getNextId() {
+	return current_id++;
 }

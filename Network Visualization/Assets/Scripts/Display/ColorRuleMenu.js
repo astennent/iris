@@ -62,10 +62,10 @@ class ColorRuleMenu extends BaseMenu {
 				sourceScrollPosition, Rect (0, 0, width, 20*files.Count+20));
 
 			for (var file : DataFile in files) {
-				var usedSourceBefore = rule.usesSource(file);
-				var usedSourceAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file)), file.shortName());
+				var usedSourceBefore = rule.usesSource(file.id);
+				var usedSourceAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.id)), file.shortName());
 				if (usedSourceAfter != usedSourceBefore) {
-					rule.toggleSource(file);
+					rule.toggleSource(file.id);
 				}			
 				temp_y+=20;
 			}

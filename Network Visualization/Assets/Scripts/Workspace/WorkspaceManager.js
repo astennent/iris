@@ -5,7 +5,6 @@ import System.Xml.Serialization;
 import System.IO;
 
 class WorkspaceManager extends MonoBehaviour {
-	var printed = false;
 	static var is_selecting_save_file = false;
 	static var is_selecting_load_file = false;
 
@@ -72,11 +71,13 @@ class WorkspaceManager extends MonoBehaviour {
 		var MinorVersion = 1;
 		var ColorRules : List.<ColorRule>;
 		var DataFiles : List.<DataFile>;
+		var current_id = 0;
 
 		// Constructor aggregates the static values
 		function SaveState(){
 			ColorRules = ColorController.rules;
 			DataFiles = FileManager.files;
+			current_id = FileManager.current_id;
 		}
 
 		function Serialize() {

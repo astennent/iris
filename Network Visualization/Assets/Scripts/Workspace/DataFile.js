@@ -39,6 +39,8 @@ class DataFile extends LoadableFile {
 
 	private var foreignKeys = new List.<ForeignKey>();
 
+	var id : int = 0; //Used as a unique key for entities after they've been serialized to avoid duplicating serialization.
+
 	public function DataFile(){};	//Default Constructor for serialization; should not be used.
 
 	//Constructor
@@ -47,6 +49,7 @@ class DataFile extends LoadableFile {
 		this.isDemoFile = isDemo;
 		generateAttributes();
 	    this.timeFrame = new TimeFrame(this);
+	    this.id = FileManager.getNextId();
 	}
 
 	// This is manually called by the FileManager because DataFile is not a MonoBehaviour.

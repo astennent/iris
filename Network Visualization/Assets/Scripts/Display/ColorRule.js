@@ -6,14 +6,20 @@ import System.Xml.Schema.XmlAtomicValue;
 
 @XmlRoot("ColorRule")
 class ColorRule {
+
+	static var sizing_types = [" By Edges", " Fixed", " By Attribute"];
+	static var SIZING_EDGES = 0;
+	static var SIZING_FIXED = 1;
+	static var SIZING_ATTRIBUTE = 2;
+
 	private var rule_type : int;
 
 	private var centrality_type : int; //corresponds to ColorController.centrality_types
 	private var inter_cluster : boolean; //used for specifying whether the centrality should be relative to everything or just the group.
 	private var invert_centrality : boolean; //swap colors?
 
-	private var sources : HashSet.<DataFile> = new HashSet.<DataFile>(); //stores name of source
-	private var clusters : HashSet.<int> = new HashSet.<int>(); //stores id of cluster
+	var sources : HashSet.<int> = new HashSet.<int>();
+	var clusters : HashSet.<int> = new HashSet.<int>(); 
 
 	private var nodes : HashSet.<Node> = new HashSet.<Node>();;
 
@@ -21,11 +27,6 @@ class ColorRule {
 	private var attribute_value : String = "";
 
 	private var continuous_attribute : Attribute;
-
-	static var sizing_types = [" By Edges", " Fixed", " By Attribute"];
-	static var SIZING_EDGES = 0;
-	static var SIZING_FIXED = 1;
-	static var SIZING_ATTRIBUTE = 2;
 	
 	private var sizing_type = 0;
 	private var sizing_scale : float = 2.5;
@@ -42,6 +43,8 @@ class ColorRule {
 	//0:custom, 1:scheme, 2:centrality, 3:continuous attribute
 	private var method : int = 0;
 	private var scheme_index : int;
+
+	private var source_ids : List.<int>; //Used for serializing the list of source files.
 
 	function ColorRule() {
 		rule_type = 2; //NODE
@@ -146,7 +149,7 @@ class ColorRule {
 			} else if (count == 1) {
 				var sourceEnumerator = sources.GetEnumerator();
 				sourceEnumerator.MoveNext();
-				return sourceEnumerator.Current.shortName() + "";
+				return FileManager.getFileFromId(sourceEnumerator.Current).shortName() + "";
 			} else {
 				return sources.Count + " sources";
 			}
@@ -184,13 +187,13 @@ class ColorRule {
 	}
 
 	//Sources
-	function usesSource(input : DataFile){
+	function usesSource(input : int){
 		return sources.Contains(input);
 	}
 	function getSources(){
 		return sources;
 	}
-	function toggleSource(input : DataFile) {
+	function toggleSource(input : int) {
 		if (usesSource(input)) {
 			sources.Remove(input);
 		} else {
@@ -250,9 +253,9 @@ class ColorRule {
 	function setContinuousAttribute(continuous_attribute : Attribute) {
 		this.continuous_attribute = continuous_attribute;
 
+		sources = new HashSet.<int>();
 		//Automatically switch to coloring the file of the selected attribute.
-		sources = new HashSet.<DataFile>();
-		sources.Add(continuous_attribute.file); 
+		sources.Add(continuous_attribute.file.id); 
 		this.setRuleType(0); //switch to coloring by source
 	}
 

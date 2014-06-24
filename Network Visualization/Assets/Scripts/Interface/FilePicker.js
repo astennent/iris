@@ -231,7 +231,6 @@ class FilePicker extends MonoBehaviour {
 						selectionBottom = selectionTop + selectRect.height;
 					}
 
-
 					//Render button
 					if (GUI.Button(buttonRect, image) || (selected && pressedEnter) ) {
 						setFileString(icon.getFullName());
@@ -246,11 +245,8 @@ class FilePicker extends MonoBehaviour {
 					}
 					GUI.color.a = 1;
 
-
 					//Render label
 					GUI.Label(textRect, text);
-
-
 
 					iconIndex++;
 					colIndex++;
