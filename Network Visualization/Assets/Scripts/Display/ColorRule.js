@@ -7,47 +7,53 @@ import System.Xml.Schema.XmlAtomicValue;
 @XmlRoot("ColorRule")
 class ColorRule {
 
+	//Determines what changes to the node size should be applied.
 	static var sizing_types = [" By Edges", " Fixed", " By Attribute"];
 	static var SIZING_EDGES = 0;
 	static var SIZING_FIXED = 1;
 	static var SIZING_ATTRIBUTE = 2;
+	private var sizing_type = SIZING_EDGES;
 
-	private var rule_type : int;
-
-	private var centrality_type : int; //corresponds to ColorController.centrality_types
-	private var inter_cluster : boolean; //used for specifying whether the centrality should be relative to everything or just the group.
-	private var invert_centrality : boolean; //swap colors?
-
-	var sources : HashSet.<int> = new HashSet.<int>();
-	var clusters : HashSet.<int> = new HashSet.<int>(); 
-
-	private var nodes : HashSet.<Node> = new HashSet.<Node>();;
-
-	private var attribute : Attribute; //stores which attribute you're looking at
-	private var attribute_value : String = "";
-
-	private var continuous_attribute : Attribute;
-	
-	private var sizing_type = 0;
-	private var sizing_scale : float = 2.5;
 	private var changing_size = false;
+	private var sizing_scale : float = 2.5;
+
+
+	//Determines which nodes to apply a rule to.
+	static var filter_methods = ["Source", "Cluster", "Node", "Attribute"];
+	static var FILTER_SOURCE = 0;
+	static var FILTER_CLUSTER = 1;
+	static var FILTER_NODE = 2;
+	static var FILTER_ATTRIBUTE = 3;
+	private var filter_method = FILTER_SOURCE;
+
+	var sources : HashSet.<int> = new HashSet.<int>();  //Which data sources does this rule apply to?
+	var clusters : HashSet.<int> = new HashSet.<int>(); //Which cluster does this rule apply to?
+	private var nodes : HashSet.<Node> = new HashSet.<Node>(); //Which nodes does this rule apply to?
+
+
+	//Determines the method by which the rule selects a color for the node.
+	static var coloring_methods = [" Custom Color", " Scheme", " Centrality", " Continuous Attribute"];
+	static var COLORING_CUSTOM = 0;
+	static var COLORING_SCHEME = 1;
+	static var COLORING_CENTRALITY = 2;
+	static var COLORING_CONTINUOUS_ATTR = 3;
+	private var coloring_method = COLORING_CUSTOM;	
 
 	var color : Color;
 	var variation : float;
-
-	var coloring_halo : boolean; //Should it color the halo?
-	var coloring_node : boolean;  //Should it color the body of the node?
-
-	var scheme_button_color : Color; //used for coloring the scheme button so it doesn't flash.
-
-	//0:custom, 1:scheme, 2:centrality, 3:continuous attribute
-	private var method : int = 0;
 	private var scheme_index : int;
+	private var centrality_type : int; //corresponds to ColorController.centrality_types
+	private var inter_cluster : boolean; //used for specifying whether the centrality should be relative to everything or just the group.
+	private var invert_centrality : boolean; //swap colors?
+	private var attribute : Attribute; //stores which attribute you're looking at
+	private var attribute_value : String = "";
+	private var continuous_attribute : Attribute;
+	
+	var coloring_node = true;  //Should it color the body of the node?
+	var coloring_halo = true; //Should it color the halo?
 
-	private var source_ids : List.<int>; //Used for serializing the list of source files.
 
 	function ColorRule() {
-		rule_type = 2; //NODE
 		centrality_type = 1; //CLOSENESS
 
 		coloring_node = coloring_halo = true;
@@ -61,19 +67,19 @@ class ColorRule {
 		return (this == ColorController.rules[0]);
 	}
 
-	function getMethod() {
-		return method;
+	function getColoringMethod() {
+		return coloring_method;
 	}
 
-	function setMethod(m : int) {
-		method = m;
+	function setColoringMethod(m : int) {
+		coloring_method = m;
 		ColorController.ApplyRule(this, true, false);
 	}
 
 	function getColor(){
-		if (method == 0) {
+		if (coloring_method == COLORING_CUSTOM) {
 			return color;
-		} else if (method == 1) {
+		} else if (coloring_method == COLORING_SCHEME) {
 			return ColorController.GenRandomColor(scheme_index);
 		} else {
 			if (centrality_type == 0) {
@@ -95,8 +101,6 @@ class ColorRule {
 	function setScheme(index : int, applyImmediately : boolean) {
 		scheme_index = index;
 		color = ColorController.GenRandomColor(scheme_index);
-		scheme_button_color = color;
-		scheme_button_color.a = 1;
 		if (applyImmediately) {
 			ColorController.ApplyRule(this, true, false);
 		}
@@ -106,13 +110,13 @@ class ColorRule {
 		return scheme_index;
 	}
 
-	function setRuleType(index : int) {
-		rule_type = index;
+	function setFilterMethod(index : int) {
+		filter_method = index;
 		ColorController.ApplyRule(this);
 	}
 
-	function getRuleType() {
-		return rule_type;
+	function getFilterMethod() {
+		return filter_method;
 	}
 
 
@@ -142,7 +146,7 @@ class ColorRule {
 	}
 
 	function getDisplayName() : String {
-		if (rule_type == 0){ //SOURCE
+		if (filter_method == FILTER_SOURCE){
 			var count = sources.Count;
 			if (count == 0) {
 				return "New Source Rule";
@@ -153,7 +157,7 @@ class ColorRule {
 			} else {
 				return sources.Count + " sources";
 			}
-		} else if (rule_type == 1){
+		} else if (filter_method == FILTER_CLUSTER){
 			count = clusters.Count;
 			if (count == 0){
 				return "New Cluster Rule";
@@ -164,7 +168,7 @@ class ColorRule {
 			} else {
 				return clusters.Count + " clusters";
 			}
-		} else if (rule_type == 2) {
+		} else if (filter_method == FILTER_NODE) {
 			count = nodes.Count;
 			if (count == 0){
 				return "New Node Rule";
@@ -175,7 +179,7 @@ class ColorRule {
 			} else {
 				return nodes.Count + " nodes";
 			}
-		} else if (rule_type == 3) {
+		} else if (filter_method == FILTER_ATTRIBUTE) {
 			if (attribute == null) {
 				return "New Attribute Rule";
 			} else {
@@ -255,8 +259,9 @@ class ColorRule {
 
 		sources = new HashSet.<int>();
 		//Automatically switch to coloring the file of the selected attribute.
+		sources.Clear();
 		sources.Add(continuous_attribute.file.id); 
-		this.setRuleType(0); //switch to coloring by source
+		this.setFilterMethod(FILTER_SOURCE); 
 	}
 
 

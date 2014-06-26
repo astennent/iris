@@ -5,11 +5,6 @@ private static var schemes = ["Bright", "Pastel", "Grayscale", "Rust", "Sunlight
 
 static var rules : List.<ColorRule> = new List.<ColorRule>();
 
-//Determines which nodes to apply a rule to.
-//TODO: Rename this to "filter types", and make the menus "ColorRuleFilterMenu" and "ColorRuleMethodMenu"
-static var rule_types = ["Source", "Cluster", "Node", "Attribute"];
-//TODO: Name these static indices (like in ColorRule) and get rid of magic numbers.
-
 static function getSchemeNames() {
 	return schemes;
 }
@@ -17,7 +12,7 @@ static function getSchemeNames() {
 //Called by Display Menu or Axis Controller.
 static function Init(){
 	createRule();
-	rules[0].setMethod(1);
+	rules[0].setColoringMethod(1);
 	rules[0].setChangingSize(true);
 }
 
@@ -50,8 +45,8 @@ static function ApplyRulesForDateChange() {
 	var foundUpdatableRule = false;
 	for (var rule in rules){
 		if (foundUpdatableRule || //You've already found a rule and must reapply everything after it
-				rule.getRuleType() == 1 || //Coloring by cluster 
-				rule.getMethod() == 2 || rule.getMethod() == 3 //Coloring by centrality or continuous attribute
+				rule.getFilterMethod() == 1 || //Coloring by cluster 
+				rule.getColoringMethod() == 2 || rule.getColoringMethod() == 3 //Coloring by centrality or continuous attribute
 			) {
 			ApplyRule(rule);
 		}
@@ -87,7 +82,7 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 		return;
 	}
 
-	var rule_type = rule.getRuleType();
+	var rule_type = rule.getFilterMethod();
 	if (rule_type == 0) {  //source
 		for (var source_id : int in rule.getSources()) {
 			var source = FileManager.getFileFromId(source_id);
@@ -112,7 +107,7 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 }
 
 private static function ApplyFallbackRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
-	var rule_type = rule.getRuleType();
+	var rule_type = rule.getFilterMethod();
 	if (rule_type == 0) {
 			for (var source : DataFile in FileManager.files) {
 				ColorBySource(source, rule, change_color, change_size);
@@ -166,26 +161,25 @@ static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, c
 	var variation : float = getAdjustedVariation(rule);
 
 	//Override color in the case of coloring by centrality or continuous variable.
-	var adjusted_variation = variation;
-	if (rule.getMethod() == 2) {
+	if (rule.getColoringMethod() == 2) {
 		color = GenCentralityColor(rule, node);
-		adjusted_variation = 0;
-	} else if (rule.getMethod() == 3) {
+		variation = 0;
+	} else if (rule.getColoringMethod() == 3) {
 		var continuousAttribute = rule.getContinuousAttribute();
 		if (continuousAttribute != null) {
 			color = continuousAttribute.genFractionalColor(node);
 		} else {
 			color = Color.white;
 		}
-		adjusted_variation = 0;
+		variation = 0;
 	}
 	
 	if (change_color) {
 		if (coloring_halo){
-			node.setHaloColor(NudgeColor(color, adjusted_variation));
+			node.setHaloColor(NudgeColor(color, variation));
 		} 
 		if (coloring_node) {
-			node.setColor(NudgeColor(color, adjusted_variation), true);
+			node.setColor(NudgeColor(color, variation), true);
 		}
 	}
 	if (change_size && rule.isChangingSize()) {
@@ -194,7 +188,7 @@ static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, c
 }
 
 static function getAdjustedVariation(rule : ColorRule){
-	if (rule.getMethod() == 2 || rule.getMethod() == 1  && rule.getScheme() == 2){
+	if (rule.getColoringMethod() == 2 || rule.getColoringMethod() == 1  && rule.getScheme() == 2){
 		return 0;
 	}
 	return rule.variation;
@@ -339,7 +333,7 @@ static function lightenColor(input : Color) {
 static function handleDateChange() {
 	for (var rule in rules) {
 		
-		if (rule.getMethod() == 2) { //centrality
+		if (rule.getColoringMethod() == 2) { //centrality
 			ApplyRule(rule, true, true);
 		} else { //Don't recolor if it's not centrality.
 			ApplyRule(rule, false, true);

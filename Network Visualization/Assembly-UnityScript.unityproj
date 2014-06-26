@@ -64,8 +64,8 @@
      <Compile Include="Assets\Scripts\Data\Node.js" />
      <Compile Include="Assets\Scripts\Display\ColorController.js" />
      <Compile Include="Assets\Scripts\Display\ColorRule.js" />
-     <Compile Include="Assets\Scripts\Display\ColorRuleColorMenu.js" />
-     <Compile Include="Assets\Scripts\Display\ColorRuleMenu.js" />
+     <Compile Include="Assets\Scripts\Display\ColorRuleFilterMenu.js" />
+     <Compile Include="Assets\Scripts\Display\ColorRuleOptionsMenu.js" />
      <Compile Include="Assets\Scripts\Display\DisplayMenu.js" />
      <Compile Include="Assets\Scripts\Display\Reticle.js" />
      <Compile Include="Assets\Scripts\Graphing\AxisController.js" />

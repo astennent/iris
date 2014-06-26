@@ -6,8 +6,14 @@
     <ColorRule>
       <sources />
       <clusters />
+      <scheme_button_color>
+        <r>0.0721339</r>
+        <g>1</g>
+        <b>0</b>
+        <a>1</a>
+      </scheme_button_color>
       <color>
-        <r>0.37180835</r>
+        <r>0.0721339</r>
         <g>1</g>
         <b>0</b>
         <a>0.5</a>
@@ -15,34 +21,6 @@
       <variation>0.3</variation>
       <coloring_halo>true</coloring_halo>
       <coloring_node>true</coloring_node>
-      <scheme_button_color>
-        <r>0.37180835</r>
-        <g>1</g>
-        <b>0</b>
-        <a>1</a>
-      </scheme_button_color>
-    </ColorRule>
-    <ColorRule>
-      <sources>
-        <int>1</int>
-        <int>2</int>
-      </sources>
-      <clusters />
-      <color>
-        <r>0.566666663</r>
-        <g>1</g>
-        <b>0</b>
-        <a>1</a>
-      </color>
-      <variation>0.3</variation>
-      <coloring_halo>true</coloring_halo>
-      <coloring_node>true</coloring_node>
-      <scheme_button_color>
-        <r>0.550036967</r>
-        <g>1</g>
-        <b>0</b>
-        <a>1</a>
-      </scheme_button_color>
     </ColorRule>
   </ColorRules>
   <DataFiles>

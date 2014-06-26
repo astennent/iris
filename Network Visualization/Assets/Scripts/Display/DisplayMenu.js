@@ -34,15 +34,15 @@ class DisplayMenu extends BaseMenu {
 		y+=30;
 
 		var rule : ColorRule = ColorController.rules[0];
-		var rule_type_index = rule.getRuleType();
+		var filter_method = rule.getFilterMethod();
 
 		//Draw radio buttons for the fallback rule
 		var temp_x = 10;
 		for (var i : int = 0 ; i < 3 ; i++) {
-			var rule_type_name = ColorController.rule_types[i];
-			var selected = GUI.Toggle (Rect (x+temp_x, y, 100, 20), (rule_type_index == i), "By " + rule_type_name);
-			if (selected && rule_type_index != i) { //you just clicked it.
-				rule.setRuleType(i);
+			var filter_method_name = ColorRule.filter_methods[i];
+			var selected = GUI.Toggle (Rect (x+temp_x, y, 100, 20), (filter_method == i), "By " + filter_method_name);
+			if (selected && filter_method != i) {
+				rule.setFilterMethod(i);
 				break;
 			}
 			temp_x+=100;
@@ -155,15 +155,15 @@ class DisplayMenu extends BaseMenu {
 			if (rule_index > -1){
 				var rule : ColorRule = ColorController.rules[rule_index];
 				ColorPicker.setColor(rule.color);
-				EnableDisplay(ColorRuleColorMenu);
+				EnableDisplay(ColorRuleOptionsMenu);
 				if (rule_index > 0) {
-					EnableDisplay(ColorRuleMenu);
+					EnableDisplay(ColorRuleFilterMenu);
 				} else {
-					DisableDisplay(ColorRuleMenu);
+					DisableDisplay(ColorRuleFilterMenu);
 				}
 			} else {
-				DisableDisplay(ColorRuleColorMenu);
-				DisableDisplay(ColorRuleMenu);
+				DisableDisplay(ColorRuleOptionsMenu);
+				DisableDisplay(ColorRuleFilterMenu);
 			}
 		}
 	}

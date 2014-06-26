@@ -1,6 +1,6 @@
 #pragma strict
 
-class ColorRuleColorMenu extends BaseMenu {
+class ColorRuleOptionsMenu extends BaseMenu {
 	private static var schemeScrollPosition : Vector2 = Vector2.zero;
 	private static var attributeScrollPosition : Vector2 = Vector2.zero;
 	private static var rule : ColorRule;
@@ -20,46 +20,51 @@ class ColorRuleColorMenu extends BaseMenu {
 			var rule_index = DisplayMenu.rule_index;
 			rule = ColorController.rules[DisplayMenu.rule_index];
 
-			var y = DrawMethod(35);
-			var method = rule.getMethod();
-			if (method == 0) {
-				y = DrawColorCustom(y);
-			} else if (method == 1) {
-				y = DrawColorScheme(y);
-			} else if (method == 2) {
-				y = DrawCentrality(y);
-			} else {
-				y = DrawContinuousAttribute(y);
-			}
+			var y = DrawColoringMethodSelection(35);
+
+			//Draw the appropriate options associated with the coloring method
+			switch (rule.getColoringMethod()) {
+				case ColorRule.COLORING_CUSTOM:
+					y = DrawColorCustom(y);
+					break;
+				case ColorRule.COLORING_SCHEME:
+					y = DrawColorScheme(y);
+					break;
+				case ColorRule.COLORING_CENTRALITY:
+					y = DrawCentrality(y);
+					break;
+				case ColorRule.COLORING_CONTINUOUS_ATTR:
+					y = DrawContinuousAttribute(y);
+			} 
+
 			y = DrawHaloOptions(y);
 			DrawSizingOptions(y);				
 		}
 	}
 
-	function DrawMethod(cur_y : int) {
+	function DrawColoringMethodSelection(cur_y : int) {
 		var is_fallback = rule.isFallback();
-		var boxHeight = (is_fallback) ? 80 : 100;
-		GUI.Box(Rect(x+5, cur_y, width-10, boxHeight), "");
+		var box_height = (is_fallback) ? 80 : 100;
+		GUI.Box(Rect(x+5, cur_y, width-10, box_height), "");
 		var toggle_rect = new Rect(x+20, cur_y+10, width, 20);
-		var method = rule.getMethod();
-		if (GUI.Toggle(toggle_rect, method==0, " Custom Color") && method != 0){
-			rule.setMethod(0);
+
+		var current_method = rule.getColoringMethod();
+		var coloring_methods = rule.coloring_methods;
+
+		for (var i = 0 ; i < coloring_methods.length ; i++) {
+			var coloring_method_name = coloring_methods[i];
+
+			// Do not draw the continuous attribute option for the fallback rule.
+			if (is_fallback && i == ColorRule.COLORING_CONTINUOUS_ATTR) {
+				continue;
+			}
+
+			if (GUI.Toggle(toggle_rect, current_method==i, coloring_method_name) && current_method != i){
+				rule.setColoringMethod(i);
+			}
+			toggle_rect.y+=20;
 		}
-		toggle_rect.y+=20;
-		if (GUI.Toggle(toggle_rect, method==1, " Scheme") && method != 1){
-			rule.setMethod(1);
-		}
-		toggle_rect.y+=20;
-		if (GUI.Toggle(toggle_rect, method==2, " Centrality") && method != 2){
-			rule.setMethod(2);
-		} 
-		toggle_rect.y+=20;
-		if (!is_fallback) {
-			if (GUI.Toggle(toggle_rect, method==3, " Continuous Attribute") && method != 3){
-				rule.setMethod(3);
-			} 
-		}
-		return cur_y+boxHeight;
+		return cur_y+box_height;
 	}
 
 	function DrawColorCustom(cur_y : int) {
@@ -94,7 +99,8 @@ class ColorRuleColorMenu extends BaseMenu {
 			var schemeRect = new Rect(0, cur_y, width, 30);
 
 			if (rule.getScheme() == i) { 
-				GUI.color = rule.scheme_button_color; 
+				GUI.color = rule.color;
+				GUI.color.a = 1; //just in case the custom color is transparent. 
 			} else {
 				GUI.color = Color.white; 
 			}
@@ -233,7 +239,7 @@ class ColorRuleColorMenu extends BaseMenu {
 
 		for (var sizing_type = 0 ; sizing_type < ColorRule.sizing_types.length ; sizing_type++) {
 			cur_y+=20;
-			var lock_toggle = (!rule.isChangingSize() || (sizing_type == ColorRule.SIZING_ATTRIBUTE && rule.getMethod() != 3) );
+			var lock_toggle = (!rule.isChangingSize() || (sizing_type == ColorRule.SIZING_ATTRIBUTE && rule.getColoringMethod() != 3) );
 			var wasUsingType = (rule.getSizingType() == sizing_type);
 			if (GuiPlus.LockableToggle(Rect(x+20, cur_y, width-40, 20), wasUsingType, ColorRule.sizing_types[sizing_type], lock_toggle) && !wasUsingType) {
 				rule.setSizingType(sizing_type);
