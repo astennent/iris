@@ -180,13 +180,13 @@ private function selectBoxedItems(){
 	}
 }
 
-static function selectAllInGroup(group_id : int, clear : boolean){
+static function selectAllInGroup(cluster_id : int, clear : boolean){
 	if (clear) {
 		clearSelectedNodes();
 	}
 	for (var file : DataFile in FileManager.files){
 		for (var node in file.getNodes()){
-			if (node.group_id == group_id){
+			if (node.cluster_id == cluster_id){
 				nodes.Add(node);
 				node.setSelected(true);
 			}

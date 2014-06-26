@@ -76,7 +76,7 @@ class RightClickMenu extends MonoBehaviour {
 
 			var clusterSize = RightClickController.getCurrentClusterSize();
 			if (GUI.Button(button_rect, "Select Cluster (" + clusterSize + ")")){
-				SelectionController.selectAllInGroup(node.group_id, true);
+				SelectionController.selectAllInGroup(node.cluster_id, true);
 				DisableDisplay();
 			}
 		}

@@ -17,7 +17,7 @@ class Node extends TimeObject {
 	var desiredDistance : float;
 	private var desiredPosition : Vector3;
 
-	var group_id :int = -1; //used by ClusterController to identify which group of edges it belongs to.
+	var cluster_id :int = -1; //used by ClusterController to identify which group of nodes it belongs to.
 	private var activated = true;
 
 	private var sizing_type = 0;

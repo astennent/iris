@@ -27,7 +27,7 @@ class RightClickController extends MonoBehaviour {
 	}
 
 	static function getCurrentClusterSize() : int {
-		return ClusterController.group_dict[node.group_id].Count;
+		return ClusterController.group_dict[node.cluster_id].Count;
 	}
 
 }

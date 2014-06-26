@@ -76,14 +76,14 @@ static function CalculateDegreeCentrality(){
 			var node_centrality : float = node.getEdges(true).Count;
 			degreeCentralities[node] = node_centrality;
 
-			var group_id = node.group_id;
+			var cluster_id = node.cluster_id;
 
 			//update cluster's min and max
-			if (!(group_id in minMaxDegreeCache[0]) || minMaxDegreeCache[0][group_id] > node_centrality) {
-				minMaxDegreeCache[0][group_id] = node_centrality;
+			if (!(cluster_id in minMaxDegreeCache[0]) || minMaxDegreeCache[0][cluster_id] > node_centrality) {
+				minMaxDegreeCache[0][cluster_id] = node_centrality;
 			}
-			if (!(group_id in minMaxDegreeCache[1]) || minMaxDegreeCache[1][group_id] < node_centrality) {
-				minMaxDegreeCache[1][group_id] = node_centrality;
+			if (!(cluster_id in minMaxDegreeCache[1]) || minMaxDegreeCache[1][cluster_id] < node_centrality) {
+				minMaxDegreeCache[1][cluster_id] = node_centrality;
 			}			
 
 			//update the global min and max
@@ -117,16 +117,16 @@ static function CalculateClosenessCentrality(){
 			//update the distance and inverted distance sums
 			CalculateDistanceSums(node);	
 
-			var group_id = node.group_id;
+			var cluster_id = node.cluster_id;
 			var node_distance = distanceSums[node];
 			var node_inverted_distance = invertedDistanceSums[node];
 
 			//update cluster's min and max distance
-			if (!(group_id in minMaxDistanceCache[0]) || minMaxDistanceCache[0][group_id] > node_distance) {
-				minMaxDistanceCache[0][group_id] = node_distance;
+			if (!(cluster_id in minMaxDistanceCache[0]) || minMaxDistanceCache[0][cluster_id] > node_distance) {
+				minMaxDistanceCache[0][cluster_id] = node_distance;
 			}
-			if (!(group_id in minMaxDistanceCache[1]) || minMaxDistanceCache[1][group_id] < node_distance) {
-				minMaxDistanceCache[1][group_id] = node_distance;
+			if (!(cluster_id in minMaxDistanceCache[1]) || minMaxDistanceCache[1][cluster_id] < node_distance) {
+				minMaxDistanceCache[1][cluster_id] = node_distance;
 			}			
 
 			//update the global min and max distance
@@ -138,11 +138,11 @@ static function CalculateClosenessCentrality(){
 			}	
 
 			//update cluster's min and max inverted distance
-			if (!(group_id in minMaxInvertedDistanceCache[0]) || minMaxInvertedDistanceCache[0][group_id] > node_inverted_distance) {
-				minMaxInvertedDistanceCache[0][group_id] = node_inverted_distance;
+			if (!(cluster_id in minMaxInvertedDistanceCache[0]) || minMaxInvertedDistanceCache[0][cluster_id] > node_inverted_distance) {
+				minMaxInvertedDistanceCache[0][cluster_id] = node_inverted_distance;
 			}
-			if (!(group_id in minMaxInvertedDistanceCache[1]) || minMaxInvertedDistanceCache[1][group_id] < node_inverted_distance) {
-				minMaxInvertedDistanceCache[1][group_id] = node_inverted_distance;
+			if (!(cluster_id in minMaxInvertedDistanceCache[1]) || minMaxInvertedDistanceCache[1][cluster_id] < node_inverted_distance) {
+				minMaxInvertedDistanceCache[1][cluster_id] = node_inverted_distance;
 			}			
 
 			//update the global min and max inverted distance
@@ -211,14 +211,14 @@ static function CalculateBetweennessCentrality(){
 				betweennessCentralities[node] = 0;
 				node_centrality = 0;
 			}
-			var group_id = node.group_id;
+			var cluster_id = node.cluster_id;
 				
 			//update cluster's min and max distance
-			if (!(group_id in minMaxBetweennessCache[0]) || minMaxBetweennessCache[0][group_id] > node_centrality) {
-				minMaxBetweennessCache[0][group_id] = node_centrality;
+			if (!(cluster_id in minMaxBetweennessCache[0]) || minMaxBetweennessCache[0][cluster_id] > node_centrality) {
+				minMaxBetweennessCache[0][cluster_id] = node_centrality;
 			}
-			if (!(group_id in minMaxBetweennessCache[1]) || minMaxBetweennessCache[1][group_id] < node_centrality) {
-				minMaxBetweennessCache[1][group_id] = node_centrality;
+			if (!(cluster_id in minMaxBetweennessCache[1]) || minMaxBetweennessCache[1][cluster_id] < node_centrality) {
+				minMaxBetweennessCache[1][cluster_id] = node_centrality;
 			}	
 
 			//update the global min and max distance
@@ -299,16 +299,10 @@ static function getCentralityFraction(node: Node, rule : ColorRule) {
 		return 0;
 	}
 
-	var group_id : int;
-	if (inter_cluster) {
-		group_id = GLOBAL_CLUSTER_ID;
-	} else {
-		group_id = node.group_id;
-	}
-
+	var cluster_id = (inter_cluster) ? GLOBAL_CLUSTER_ID : node.cluster_id;
 	var node_centrality : float = relevant_dictionary[node];
-	var min_centrality : float = relevant_cache[0][group_id];
-	var max_centrality : float = relevant_cache[1][group_id];
+	var min_centrality : float = relevant_cache[0][cluster_id];
+	var max_centrality : float = relevant_cache[1][cluster_id];
 
 	return makeFraction(node_centrality, min_centrality, max_centrality);
 }
