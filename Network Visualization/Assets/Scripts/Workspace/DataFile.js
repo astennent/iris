@@ -14,12 +14,11 @@ class DataFile extends LoadableFile {
 	//Used to ensure that files are loaded in the correct order after being activated.
 	static var activationQueue = new LinkedList.<DataFile>();
 	//The maximum number of nodes/edges to generate before moving on with the thread
-	static var activationCutoff = 10;
+	static var activationCutoff = 14;
 
 	var linking_table : boolean = false;
 
 	var pkey_indices : int[];
-	var shown_indices : int[];
 
 	private var first_row : String[]; 
 
@@ -391,7 +390,6 @@ class DataFile extends LoadableFile {
 
 	function GenerateNodes(){
 		UpdatePKeyIndices();
-		UpdateShownIndices();
 
 		var fileContents = getFileContents();
 		for (var rowIndex = contentIndex; rowIndex < fileContents.Count && rowIndex < contentIndex+activationCutoff; rowIndex++) {
@@ -634,15 +632,7 @@ class DataFile extends LoadableFile {
 		ProgressBar.setProgress(1);
 	}
 
-	function UpdateShownIndices(){
-		var output = new Array();
-		for (var i = 0 ; i < attributes.Count ; i++){
-			if (attributes[i].is_shown){
-				output.Push(i);
-			}
-		}
-		shown_indices = output;
-			
+	function updateNodeNames(){		
 		for (var node in nodes){
 			node.Value.UpdateName();
 		}

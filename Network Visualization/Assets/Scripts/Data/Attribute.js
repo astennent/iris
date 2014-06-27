@@ -52,7 +52,7 @@ class Attribute extends Stats {
 
 	function ToggleShown(){
 		is_shown = !is_shown;
-		file.UpdateShownIndices();
+		file.updateNodeNames();
 	}
 
 	function TogglePkey(){

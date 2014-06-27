@@ -256,6 +256,8 @@ class Node extends TimeObject {
 		}
 		if (name_string != "") {
 			display_name = name_string.Substring(1);
+		} else {
+			display_name = " "; //GUIText.text can't have an empty string. Weird.
 		}
 		label.GetComponent(GUIText).text = display_name;
 		gameObject.name = display_name;
