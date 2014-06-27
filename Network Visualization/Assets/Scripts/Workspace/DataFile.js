@@ -2,26 +2,19 @@
 
 #pragma strict
 
-import System.Xml;
-import System.Xml.Serialization;
-import System.Xml.Schema.XmlAtomicValue;
-
 class DataFile extends LoadableFile {
 
-	//Used to ensure that files are loaded in the correct order after being activated.
-	static var activationQueue = new LinkedList.<DataFile>();
-
-	//The maximum number of nodes/edges to generate before moving on with the thread
-	static var activationCutoff = 10;
-
 	private var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
-
 	private var activated : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
 
 	// Used for loading a file across multiple frames.
 	private var activating : boolean = false;
 	private var activatingNodes : boolean = false;
 	private var contentIndex : int;
+	//Used to ensure that files are loaded in the correct order after being activated.
+	static var activationQueue = new LinkedList.<DataFile>();
+	//The maximum number of nodes/edges to generate before moving on with the thread
+	static var activationCutoff = 10;
 
 	var linking_table : boolean = false;
 
@@ -36,23 +29,22 @@ class DataFile extends LoadableFile {
 	private var hasValidNodeLists = false;
 
 	var timeFrame : TimeFrame;
+	var foreignKeys = new List.<ForeignKey>();
 
-	private var foreignKeys = new List.<ForeignKey>();
+	var uuid : int = 0;
 
-	var id : int = 0; //Used as a unique key for entities after they've been serialized to avoid duplicating serialization.
-
-	public function DataFile(){};	//Default Constructor for serialization; should not be used.
-
-	//Constructor
+	//Constructors
+	public function DataFile(){};	//Default Constructor for serialization
 	public function DataFile(fname : String, isDemo : boolean) {
 		this.fname = fname; 
 		this.isDemoFile = isDemo;
 		generateAttributes();
 	    this.timeFrame = new TimeFrame(this);
-	    this.id = FileManager.getNextId();
+	    this.uuid = WorkspaceManager.generateUUID();
 	}
 
 	// This is manually called by the FileManager because DataFile is not a MonoBehaviour.
+	// TODO: This check could be done in FileManager.
 	function Update() {
 		if (activationQueue.Count > 0 && activationQueue.First.Value == this) {
 			activationQueue.RemoveFirst();
@@ -171,8 +163,8 @@ class DataFile extends LoadableFile {
 			var alreadyUpdated = new HashSet.<DataFile>();
 			alreadyUpdated.Add(this);
 			for (var fkey in foreignKeys) {
-				var from_file = fkey.from_file;
-				var to_file = fkey.to_file;
+				var from_file = fkey.getFromFile();
+				var to_file = fkey.getToFile();
 				if (!alreadyUpdated.Contains(from_file)) {
 					from_file.UpdateDates();
 					alreadyUpdated.Add(from_file);
@@ -317,14 +309,14 @@ class DataFile extends LoadableFile {
 		//Process self
 		if (linking_table) {
 			for (var foreignKey in foreignKeys) {
-				for (var node in foreignKey.to_file.getNodes()){
+				for (var node in foreignKey.getFromFile().getNodes()){
 					node.DeactivateEdges(foreignKey);
 				}
 			}
 		} else {
 			for (var foreignKey in foreignKeys) {
-				var from_file = foreignKey.from_file;
-				var to_file = foreignKey.to_file;
+				var from_file = foreignKey.getFromFile();
+				var to_file = foreignKey.getToFile();
 				from_file.DeactivateEdges(to_file);
 				to_file.DeactivateEdges(from_file);
 			}
@@ -357,7 +349,7 @@ class DataFile extends LoadableFile {
 	private function determineDependencies(checked : HashSet.<DataFile>) : List.<DataFile> {
 		var output = new List.<DataFile>();
 		for (var fkey in foreignKeys) {
-			var to_file = fkey.to_file;
+			var to_file = fkey.getToFile();
 			if (!checked.Contains(to_file)) {
 				checked.Add(to_file);
 				var innerList = to_file.determineDependencies(checked);
@@ -386,7 +378,7 @@ class DataFile extends LoadableFile {
 			if (!checked.Contains(file)) {
 				//see if there's a direct edge to this file.
 				for (var fkey in file.foreignKeys) {
-					if (fkey.to_file == this) {
+					if (fkey.getToFile() == this) {
 						checked.Add(file);			
 						list.Insert(0, file);
 						list = determineDependents(checked, list);
@@ -459,7 +451,7 @@ class DataFile extends LoadableFile {
 		for (var entry in nodes){
 			var from_node : Node = entry.Value;
 			for (var foreignKey in foreignKeys) {
-				var other_file : DataFile = foreignKey.to_file;
+				var other_file : DataFile = foreignKey.getToFile();
 				var fkeyPairs = foreignKey.getKeyPairs();
 				var matches = new List.<Node>();
 
@@ -545,7 +537,7 @@ class DataFile extends LoadableFile {
 
 	    	for (i = 0 ; i < foreignKeys.Count ; i++) {
 	    		var foreignKey = foreignKeys[i];
-	    		var other_file = foreignKey.to_file;    		
+	    		var other_file = foreignKey.getToFile();    		
 				var keyPairs = foreignKey.getKeyPairs();
 				var these_matches = new List.<Node>();
 

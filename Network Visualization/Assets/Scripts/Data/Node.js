@@ -247,15 +247,15 @@ class Node extends TimeObject {
 
 
 	function UpdateName(){
-		var shown_indices = source.shown_indices;
 		var name_string = "";
-		if (shown_indices.length > 0){
-			for (var index in shown_indices){
-				name_string += "\n" + Get(index); //access Data attribute
+		var attributes = source.getAttributes();
+		for (var attribute in attributes) {
+			if (attribute.is_shown) {
+				name_string += "\n" + Get(attribute);
 			}
+		}
+		if (name_string != "") {
 			display_name = name_string.Substring(1);
-		} else {
-			display_name = "";
 		}
 		label.GetComponent(GUIText).text = display_name;
 		gameObject.name = display_name;

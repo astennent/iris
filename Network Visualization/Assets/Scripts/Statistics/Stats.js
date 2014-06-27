@@ -84,7 +84,7 @@ class Stats {
 		// Find all files that are be connected with the linking table.
 		var filesToCheck = new HashSet.<DataFile>();
 		for (var fkey in attribute.file.getForeignKeys()) {
-			filesToCheck.Add(fkey.to_file);
+			filesToCheck.Add(fkey.getToFile());
 		}
 
 		//Loop over those files and check the relevant edges
@@ -124,6 +124,7 @@ class Stats {
 	//Marks stats as invalid. They will be updated whenever they are required.
 	public function invalidate() {
 		valid = false;
+		ColorController.handleAttributeInvalidate(attribute);
 	}
 
 	private function calculateStats() {

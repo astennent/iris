@@ -9,11 +9,29 @@ static function getSchemeNames() {
 	return schemes;
 }
 
+private static var invalid_attributes = new List.<Attribute>();
+
 //Called by Display Menu or Axis Controller.
 static function Init(){
 	createRule();
 	rules[0].setColoringMethod(1);
 	rules[0].setChangingSize(true);
+}
+
+function Update() {
+	for (var invalid_attr in invalid_attributes) {
+		for (var rule in rules) {
+			var isFilteringByAttribute = (rule.getFilterMethod() == ColorRule.FILTER_ATTRIBUTE && invalid_attr == rule.getAttribute());
+			var isSizingByAttribute = (rule.getSizingType() == ColorRule.SIZING_ATTRIBUTE && invalid_attr == rule.getContinuousAttribute() && rule.isChangingSize());
+			var isColoringbyAttribute = (rule.getColoringMethod() == ColorRule.COLORING_CONTINUOUS_ATTR && invalid_attr == rule.getContinuousAttribute());
+			if ( isFilteringByAttribute || isSizingByAttribute || isColoringbyAttribute) {
+				var change_color = (isFilteringByAttribute || isColoringbyAttribute);
+				var change_size = (isFilteringByAttribute || isSizingByAttribute);
+				ApplyRule(rule, change_color, change_size);
+			}
+		}
+	}
+	invalid_attributes.Clear();
 }
 
 static function createRule() : ColorRule {
@@ -85,7 +103,7 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 	var rule_type = rule.getFilterMethod();
 	if (rule_type == 0) {  //source
 		for (var source_id : int in rule.getSources()) {
-			var source = FileManager.getFileFromId(source_id);
+			var source = FileManager.getFileFromUUID(source_id);
 			ColorBySource(source, rule, change_color, change_size);
 		}
 	} else if (rule_type == 1) { //cluster
@@ -339,4 +357,8 @@ static function handleDateChange() {
 			ApplyRule(rule, false, true);
 		}
 	}
+}
+
+static function handleAttributeInvalidate(attribute : Attribute) {
+	invalid_attributes.Add(attribute);
 }

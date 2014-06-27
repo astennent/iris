@@ -8,7 +8,7 @@ var is_shown : boolean = false; //for display on the screen.
 
 var is_pkey : boolean = false;
 
-var file : DataFile; //the file to which this attribute belongs
+var source_uuid : int; //uuid of the file to which this attribute belongs
 
 private var restrictedNameCache = new Dictionary.<int, String>();
 
@@ -26,12 +26,14 @@ static var aspectColors = [
 static var shownColor = new Color(1, 1, .5);
 static var pkeyColor = new Color(1, .5, .5);
 
-
 //TimeFrame variables
 private var timeFrameFormat : String = "";
 private var validTimeFrameFormat : boolean = false;
 private var timeFrameFormatWarning : String = "";
 
+var uuid;
+
+var file : DataFile;
 
 class Attribute extends Stats {
 
@@ -41,9 +43,11 @@ class Attribute extends Stats {
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
 		this.file = file;
+		this.source_uuid = file.uuid;
 		this.column_index = column_index;
 		this.column_name = column_name;
 		setStatsAttribute(this);
+		uuid = WorkspaceManager.generateUUID();
 	}
 
 	function ToggleShown(){
@@ -181,6 +185,10 @@ class Attribute extends Stats {
 			}
 		}
 		return output;
+	}
+
+	function getSource() {
+		return FileManager.getFileFromUUID(source_uuid);
 	}
 
 }

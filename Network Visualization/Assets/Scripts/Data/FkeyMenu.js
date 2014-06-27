@@ -78,7 +78,7 @@ class FkeyMenu extends BaseMenu {
 				continue;
 			}
 
-			GUI.Box(fkey_box, foreignKey.to_file.shortName()); 
+			GUI.Box(fkey_box, foreignKey.getToFile().shortName()); 
 			
 			cur_y += 30;
 			foreignKey.isBidirectional = GUI.Toggle(new Rect(x+5, cur_y, 100, 20),
@@ -204,7 +204,7 @@ class FkeyMenu extends BaseMenu {
 					
 				} else { //need to add a "to" index		
 
-					var to_file_attributes = foreignKey.to_file.getAttributes();
+					var to_file_attributes = foreignKey.getToFile().getAttributes();
 					
 					//select a referenced attribute
 					GUI.Box(reference_box, "From " + adding_from_attr.getColumnName() + " to Attribute:");

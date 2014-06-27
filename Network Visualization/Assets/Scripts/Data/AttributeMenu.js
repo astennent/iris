@@ -239,7 +239,7 @@ class AttributeMenu extends BaseMenu {
 				var to_attr = fkey.getKeyPairs()[0][1];
 
 				//Draw the box that surrounds the fkey options.
-				GUI.Box(fkeyRect, fkey.to_file.shortName() + " / " + to_attr.getRestrictedName(80));
+				GUI.Box(fkeyRect, fkey.getToFile().shortName() + " / " + to_attr.getRestrictedName(80));
 
 
 				//Draw the weight attribute label
@@ -303,9 +303,9 @@ class AttributeMenu extends BaseMenu {
 
 	static function getFkeyDropdownId(fkey : ForeignKey) {
 		if (fkey.isLinking()) {
-			return "4" + fkey.source_file.shortName();
+			return "4" + fkey.getSourceFile().shortName();
 		}
-		var id = "4" + fkey.from_file.shortName() + fkey.to_file.shortName();
+		var id = "4" + fkey.getFromFile().shortName() + fkey.getToFile().shortName();
 		for (var keyPair in fkey.getKeyPairs()) {
 			id += keyPair[0].column_index + " " + keyPair[1].column_index + " ";
 		}

@@ -4,7 +4,6 @@ import System.IO;
 
 static var files = new List.<DataFile>();
 static var demoMode = true;
-static var current_id = 1;
 
 function Start(){
 	if (demoMode){
@@ -137,9 +136,9 @@ static function getFileIndex(file : DataFile) {
 }
 
 //TODO: If this is used often enough, it should be a hashset.
-static function getFileFromId(id : int) {
+static function getFileFromUUID(uuid : int) {
 	for (var file in files) {
-		if (file.id == id) {
+		if (file.uuid == uuid) {
 			return file;
 		}
 	}
@@ -150,8 +149,4 @@ static function invalidateAllStats() {
 	for (var file in files) {
 		file.invalidateAllStats();
 	}
-}
-
-static function getNextId() {
-	return current_id++;
 }

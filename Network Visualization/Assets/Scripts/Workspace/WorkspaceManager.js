@@ -8,6 +8,9 @@ class WorkspaceManager extends MonoBehaviour {
 	static var is_selecting_save_file = false;
 	static var is_selecting_load_file = false;
 
+	// The next universally unique identifier for a serializable entity.
+	static var next_uuid = 1; //Used by File, ForeignKey
+
 	static function toggleSelectingSaveFile() {
 		if (is_selecting_save_file) {
 			stopSelectingSaveFile();
@@ -63,7 +66,9 @@ class WorkspaceManager extends MonoBehaviour {
 		stopSelectingLoadFile();
 	}
 
-
+	static function generateUUID() {
+		return next_uuid++;
+	}
 
 	class SaveState {
 
@@ -71,13 +76,13 @@ class WorkspaceManager extends MonoBehaviour {
 		var MinorVersion = 1;
 		var ColorRules : List.<ColorRule>;
 		var DataFiles : List.<DataFile>;
-		var current_id = 0;
+		var current_uuid = 0;
 
 		// Constructor aggregates the static values
 		function SaveState(){
 			ColorRules = ColorController.rules;
 			DataFiles = FileManager.files;
-			current_id = FileManager.current_id;
+			current_uuid = WorkspaceManager.generateUUID();
 		}
 
 		function Serialize() {

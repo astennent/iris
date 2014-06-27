@@ -52,6 +52,7 @@ class ColorRule {
 	var coloring_node = true;  //Should it color the body of the node?
 	var coloring_halo = true; //Should it color the halo?
 
+	var uuid : int;
 
 	function ColorRule() {
 		centrality_type = 1; //CLOSENESS
@@ -61,6 +62,8 @@ class ColorRule {
 		color = ColorController.GenRandomColor(scheme_index); //BRIGHT
 		setScheme(0, false);  //bright
 		variation = 0.3;
+
+		uuid = WorkspaceManager.generateUUID();
 	}
 
 	function isFallback() {
@@ -153,7 +156,7 @@ class ColorRule {
 			} else if (count == 1) {
 				var sourceEnumerator = sources.GetEnumerator();
 				sourceEnumerator.MoveNext();
-				return FileManager.getFileFromId(sourceEnumerator.Current).shortName() + "";
+				return FileManager.getFileFromUUID(sourceEnumerator.Current).shortName() + "";
 			} else {
 				return sources.Count + " sources";
 			}
@@ -239,7 +242,7 @@ class ColorRule {
 	function getAttribute(){
 		return attribute;
 	}
-	function setAttribute(attribute : Attribute){
+	function setAttribute(attribute : Attribute) {
 		this.attribute = attribute;
 	}
 	function getAttributeValue(){
@@ -260,7 +263,7 @@ class ColorRule {
 		sources = new HashSet.<int>();
 		//Automatically switch to coloring the file of the selected attribute.
 		sources.Clear();
-		sources.Add(continuous_attribute.file.id); 
+		sources.Add(continuous_attribute.file.uuid); 
 		this.setFilterMethod(FILTER_SOURCE); 
 	}
 

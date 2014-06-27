@@ -74,10 +74,10 @@ class ColorRuleFilterMenu extends BaseMenu {
 
 		var temp_y = 0;
 		for (var file : DataFile in files) {
-			var usedSourceBefore = rule.usesSource(file.id);
-			var usedSourceAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.id)), file.shortName());
+			var usedSourceBefore = rule.usesSource(file.uuid);
+			var usedSourceAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.uuid)), file.shortName());
 			if (usedSourceAfter != usedSourceBefore) {
-				rule.toggleSource(file.id);
+				rule.toggleSource(file.uuid);
 			}			
 			temp_y+=20;
 		}
