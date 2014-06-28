@@ -36,7 +36,7 @@ static function refreshHeightmap() {
 	var numBucketsX = BarController.getNumBars(0);
 	var numBucketsZ = BarController.getNumBars(2);
 	var maxCount = 0;
-	var numNodes = (attrX != null) ? attrX.file.getNodes(true).Count : (attrZ != null) ? attrZ.file.getNodes(true).Count : 1;
+	var numNodes = (attrX != null) ? attrX.getFile().getNodes(true).Count : (attrZ != null) ? attrZ.getFile().getNodes(true).Count : 1;
 	for (var x = 0 ; x < numBucketsX ; x++) {
 		for (var z = 0 ; z < numBucketsZ ; z++) {
 			var height = CountCache.getCount(attrX, attrZ, numBucketsX, numBucketsZ, x, z);

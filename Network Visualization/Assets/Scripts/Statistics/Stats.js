@@ -14,6 +14,8 @@ class Stats {
 
 	private var values : List.<float>;
 	private var uniqueValues : HashSet.<float>;
+	
+	var defaultNumeric : float = 0; //getNumeric return value for when a value is not a valid number.
 
 	function setStatsAttribute(attribute : Attribute) {
 		minValue = 0;
@@ -70,7 +72,7 @@ class Stats {
 		values = new List.<float>();
 		uniqueValues = new HashSet.<float>();
 
-		if (attribute.file.linking_table) {
+		if (attribute.getFile().linking_table) {
 			updateValuesForLinkingTable();
 		} else {
 			updateValuesForNormalTable();
@@ -83,7 +85,7 @@ class Stats {
 	private function updateValuesForLinkingTable() {
 		// Find all files that are be connected with the linking table.
 		var filesToCheck = new HashSet.<DataFile>();
-		for (var fkey in attribute.file.getForeignKeys()) {
+		for (var fkey in attribute.getFile().getForeignKeys()) {
 			filesToCheck.Add(fkey.getToFile());
 		}
 
@@ -108,7 +110,7 @@ class Stats {
 	}
 
 	private function updateValuesForNormalTable() {
-		var nodes = attribute.file.getNodes(true);
+		var nodes = attribute.getFile().getNodes(true);
 		for (var node in nodes) {
 			addValue(node);
 		}

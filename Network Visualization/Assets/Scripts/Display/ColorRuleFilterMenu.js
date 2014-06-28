@@ -237,7 +237,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 			return;
 		}
 		attributeValueCache = new HashSet.<String>();
-		var file = attribute.file;
+		var file = attribute.getFile();
 		var attribute_index : int = -1;
 		var file_attributes = file.getAttributes();
 		for (var i : int = 0 ; i < file_attributes.Count ; i++){

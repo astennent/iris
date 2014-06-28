@@ -85,7 +85,7 @@ class CountCache {
 		//Overwrite old data if it exists.
 		small_cache[attr][numBuckets] = new int[numBuckets];
 
-		var file = attr.file;
+		var file = attr.getFile();
 		for (var node in file.getNodes(true)) {
 			var value = node.GetNumeric(attr);
 			var bucket = attr.getBucket(value, numBuckets);
@@ -124,7 +124,7 @@ class CountCache {
 
 
 		// Loop over the nodes in the file and aggregate the counts.
-		var file = attr1.file;
+		var file = attr1.getFile();
 		for (var node in file.getNodes(true)) {
 			var value1 = node.GetNumeric(attr1);
 			var value2 = node.GetNumeric(attr2);

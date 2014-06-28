@@ -162,7 +162,7 @@ static function ColorBySource(file : DataFile, rule  : ColorRule, change_color :
 //color nodes based on a certain attribute value.
 static function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
-	var file : DataFile = attribute.file;
+	var file : DataFile = attribute.getFile();
 	var attr_index : int = file.getAttributes().IndexOf(attribute);
 
 	for (var node in file.getNodes()){

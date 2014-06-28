@@ -225,7 +225,7 @@ class Node extends TimeObject {
 		this.sizing_type = sizing_type;
 
 		// Only use this sizing attribute if it's the correct source file.
-		if (sizing_attribute != null && sizing_attribute.file == this.source) {
+		if (sizing_attribute != null && sizing_attribute.getFile() == this.source) {
 			this.sizing_attribute = sizing_attribute;
 		} else {
 			this.sizing_attribute = null;

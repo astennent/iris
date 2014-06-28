@@ -114,14 +114,14 @@ class AttributeMenu extends BaseMenu {
 				GUI.Label(label_box, "Part of " + name + " Date");
 				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 				if (GUI.Button(button_box, "Remove")) {
-					attribute.file.timeFrame.removeColumn(attribute, isStart);
+					attribute.getFile().timeFrame.removeColumn(attribute, isStart);
 				}
 			} else {
 				//The attribute is not in the TimeFrame.
 				GUI.Label(label_box, "Not part of " + name + " Date");
 				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
 				if (GUI.Button(button_box, "Add")) {
-					attribute.file.timeFrame.addColumn(attribute, isStart);
+					attribute.getFile().timeFrame.addColumn(attribute, isStart);
 				}
 			}
 
@@ -298,7 +298,7 @@ class AttributeMenu extends BaseMenu {
 	}
 
 	static function getDropdownId(attribute : Attribute) {
-		return "3" + attribute.file.shortName()+attribute.column_index;
+		return "3" + attribute.getFile().shortName()+attribute.column_index;
 	}
 
 	static function getFkeyDropdownId(fkey : ForeignKey) {

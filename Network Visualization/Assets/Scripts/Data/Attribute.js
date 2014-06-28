@@ -1,14 +1,12 @@
 #pragma strict
 
-private var column_name :String;
-private var defaultNumeric : float = 0;
-
+var column_name :String;
 var column_index : int;
 var is_shown : boolean = false; //for display on the screen.
-
 var is_pkey : boolean = false;
 
-var source_uuid : int; //uuid of the file to which this attribute belongs
+var file_uuid : int; //uuid of the file to which this attribute belongs
+private var file : DataFile;
 
 private var restrictedNameCache = new Dictionary.<int, String>();
 
@@ -16,7 +14,7 @@ static var FOREIGN_KEY = 0;
 static var TIME_SERIES = 1;
 static var GIS = 2;
 
-private var aspects = new boolean[3];
+var aspects = new boolean[3];
 static var aspectColors = [
 						new Color(1, .5, 0), //FKey
 						new Color(.2, 1, .5), // Time Series
@@ -27,23 +25,23 @@ static var shownColor = new Color(1, 1, .5);
 static var pkeyColor = new Color(1, .5, .5);
 
 //TimeFrame variables
-private var timeFrameFormat : String = "";
+var timeFrameFormat : String = "";
 private var validTimeFrameFormat : boolean = false;
 private var timeFrameFormatWarning : String = "";
 
 var uuid;
 
-var file : DataFile;
-
 class Attribute extends Stats {
 
 	//Default Constructor required for serialization
-	public function Attribute(){}
+	public function Attribute(){
+		setStatsAttribute(this);
+	}
 
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
+		this.file_uuid = file.uuid;
 		this.file = file;
-		this.source_uuid = file.uuid;
 		this.column_index = column_index;
 		this.column_name = column_name;
 		setStatsAttribute(this);
@@ -187,8 +185,14 @@ class Attribute extends Stats {
 		return output;
 	}
 
-	function getSource() {
-		return FileManager.getFileFromUUID(source_uuid);
+	function getFile() {
+		return file;
+	}
+
+	// May want this to be in the constructor. TBD.
+	function OnLoadComplete() {
+		file = FileManager.getFileFromUUID(file_uuid);
+		setTimeFrameFormat(timeFrameFormat);
 	}
 
 }

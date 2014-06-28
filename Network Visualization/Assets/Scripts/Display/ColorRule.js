@@ -263,7 +263,7 @@ class ColorRule {
 		sources = new HashSet.<int>();
 		//Automatically switch to coloring the file of the selected attribute.
 		sources.Clear();
-		sources.Add(continuous_attribute.file.uuid); 
+		sources.Add(continuous_attribute.getFile().uuid); 
 		this.setFilterMethod(FILTER_SOURCE); 
 	}
 

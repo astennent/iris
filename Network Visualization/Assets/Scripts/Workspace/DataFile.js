@@ -4,7 +4,7 @@
 
 class DataFile extends LoadableFile {
 
-	private var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
+	var attributes : List.<Attribute>; //Contains an ordered list of attributes of the file (columns)
 	private var activated : boolean = false; //used to determine if the file has been imported into the workspace. Deactivate negates this.
 
 	// Used for loading a file across multiple frames.
