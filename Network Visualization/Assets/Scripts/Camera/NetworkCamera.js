@@ -12,6 +12,8 @@ class NetworkCamera extends MonoBehaviour {
 	var desired_distance : float = 100;
 	var bubbleSize : int = 0;
 
+	private var spinning = false;
+
 	static function StartCamera() {
 
 	}
@@ -38,7 +40,19 @@ class NetworkCamera extends MonoBehaviour {
 		var coordinates = Camera.main.WorldToScreenPoint(selectionCenter);
 		var mouseCoords = Input.mousePosition;
 
-		if (!GuiPlus.isBlocked()) {  //Don't add spin if the user is operating in a menu.
+	
+		// Update the value of spinning
+		var mouseClicked = (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1));
+		var isBlocked = GuiPlus.isBlocked();
+		if (!spinning && mouseClicked && !isBlocked) {  //Don't add spin if the user is operating in a menu.
+			spinning = true;
+		}
+
+		if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) {
+			spinning = false;
+		}
+
+		if (spinning) {
 			if (Input.GetMouseButton(0)){
 				x += Input.GetAxis("Mouse X")*4;
 				y += Input.GetAxis("Mouse Y")*4;
