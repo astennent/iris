@@ -166,7 +166,7 @@ class MainMenu extends BaseMenu {
 
 
 			button_position = new Rect(x+5, Screen.height-50, 35, 35);
-			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+			GUI.color = Attribute.TIME_SERIES_COLOR;
 			if (GUI.Button(button_position, clock)){
 				TimeSeriesMenu.ToggleDisplay(TimeSeriesMenu);
 			}

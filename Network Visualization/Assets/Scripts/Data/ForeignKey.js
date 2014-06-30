@@ -49,24 +49,36 @@ class ForeignKey {
 		var tuple = new List.<Attribute>();
 		tuple.Add(from);
 		tuple.Add(to);
-
-		//Update aspect
-		from.setAspect(Attribute.FOREIGN_KEY, true);
-
 		keyPairs.Add(tuple);
+
+		//Inform the attributes involved that they have another foreign key associated with it.
+		from.associateForeignKey(this, true);
+		to.associateForeignKey(this, false);
 	}
 
 	function removeKeyPair(from : Attribute, to : Attribute){
-		for (var i = 0 ; i < keyPairs.Count ; i++){
-			var tuple = keyPairs[i];
+		for (var index = 0 ; index < keyPairs.Count ; index++){
+			var tuple = keyPairs[index];
 			if (tuple[0] == from && tuple[1] == to){
-				removeKeyPair(i);
+				removeKeyPair(index);
+				return;
 			}
 		}
 	}
 
-	function removeKeyPair(index : int){
+	function removeKeyPair(index : int) {
+		//Inform the attributes involved that they are no longer associated with this foreign key.
+		keyPairs[index][0].disassociateForeignKey(this, true);
+		keyPairs[index][1].disassociateForeignKey(this, false);
+
 		keyPairs.RemoveAt(index);
+	}
+
+	function deactivate() {
+		//Removes all key pairs first, to ensure that attributes are properly notified of removal.
+		while (keyPairs.Count > 0) {
+			removeKeyPair(0);
+		}
 	}
 
 	function getKeyPairs(){
@@ -117,11 +129,7 @@ class ForeignKey {
  
 	//This can only be set by id (instead of attribute itself) so that you can only have weights from the "from" file.
 	function setWeightAttributeIndex(weightAttributeIndex : int) {
-		if (weightAttributeIndex == -1) {
-			this.weightAttribute = null;
-		} else {
-			this.weightAttribute = from_file.getAttribute(weightAttributeIndex);
-		}
+		this.weightAttribute = (weightAttributeIndex == -1) ? null :  from_file.getAttribute(weightAttributeIndex);
 
 		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {
 			linkedFKey.setWeightAttributeIndex(weightAttributeIndex);

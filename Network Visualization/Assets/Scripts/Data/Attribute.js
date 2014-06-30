@@ -10,19 +10,13 @@ private var file : DataFile;
 
 private var restrictedNameCache = new Dictionary.<int, String>();
 
-static var FOREIGN_KEY = 0;
-static var TIME_SERIES = 1;
-static var GIS = 2;
+static var FKEY_COLOR = new Color(1, .5, 0);
+static var PKEY_COLOR = new Color(1, .5, .5);
+static var SHOWN_COLOR = new Color(1, 1, .5);
+static var TIME_SERIES_COLOR = new Color(.2, 1, .5);
 
-var aspects = new boolean[3];
-static var aspectColors = [
-						new Color(1, .5, 0), //FKey
-						new Color(.2, 1, .5), // Time Series
-						new Color(1, 0, .5) //GIS
-						];
-
-static var shownColor = new Color(1, 1, .5);
-static var pkeyColor = new Color(1, .5, .5);
+private var associatedForeignKeysFrom = new HashSet.<ForeignKey>();
+private var associatedForeignKeysTo = new HashSet.<ForeignKey>();
 
 //TimeFrame variables
 var timeFrameFormat : String = "";
@@ -34,9 +28,7 @@ var uuid;
 class Attribute extends Stats {
 
 	//Default Constructor required for serialization
-	public function Attribute(){
-		setStatsAttribute(this);
-	}
+	public function Attribute() {	}
 
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
@@ -103,61 +95,28 @@ class Attribute extends Stats {
 		return defaultNumeric;
 	}
 
-	function getAspect(index : int) {
-		return aspects[index];
-	}
-
-	function getAspectColor() {
+	function getAspectColor() : Color {
 		var colors = new List.<Color>();
 
 		if (is_shown) {
-			colors.Add(shownColor);
+			colors.Add(SHOWN_COLOR);
 		}
 
 		if (is_pkey) {
-			colors.Add(pkeyColor);
+			colors.Add(PKEY_COLOR);
 		}
 
-		for (var index = 0 ; index < aspects.length; index++) {
-			if (aspects[index]) {
-				colors.Add(aspectColors[index]);
-			}
+		if (associatedForeignKeysFrom.Count > 0) {
+			colors.Add(FKEY_COLOR);
 		}
 
-		if (colors.Count == 0) {
-			return Color.white;
-		} else {
-			return mergeColors(colors);
-		}
-	}
-
-	function mergeColors(colors : List.<Color>) {
-
-		var r = 0.0;
-		var g = 0.0;
-		var b = 0.0;
-
-		for (var color in colors) {
-			r += color.r;
-			g += color.g;
-			b += color.b;
+		if (file.timeFrame.usesAttribute(this, true) || file.timeFrame.usesAttribute(this, false)) {
+			colors.Add(TIME_SERIES_COLOR);
 		}
 
-		var numColors = colors.Count;
-		r /= numColors; 
-		g /= numColors;
-		b /= numColors;
-
-		return new Color(r, g, b);
-	}
-	function setAspect(aspect : int, on : boolean) {
-		aspects[aspect] = on;
+		return ColorController.mergeColors(colors);
 	}
 
-
-	function getTimeFramePresence(isStart : boolean) {
-		return file.timeFrame.getPresence(this, isStart);
-	}
 	function getTimeFrameFormat() {
 		return timeFrameFormat;
 	}
@@ -168,29 +127,46 @@ class Attribute extends Stats {
 		this.timeFrameFormat = format;
 		timeFrameFormatWarning = TimeParser.getFormatWarning(format);
 		validTimeFrameFormat = (timeFrameFormatWarning == "");
-		file.timeFrame.updateValid();
+		if (file.timeFrame != null) { //This should only be false on startup.
+			file.timeFrame.updateValid();
+		}
 	}
 	function hasValidTimeFrameFormat() {
 		return validTimeFrameFormat;
 	}
 
+	// A "Simple FKey" is defined as a foreign key that originates from this file, using only this attribute.
 	function getSimpleFKeys() {
 		var output = new List.<ForeignKey>();
-		for (var fkey in file.getForeignKeys()) {
-			var keyPairs = fkey.getKeyPairs();
-			if (keyPairs.Count == 1 && keyPairs[0][0] == this) {
+		for (var fkey in associatedForeignKeysFrom) {
+			if (fkey.getKeyPairs().Count == 1) {
 				output.Add(fkey);
 			}
 		}
 		return output;
 	}
 
+	function associateForeignKey(foreignKey : ForeignKey, isFrom : boolean) {
+		if (isFrom) {
+			associatedForeignKeysFrom.Add(foreignKey);
+		} else {
+			associatedForeignKeysTo.Add(foreignKey);
+		}
+	}
+	function disassociateForeignKey(foreignKey : ForeignKey, isFrom : boolean) {
+		if (isFrom) {
+			associatedForeignKeysFrom.Remove(foreignKey);
+		} else {
+			associatedForeignKeysTo.Remove(foreignKey);
+		}
+	}
+
 	function getFile() {
 		return file;
 	}
 
-	// May want this to be in the constructor. TBD.
-	function OnLoadComplete() {
+	function OnWorkspaceLoad() {
+		setStatsAttribute(this);
 		file = FileManager.getFileFromUUID(file_uuid);
 		setTimeFrameFormat(timeFrameFormat);
 	}

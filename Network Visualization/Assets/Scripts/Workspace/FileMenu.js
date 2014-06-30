@@ -123,12 +123,12 @@ class FileMenu extends BaseMenu {
 		
 		cur_y+=28;
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
-		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
+		GUI.color = Attribute.FKEY_COLOR;
 		if (GUI.Button(fkey_box, "Foreign Keys")){
 			FkeyMenu.ToggleDisplay(FkeyMenu);
 		}
 		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);
-		GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+		GUI.color = Attribute.TIME_SERIES_COLOR;
 		if (GUI.Button(details_box, "Time Series")){
 			TimeFrameMenu.ToggleDisplay(TimeFrameMenu);
 		}
@@ -159,7 +159,7 @@ class FileMenu extends BaseMenu {
 			var attribute = file_attributes[i];
 						
 			//is shown toggles
-			if (attribute.is_shown){ GUI.color = Attribute.shownColor; } 
+			if (attribute.is_shown){ GUI.color = Attribute.SHOWN_COLOR; } 
 			else { GUI.color = Color.white; }		
 			var is_name_box = new Rect(17, attribute_y, 20, 20);
 			var is_shown_value = GUI.Toggle (is_name_box, attribute.is_shown, "");	
@@ -168,7 +168,7 @@ class FileMenu extends BaseMenu {
 			}		
 	
 			//pkey toggles
-			if (attribute.is_pkey){ GUI.color = Attribute.pkeyColor; } 
+			if (attribute.is_pkey){ GUI.color = Attribute.PKEY_COLOR; } 
 			else { GUI.color = Color.white; }		
 			var is_pkey_box = new Rect(63, attribute_y, 20, 20);
 			var pkey_value = GuiPlus.LockableToggle (is_pkey_box, attribute.is_pkey, "", file.isActivated() || file.isActivating());	

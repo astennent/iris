@@ -83,8 +83,9 @@ static function Load(fname : String, isDemo : boolean) : int {
 		}
 
 		var new_file = new DataFile(fname, isDemo);
-
 		files.Add(new_file);
+
+		new_file.generateAttributes();
 		return files.Count-1;
 
 	} else if (Directory.Exists(fname)){

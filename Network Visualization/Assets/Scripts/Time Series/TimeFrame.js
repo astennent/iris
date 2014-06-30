@@ -19,28 +19,20 @@ class TimeFrame {
 
 	//Checks that both start and end are valid.
 	function isValid() {
-		return (isValid(true) && isValid(false) );
+		return (validStart && validEnd);
 	}
 
 	//Checks that start or end is valid.
 	function isValid(isStart : boolean) {
-		if (isStart) {
-			return validStart;
-		} else {
-			return validEnd;
-		}
+		return (isStart) ? validStart : validEnd;
 	}
 
 	function isUsed() {
 		return (startColumns.Count > 0 || endColumns.Count > 0);
 	}
 
-	function getColumnIndex(attribute : Attribute, isStart : boolean) {
-		if (isStart) {
-			var relevantColumns = startColumns;
-		} else {
-			relevantColumns = endColumns;
-		}
+	function getColumnIndex(attribute : Attribute, isStart : boolean) : int{
+		var relevantColumns = (isStart) ? startColumns : endColumns;
 		for (var i = 0 ; i < relevantColumns.Count ; i++) {
 			if (relevantColumns[i] == attribute) {
 				return i;
@@ -58,40 +50,21 @@ class TimeFrame {
 	}
 
 	function getInvalidMessage(isStart : boolean) {
-		if (isStart) {
-			return invalidMessages[0];
-		} else {
-			return invalidMessages[1];
-		}
+		return (isStart) ? invalidMessages[0] : invalidMessages[1];
 	}
 
 	function getColumns(start : boolean) {
-		if (start) {
-			return startColumns;
-		} else {
-			return endColumns;
-		}
+		return (start) ? startColumns : endColumns;
 	}
 
 	function addColumn(attribute : Attribute, isStart : boolean) {
-		//Check if it's in the columns already.
-		if (isStart) {
-			var checkColumns = startColumns;
-		} else {
-			checkColumns = endColumns;
+		var columns = (isStart) ? startColumns : endColumns;
+		if (columns.Contains(attribute)) {
+			Debug.Log("Already Added");
+			return;
 		}
 
-		//Check if the attribute already in this list.
-		for (var column in checkColumns) {
-			if (attribute == column) {
-				Debug.Log("Already Added");
-				return;
-			} 
-		}
-
-		//add it to the list and update the aspect.
-		checkColumns.Add(attribute);
-		attribute.setAspect(Attribute.TIME_SERIES, true);
+		columns.Add(attribute);
 		updateValid();
 	}
 
@@ -101,25 +74,8 @@ class TimeFrame {
 	}
 
 	function removeColumn(index : int, isStart : boolean) {
-		if (isStart) {
-			var relevantColumns = startColumns;
-			var otherColumns = endColumns;
-		} else {
-			relevantColumns = endColumns;
-			otherColumns = startColumns;
-		}
-
-		//Remove the tuple from the list of columns.
-		var doomedAttribute = relevantColumns[index];
+		var relevantColumns = (isStart) ? startColumns : endColumns;
 		relevantColumns.RemoveAt(index);
-
-		//Update the aspect
-		for (var column in otherColumns) {
-			if (doomedAttribute == column) {
-				return; //It's present in the other columnSet, don't update aspect.
-			}
-		}
-		doomedAttribute.setAspect(Attribute.TIME_SERIES, false);	
 		updateValid();
 	}
 
@@ -187,18 +143,11 @@ class TimeFrame {
 	}
 
 	//Checks if a given attribute is present in the TimeFrame.
-	function getPresence(attr : Attribute, isStart : boolean) {
-		if (isStart) {
-			var relevantColumns = startColumns;
-		} else {
-			relevantColumns = endColumns;
-		}
-		for (var attribute in relevantColumns) {
-			if (attribute == attr) {
-				return true;
-			}
-		}
-		return false;
+	function usesAttribute(attr : Attribute) {
+		return (usesAttribute(attr, false) || usesAttribute(attr, true));
+	}
+	function usesAttribute(attr : Attribute, isStart : boolean) {
+		return (getColumnIndex(attr, isStart) > -1);
 	}
 
 }

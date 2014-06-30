@@ -63,17 +63,18 @@ class AttributeMenu extends BaseMenu {
 		var large_box = new Rect(x+5, cur_y, width-10, 50);
 		GUI.Box(large_box, "");
 		var toggle_box = new Rect(x+10, cur_y+5, width-20, 20);
-		if (attribute.is_shown){ GUI.color = Attribute.shownColor; } 
-		else { GUI.color = Color.white; }
+
+		GUI.color = (attribute.is_shown) ? Attribute.SHOWN_COLOR : Color.white;
 		var shown_toggle = GUI.Toggle (toggle_box, attribute.is_shown, " Shown in 3D view");
 		if (shown_toggle != attribute.is_shown){
 			file.ToggleShown(selected_index);
 		}
 
-		//Primary Key Toggle
 		toggle_box.y += 20;
-		if (attribute.is_pkey){ GUI.color = Attribute.pkeyColor; } 
-		else { GUI.color = Color.white; }
+
+		//Primary Key Toggle
+		GUI.color = (attribute.is_pkey) ? Attribute.PKEY_COLOR : Color.white;
+		//TODOX: Wow this needs to be a setter.
 		attribute.is_pkey = GuiPlus.LockableToggle (toggle_box, attribute.is_pkey, " Part of Primary Key", file.isActivated() || file.isActivating());		
 
 		return cur_y + large_box.height;
@@ -83,7 +84,7 @@ class AttributeMenu extends BaseMenu {
 
 		var box_height = 50;
 		var present = false; //present in either Start or End
-		if (attribute.getTimeFramePresence(true) || attribute.getTimeFramePresence(false)) {
+		if (attribute.getFile().timeFrame.usesAttribute(attribute)) {
 			box_height += 20;
 			present = true;
 		}
@@ -109,17 +110,17 @@ class AttributeMenu extends BaseMenu {
 			}
 
 			//Draw options for adding and removing from TimeFrame
-			if (attribute.getTimeFramePresence(isStart)) {
+			if (attribute.getFile().timeFrame.usesAttribute(attribute, isStart)) {
 				//The attribute is present in the TimeFrame.
 				GUI.Label(label_box, "Part of " + name + " Date");
-				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+				GUI.color = Attribute.TIME_SERIES_COLOR;
 				if (GUI.Button(button_box, "Remove")) {
 					attribute.getFile().timeFrame.removeColumn(attribute, isStart);
 				}
 			} else {
 				//The attribute is not in the TimeFrame.
 				GUI.Label(label_box, "Not part of " + name + " Date");
-				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+				GUI.color = Attribute.TIME_SERIES_COLOR;
 				if (GUI.Button(button_box, "Add")) {
 					attribute.getFile().timeFrame.addColumn(attribute, isStart);
 				}
@@ -136,11 +137,8 @@ class AttributeMenu extends BaseMenu {
 
 			//Draw the format textbox
 			var text_box = new Rect(x+58, label_box.y, 80, 20);
-			if (attribute.hasValidTimeFrameFormat()) {
-				GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
-			} else {
-				GUI.color = Color.red;
-			}
+
+			GUI.color = (attribute.hasValidTimeFrameFormat()) ? Attribute.TIME_SERIES_COLOR : Color.red;
 
 			var old_format = attribute.getTimeFrameFormat();
 			var new_format = GUI.TextField(text_box, old_format);
@@ -186,7 +184,7 @@ class AttributeMenu extends BaseMenu {
 	}
 
 	function DrawForeignKeyEditing(cur_y : int) {
-		GUI.color = Attribute.aspectColors[Attribute.FOREIGN_KEY];
+		GUI.color = Attribute.FKEY_COLOR;
 
 		var outerBoxHeight = MenuController.getScreenHeight()-cur_y;
 		var outerBox = new Rect(x+5, cur_y, width-10, outerBoxHeight);

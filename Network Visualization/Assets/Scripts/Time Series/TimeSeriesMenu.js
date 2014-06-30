@@ -35,7 +35,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		if (enabled) {
 			enableText = "Disable\nTime Series";
 		} else {
-			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+			GUI.color = Attribute.TIME_SERIES_COLOR;
 			enableText = "Enable\nTime Series";
 		}
 
@@ -124,7 +124,7 @@ public class TimeSeriesMenu extends BaseMenu {
 
 		var sliderRect = new Rect(sliderX-5, timeLineBox.y+5, 10, timeLineBox.height-10);
 		if (TimeSeriesController.getEnabled()) {
-			GUI.color = Attribute.aspectColors[Attribute.TIME_SERIES];
+			GUI.color = Attribute.TIME_SERIES_COLOR;
 		}
 		GUI.Button(sliderRect, ""); 
 		GUI.color = Color.white;
