@@ -275,15 +275,19 @@ class AttributeMenu extends BaseMenu {
 				}
 
 				// Draw the inverted selection
+				var wasInverted = fkey.isWeightInverted();
 				var invertedText : String;
-				if (fkey.weightInverted) {
+				if (wasInverted) {
 					invertedText = " Inverted";
 				} else {
 					invertedText = " Not Inverted";
 				}
 
 				var invertedRect = new Rect(sliderRect.x+sliderRect.width+5, fkeyRect.y+45, invertedWidth, 20);
-				fkey.weightInverted = GUI.Toggle(invertedRect, fkey.weightInverted, invertedText);
+				var isInverted = GUI.Toggle(invertedRect, wasInverted, invertedText);
+				if (wasInverted != isInverted) {
+					fkey.setWeightInverted(isInverted);
+				}
 
 				fkeyRect.y += fkeyRect.height;
 

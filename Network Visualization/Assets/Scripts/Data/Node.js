@@ -167,7 +167,7 @@ class Node extends TimeObject {
 		var distanceModifier = fkeyStrength * weightRatio;
 
 		var desiredDistance : float;
-		if (foreignKey.weightInverted) { //high values = far apart.
+		if (foreignKey.isWeightInverted()) { //high values = far apart.
 			desiredDistance = BASE_DESIRED_DISTANCE * distanceModifier;
 		} else { //high values = close together (default)
 			desiredDistance = BASE_DESIRED_DISTANCE / distanceModifier;

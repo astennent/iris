@@ -1,7 +1,7 @@
 #pragma strict
 
 private var keyPairs = new List.<List.<Attribute> >(); //array of tuples. [ [from,to] [from,to] [from,to]...]
-
+var keyPairIds = new List.<List.<int> >(); //matching array of attribute tuples for serialization
 
 private var from_file : DataFile; 
 private var to_file : DataFile;
@@ -14,19 +14,13 @@ var source_file_id : int;
 
 var isBidirectional : boolean = false;
 
-private var weightAttribute : Attribute = null;
-private var weightModifier : float = 1.0;
+var weightAttribute : Attribute = null;
+var weightModifier : float = 1.0;
 var weightInverted = false;
 static var MIN_WEIGHT_MODIFIER : float = 0.01;
 static var MAX_WEIGHT_MODIFIER : float = 10;
 
-//The other edge if this is a linking table.
-private var linkedFKey : ForeignKey;
-var linkedFkeyId : int;
-
-//TODO: Create a ForeignKeyManager to handle uuids and linked fkeys?
-
-var uuid : int; //
+var uuid : int; 
 
 class ForeignKey {
 
@@ -109,13 +103,26 @@ class ForeignKey {
 	function getWeightModifier() {
 		return weightModifier;
 	}
-
 	function setWeightModifier(weightModifier : float) {
 		this.weightModifier = weightModifier;
+		var linkedFKey = getLinkedFKey();
 		if (linkedFKey != null && linkedFKey.getWeightModifier() != weightModifier) {
 			linkedFKey.setWeightModifier(weightModifier);
 		}
 	}
+
+	function isWeightInverted() {
+		return weightInverted;
+	}
+	function setWeightInverted(weightInverted : boolean) {
+		this.weightInverted = weightInverted;
+		var linkedFKey = getLinkedFKey();
+		if (linkedFKey != null && linkedFKey.isWeightInverted() != weightInverted) {
+			linkedFKey.setWeightInverted(weightInverted);
+		}
+	}
+
+
 
 	function getWeightAttribute() {
 		return weightAttribute;
@@ -131,14 +138,21 @@ class ForeignKey {
 	function setWeightAttributeIndex(weightAttributeIndex : int) {
 		this.weightAttribute = (weightAttributeIndex == -1) ? null :  from_file.getAttribute(weightAttributeIndex);
 
+		var linkedFKey = getLinkedFKey();
 		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {
 			linkedFKey.setWeightAttributeIndex(weightAttributeIndex);
 		} 
 	}
 
-	function setLinkedFKey(linkedFKey : ForeignKey) {
-		this.linkedFKey = linkedFKey;
-		linkedFkeyId = linkedFKey.uuid;
+	function getLinkedFKey() {
+		if (!isLinking()) {
+			return null;
+		}
+
+		// We assume here that that a linking table has exactly 2 foreign keys.
+		// Note that this may eventually be an invalid assumption.
+		return (source_file.foreignKeys[0] == this) ? source_file.foreignKeys[1] : source_file.foreignKeys[0]; 
+
 	}
 
 	function isLinking() {
@@ -155,6 +169,18 @@ class ForeignKey {
 
 	function getSourceFile() {
 		return source_file;
+	}
+
+	function OnWorkspaceLoad() {
+		from_file = FileManager.getFileFromUUID(from_file_id);
+		to_file = FileManager.getFileFromUUID(to_file_id);
+		source_file = FileManager.getFileFromUUID(source_file_id);
+
+		for (var keyPair in keyPairIds) {
+			var attr1 = from_file.getAttributeFromUUID(keyPair[0]);
+			var attr2 = to_file.getAttributeFromUUID(keyPair[1]);
+			addKeyPair(attr1, attr2);
+		}
 	}
 
 }

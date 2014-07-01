@@ -126,17 +126,18 @@ class FkeyMenu extends BaseMenu {
 				foreignKey.setWeightModifier(new_weight_modifier);
 			}
 
-			//Draw the inversion option.
-			// Draw the inverted selection
+			var wasInverted = foreignKey.isWeightInverted();
 			var invertedText : String;
-			if (foreignKey.weightInverted) {
+			if (wasInverted) {
 				invertedText = " Inverted";
 			} else {
 				invertedText = " Not Inverted";
 			}
 			var invertedRect = new Rect(x+150, cur_y, width-160, 20);
-			foreignKey.weightInverted = GUI.Toggle(invertedRect, foreignKey.weightInverted, invertedText);
-
+			var isInverted = GUI.Toggle(invertedRect, wasInverted, invertedText);
+			if (wasInverted != isInverted) {
+				foreignKey.setWeightInverted(isInverted);
+			}
 			cur_y += 30;
 			
 			for (var pair in keyPairs){

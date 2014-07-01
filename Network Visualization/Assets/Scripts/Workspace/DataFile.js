@@ -552,10 +552,6 @@ class DataFile extends LoadableFile {
 					matches.Add(these_matches);
 				}
 			}
-
-			//Update the linked foreign keys so that an update to one can update the other.
-			foreignKeys[0].setLinkedFKey(foreignKeys[1]);
-			foreignKeys[1].setLinkedFKey(foreignKeys[0]);
 			
 			//TODO: make n-way edges.
 			if (matches.Count == 2){
@@ -656,5 +652,14 @@ class DataFile extends LoadableFile {
 		for (var attribute in attributes) {
 			attribute.invalidate();
 		}
+	}
+
+	function getAttributeFromUUID(id : int) {
+		for (var attribute in attributes) {
+			if (attribute.uuid == id) {
+				return attribute;
+			}
+		}
+		return null;
 	}
 }

@@ -110,7 +110,7 @@ class Attribute extends Stats {
 			colors.Add(FKEY_COLOR);
 		}
 
-		if (file.timeFrame.usesAttribute(this, true) || file.timeFrame.usesAttribute(this, false)) {
+		if (file.timeFrame.usesAttribute(this)) {
 			colors.Add(TIME_SERIES_COLOR);
 		}
 
