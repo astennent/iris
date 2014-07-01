@@ -146,6 +146,25 @@ static function getFileFromUUID(uuid : int) {
 	return null;
 }
 
+
+static function getAttributeFromUUID(id : int) {
+	for (var file in files) {
+		var attr = getAttributeFromUUID(id, file);
+		if (attr != null) {
+			return attr;
+		}
+	}
+	return null;
+}
+static function getAttributeFromUUID(id : int, file : DataFile) {
+	for (var attribute in file.attributes) {
+		if (attribute.uuid == id) {
+			return attribute;
+		}
+	}
+	return null;
+}
+
 static function invalidateAllStats() {
 	for (var file in files) {
 		file.invalidateAllStats();

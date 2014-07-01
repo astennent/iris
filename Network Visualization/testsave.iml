@@ -4,18 +4,54 @@
   <MinorVersion>1</MinorVersion>
   <ColorRules>
     <ColorRule>
+      <sizing_type>0</sizing_type>
+      <sizing_scale>2.5</sizing_scale>
+      <filter_method>0</filter_method>
       <sources />
       <clusters />
+      <coloring_method>1</coloring_method>
       <color>
-        <r>0</r>
-        <g>1</g>
-        <b>0.274511755</b>
+        <r>0.162092447</r>
+        <g>0</g>
+        <b>1</b>
         <a>0.5</a>
       </color>
       <variation>0.3</variation>
+      <scheme_index>0</scheme_index>
+      <centrality_type>1</centrality_type>
+      <inter_cluster>false</inter_cluster>
+      <invert_centrality>false</invert_centrality>
+      <attribute_uuid>0</attribute_uuid>
+      <attribute_value />
+      <continuous_attribute_uuid>0</continuous_attribute_uuid>
       <coloring_node>true</coloring_node>
       <coloring_halo>true</coloring_halo>
       <uuid>64</uuid>
+    </ColorRule>
+    <ColorRule>
+      <sizing_type>0</sizing_type>
+      <sizing_scale>2.5</sizing_scale>
+      <filter_method>0</filter_method>
+      <sources />
+      <clusters />
+      <coloring_method>2</coloring_method>
+      <color>
+        <r>1</r>
+        <g>0</g>
+        <b>0.95</b>
+        <a>1</a>
+      </color>
+      <variation>0.3</variation>
+      <scheme_index>0</scheme_index>
+      <centrality_type>1</centrality_type>
+      <inter_cluster>false</inter_cluster>
+      <invert_centrality>false</invert_centrality>
+      <attribute_uuid>0</attribute_uuid>
+      <attribute_value />
+      <continuous_attribute_uuid>0</continuous_attribute_uuid>
+      <coloring_node>true</coloring_node>
+      <coloring_halo>true</coloring_halo>
+      <uuid>65</uuid>
     </ColorRule>
   </ColorRules>
   <DataFiles>
@@ -665,5 +701,5 @@
       <uuid>54</uuid>
     </DataFile>
   </DataFiles>
-  <current_uuid>65</current_uuid>
+  <current_uuid>66</current_uuid>
 </SaveState>

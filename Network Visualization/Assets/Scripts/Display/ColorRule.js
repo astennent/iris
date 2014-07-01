@@ -12,10 +12,10 @@ class ColorRule {
 	static var SIZING_EDGES = 0;
 	static var SIZING_FIXED = 1;
 	static var SIZING_ATTRIBUTE = 2;
-	private var sizing_type = SIZING_EDGES;
+	var sizing_type = SIZING_EDGES;
 
 	private var changing_size = false;
-	private var sizing_scale : float = 2.5;
+	var sizing_scale : float = 2.5;
 
 
 	//Determines which nodes to apply a rule to.
@@ -24,7 +24,7 @@ class ColorRule {
 	static var FILTER_CLUSTER = 1;
 	static var FILTER_NODE = 2;
 	static var FILTER_ATTRIBUTE = 3;
-	private var filter_method = FILTER_SOURCE;
+	var filter_method = FILTER_SOURCE;
 
 	var sources : HashSet.<int> = new HashSet.<int>();  //Which data sources does this rule apply to?
 	var clusters : HashSet.<int> = new HashSet.<int>(); //Which cluster does this rule apply to?
@@ -37,17 +37,19 @@ class ColorRule {
 	static var COLORING_SCHEME = 1;
 	static var COLORING_CENTRALITY = 2;
 	static var COLORING_CONTINUOUS_ATTR = 3;
-	private var coloring_method = COLORING_CUSTOM;	
+	var coloring_method = COLORING_CUSTOM;	
 
 	var color : Color;
 	var variation : float;
-	private var scheme_index : int;
-	private var centrality_type : int; //corresponds to ColorController.centrality_types
-	private var inter_cluster : boolean; //used for specifying whether the centrality should be relative to everything or just the group.
-	private var invert_centrality : boolean; //swap colors?
+	var scheme_index : int;
+	var centrality_type : int; //corresponds to ColorController.centrality_types
+	var inter_cluster : boolean; //used for specifying whether the centrality should be relative to everything or just the group.
+	var invert_centrality : boolean; //swap colors?
 	private var attribute : Attribute; //stores which attribute you're looking at
-	private var attribute_value : String = "";
+	var attribute_uuid : int;
+	var attribute_value : String = "";
 	private var continuous_attribute : Attribute;
+	var continuous_attribute_uuid : int;
 	
 	var coloring_node = true;  //Should it color the body of the node?
 	var coloring_halo = true; //Should it color the halo?
@@ -295,5 +297,10 @@ class ColorRule {
 		this.sizing_scale = sizing_scale;
 	}
 
+	function OnWorkspaceLoad() {
+		continuous_attribute = FileManager.getAttributeFromUUID(continuous_attribute_uuid);
+		attribute = FileManager.getAttributeFromUUID(attribute_uuid);
+		//Apply rule?
+	}
 
 }

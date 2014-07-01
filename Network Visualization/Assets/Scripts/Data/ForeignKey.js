@@ -177,8 +177,8 @@ class ForeignKey {
 		source_file = FileManager.getFileFromUUID(source_file_id);
 
 		for (var keyPair in keyPairIds) {
-			var attr1 = from_file.getAttributeFromUUID(keyPair[0]);
-			var attr2 = to_file.getAttributeFromUUID(keyPair[1]);
+			var attr1 = FileManager.getAttributeFromUUID(keyPair[0], from_file);
+			var attr2 = FileManager.getAttributeFromUUID(keyPair[1], to_file);
 			addKeyPair(attr1, attr2);
 		}
 	}

@@ -653,13 +653,4 @@ class DataFile extends LoadableFile {
 			attribute.invalidate();
 		}
 	}
-
-	function getAttributeFromUUID(id : int) {
-		for (var attribute in attributes) {
-			if (attribute.uuid == id) {
-				return attribute;
-			}
-		}
-		return null;
-	}
 }
