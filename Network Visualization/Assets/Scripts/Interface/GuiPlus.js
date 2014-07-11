@@ -52,4 +52,12 @@ public class GuiPlus extends MonoBehaviour {
 		return (locked) ? on : result;
 	}
 
+	static function BeginScrollView() {
+
+	}
+
+	static function EndScrollView() {
+		//TOOD: Pop dropdowns.
+	}
+
 }

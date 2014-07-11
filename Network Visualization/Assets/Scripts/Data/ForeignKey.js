@@ -1,6 +1,6 @@
 #pragma strict
 
-private var keyPairs = new List.<List.<Attribute> >(); //array of tuples. [ [from,to] [from,to] [from,to]...]
+private var keyPairs = new List.<Attribute[] >(); //array of tuples. [ [from,to] [from,to] [from,to]...]
 var keyPairIds = new List.<List.<int> >(); //matching array of attribute tuples for serialization
 
 private var from_file : DataFile; 
@@ -17,6 +17,7 @@ var isBidirectional : boolean = false;
 var weightAttribute : Attribute = null;
 var weightModifier : float = 1.0;
 var weightInverted = false;
+
 static var MIN_WEIGHT_MODIFIER : float = 0.01;
 static var MAX_WEIGHT_MODIFIER : float = 10;
 
@@ -26,23 +27,29 @@ class ForeignKey {
 
 	public function ForeignKey() {} // Default constructor required for serialization.
 
-	public function ForeignKey(from_file : DataFile, to_file : DataFile, source_file : DataFile) {
-		this.from_file = from_file;
-		this.to_file = to_file;
-		this.source_file = source_file; //equal to from_file with non-linking tables.
-
-		from_file_id = from_file.uuid;
-		to_file_id = to_file.uuid;
+	public function ForeignKey(source_file : DataFile) {
+		this.source_file = source_file; 
 		source_file_id = source_file.uuid;
-
 		uuid = WorkspaceManager.generateUUID();
+	}
+
+	function setFromFile(file : DataFile) {
+		from_file = file;
+		from_file_id = (from_file != null) ? from_file.uuid : 0;
+		removeAllKeyPairs();
+	}
+
+	function setToFile(file : DataFile) {
+		this.to_file = file;
+		to_file_id = (to_file != null) ? to_file.uuid : 0;
+		removeAllKeyPairs();
 	}
 
 	//add a from/to keyPair pair. 
 	function addKeyPair(from : Attribute, to : Attribute){
-		var tuple = new List.<Attribute>();
-		tuple.Add(from);
-		tuple.Add(to);
+		var tuple = new Attribute[2];
+		tuple[0] = from;
+		tuple[1] = to;
 		keyPairs.Add(tuple);
 
 		//Inform the attributes involved that they have another foreign key associated with it.
@@ -68,7 +75,7 @@ class ForeignKey {
 		keyPairs.RemoveAt(index);
 	}
 
-	function deactivate() {
+	function removeAllKeyPairs() {
 		//Removes all key pairs first, to ensure that attributes are properly notified of removal.
 		while (keyPairs.Count > 0) {
 			removeKeyPair(0);
@@ -80,7 +87,7 @@ class ForeignKey {
 	}
 
 	function isSimpleFkey(from : Attribute, to : Attribute){
-		return keyPairs.Count == 1 && keyPairs[0][0] == from && keyPairs[0][1] == to;
+		return (isLinking()) ? false : (keyPairs.Count == 1 && keyPairs[0][0] == from && keyPairs[0][1] == to);
 	}
 
 	//check if the key maps directly onto the target file's primary key. 
@@ -105,10 +112,6 @@ class ForeignKey {
 	}
 	function setWeightModifier(weightModifier : float) {
 		this.weightModifier = weightModifier;
-		var linkedFKey = getLinkedFKey();
-		if (linkedFKey != null && linkedFKey.getWeightModifier() != weightModifier) {
-			linkedFKey.setWeightModifier(weightModifier);
-		}
 	}
 
 	function isWeightInverted() {
@@ -116,43 +119,20 @@ class ForeignKey {
 	}
 	function setWeightInverted(weightInverted : boolean) {
 		this.weightInverted = weightInverted;
-		var linkedFKey = getLinkedFKey();
-		if (linkedFKey != null && linkedFKey.isWeightInverted() != weightInverted) {
-			linkedFKey.setWeightInverted(weightInverted);
-		}
 	}
-
-
 
 	function getWeightAttribute() {
 		return weightAttribute;
 	}
 	function getWeightAttributeIndex() {
-		if (weightAttribute == null) {
-			return -1;
-		}
-		return weightAttribute.column_index;
+		return (weightAttribute != null) ? weightAttribute.column_index : -1;
 	}
  
-	//This can only be set by id (instead of attribute itself) so that you can only have weights from the "from" file.
+	//This can only be set by id (instead of attribute itself) so that you can only have weights from the "source" file.
 	function setWeightAttributeIndex(weightAttributeIndex : int) {
-		this.weightAttribute = (weightAttributeIndex == -1) ? null :  from_file.getAttribute(weightAttributeIndex);
-
-		var linkedFKey = getLinkedFKey();
-		if (linkedFKey != null && linkedFKey.getWeightAttribute() != weightAttribute) {
-			linkedFKey.setWeightAttributeIndex(weightAttributeIndex);
-		} 
-	}
-
-	function getLinkedFKey() {
-		if (!isLinking()) {
-			return null;
-		}
-
-		// We assume here that that a linking table has exactly 2 foreign keys.
-		// Note that this may eventually be an invalid assumption.
-		return (source_file.foreignKeys[0] == this) ? source_file.foreignKeys[1] : source_file.foreignKeys[0]; 
-
+		this.weightAttribute = (weightAttributeIndex >= 0 && source_file != null) 
+			? source_file.getAttribute(weightAttributeIndex)
+			: null;
 	}
 
 	function isLinking() {
@@ -177,8 +157,8 @@ class ForeignKey {
 		source_file = FileManager.getFileFromUUID(source_file_id);
 
 		for (var keyPair in keyPairIds) {
-			var attr1 = FileManager.getAttributeFromUUID(keyPair[0], from_file);
-			var attr2 = FileManager.getAttributeFromUUID(keyPair[1], to_file);
+			var attr1 = FileManager.getAttributeFromUUID(keyPair[0], source_file);
+			var attr2 = FileManager.getAttributeFromUUID(keyPair[1]);
 			addKeyPair(attr1, attr2);
 		}
 	}

@@ -117,7 +117,7 @@ class DataFile extends LoadableFile {
 
 
 	function removeFkey(fkey : ForeignKey){
-		fkey.deactivate();
+		fkey.removeAllKeyPairs();
 		foreignKeys.Remove(fkey);
 	}
 
@@ -145,13 +145,15 @@ class DataFile extends LoadableFile {
 	}
 
 	//creates an empty foreign key.
-	function createEmptyFkey(other_file : DataFile){
-		var foreignKey = new ForeignKey(this, other_file, this);
+	function createEmptyFkey() {
+		var foreignKey = new ForeignKey(this);
 		foreignKeys.Add(foreignKey);
 	}
 
 	function createSimpleFkey(other_file: DataFile, from : Attribute, to : Attribute){
-		var foreignKey = new ForeignKey(this, other_file, this);
+		var foreignKey = new ForeignKey(this);
+		foreignKey.setFromFile(this);
+		foreignKey.setToFile(other_file);
 		foreignKey.addKeyPair(from, to);
 		foreignKeys.Add(foreignKey);
 	}
@@ -164,11 +166,11 @@ class DataFile extends LoadableFile {
 	function getSimpleFkey(from : Attribute, to : Attribute){
 		for (var foreignKey in foreignKeys){
 			//only returns true if attribute is found and the size of that dictionary is 1.
-			if (foreignKey.isSimpleFkey(from, to)){
+			if (foreignKey.isSimpleFkey(from, to)) {
 				return foreignKey;
 			}
 		}
-		return null;	
+		return null;
 	}
 
 	//returns true if this object can be found anywhere as a referencing foreign key
@@ -313,7 +315,7 @@ class DataFile extends LoadableFile {
 		var output = new List.<DataFile>();
 		for (var fkey in foreignKeys) {
 			var to_file = fkey.getToFile();
-			if (!checked.Contains(to_file)) {
+			if (to_file != null && !checked.Contains(to_file)) {
 				checked.Add(to_file);
 				var innerList = to_file.determineDependencies(checked);
 				for (var innerFile in innerList) {
@@ -569,7 +571,7 @@ class DataFile extends LoadableFile {
 			}
 
 			//Remove the template used to make those edges.
-			MonoBehaviour.Destroy(data);
+			MonoBehaviour.Destroy(templateObject);
 			ProgressBar.setProgress(rowIndex * 1.0 / fileContents.Count);
 	    }
 

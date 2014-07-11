@@ -300,18 +300,11 @@ class AttributeMenu extends BaseMenu {
 	}
 
 	static function getDropdownId(attribute : Attribute) {
-		return "3" + attribute.getFile().shortName()+attribute.column_index;
+		return "3" + attribute.uuid;
 	}
 
 	static function getFkeyDropdownId(fkey : ForeignKey) {
-		if (fkey.isLinking()) {
-			return "4" + fkey.getSourceFile().shortName();
-		}
-		var id = "4" + fkey.getFromFile().shortName() + fkey.getToFile().shortName();
-		for (var keyPair in fkey.getKeyPairs()) {
-			id += keyPair[0].column_index + " " + keyPair[1].column_index + " ";
-		}
-		return id;
+		return "4" + fkey.uuid;
 	}
 
 	static function OnDisableDisplay(){

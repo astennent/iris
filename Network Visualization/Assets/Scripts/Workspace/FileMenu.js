@@ -35,7 +35,6 @@ class FileMenu extends BaseMenu {
 		if (selected_file_index != index) {
 			selected_file_index = index;
 			AttributeMenu.setSelectedIndex(-1);
-			FkeyMenu.resetCreation();
 			creating_file = false;
 			Dropdown.reset(DROPDOWN_ID);
 		}
@@ -44,7 +43,6 @@ class FileMenu extends BaseMenu {
 	static function toggleCreatingFile() {
 		creating_file = !creating_file;
 		AttributeMenu.setSelectedIndex(-1);
-		FkeyMenu.resetCreation();
 
 		if (creating_file) {
 			FilePicker.centerWindow();
@@ -71,7 +69,6 @@ class FileMenu extends BaseMenu {
 		if (new_selected_index != selected_file_index) {
 			setSelectedFileIndex(new_selected_index);
 		}
-
 		
 		//Draw the new file button
 		selection_rect.x = x+width-40;
@@ -101,7 +98,6 @@ class FileMenu extends BaseMenu {
 	//displays information / actions for activated files.
 	function DrawLoadedFileDetails(){
 		var file = FileManager.files[selected_file_index];
-
 		var menuRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);
 		if (file.isActivated()){
 			var title = "Activated File";
