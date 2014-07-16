@@ -53,7 +53,7 @@ class FkeyMenu extends BaseMenu {
 
 	    var cur_y = 40;
 		var add_box = new Rect(x+20, cur_y, width-40, 30);
-		if (GUI.Button(add_box, "Create Foreign Key")){
+		if (GuiPlus.Button(add_box, "Create Foreign Key")){
 			file.createEmptyFkey();
 		}
 
@@ -63,7 +63,7 @@ class FkeyMenu extends BaseMenu {
 		innerBox = new Rect(0, 0, contentWidth, totalHeight);
 		outerBox = new Rect(x, cur_y+40, width, outerBoxHeight);
 
-		fkeyScrollPosition = GUI.BeginScrollView (outerBox, 
+		fkeyScrollPosition = GuiPlus.BeginScrollView (outerBox, 
 				fkeyScrollPosition, innerBox);
 					
 			cur_y = 0;
@@ -77,23 +77,23 @@ class FkeyMenu extends BaseMenu {
 				}
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 	}
 
 	private function DrawForeignKey(file : DataFile, foreignKey : ForeignKey, cur_y : int) {
 		var pair_count = foreignKey.getKeyPairs().Count;
 		
 		var fkey_box = new Rect(1, cur_y, contentWidth, pair_count*keyPairHeight + fkeyBoxHeight);
-		GUI.Box(fkey_box, ""); 
+		GuiPlus.Box(fkey_box, ""); 
 
 		//deletes the foreign key.
-		if (GUI.Button(new Rect(contentWidth-30, cur_y+3, 27, 27), "X")){
+		if (GuiPlus.Button(new Rect(contentWidth-30, cur_y+3, 27, 27), "X")){
 			file.removeFkey(foreignKey);
 			return cur_y;
 		}
 
 
-		foreignKey.isBidirectional = GUI.Toggle(new Rect(10, cur_y+6, 100, 20),
+		foreignKey.isBidirectional = GuiPlus.Toggle(new Rect(10, cur_y+6, 100, 20),
 				foreignKey.isBidirectional, "bi-directional");
 					
 		cur_y += 32;
@@ -101,7 +101,7 @@ class FkeyMenu extends BaseMenu {
 		//Draw the weight attribute label
 		var weightLabelWidth = 105;
 		var weightLabelRect = new Rect(10, cur_y, weightLabelWidth, 20);
-		GUI.Label(weightLabelRect, "Weight Attribute: ");
+		GuiPlus.Label(weightLabelRect, "Weight Attribute: ");
 
 		//Draw the dropdown for choosing the weight attribute
 		var weightWidth = contentWidth-weightLabelWidth-20;
@@ -129,7 +129,7 @@ class FkeyMenu extends BaseMenu {
 		cur_y += 20;
 
 		var old_weight_modifier = foreignKey.getWeightModifier();
-		GUI.Label(new Rect(10, cur_y, contentWidth, 20), "Strength: " + old_weight_modifier.ToString("f1"));
+		GuiPlus.Label(new Rect(10, cur_y, contentWidth, 20), "Strength: " + old_weight_modifier.ToString("f1"));
 		var new_weight_modifier = GUI.HorizontalSlider(Rect(95, cur_y+5, 60, 20), old_weight_modifier, 
 				ForeignKey.MIN_WEIGHT_MODIFIER, ForeignKey.MAX_WEIGHT_MODIFIER);
 		if (old_weight_modifier != new_weight_modifier) {
@@ -138,7 +138,7 @@ class FkeyMenu extends BaseMenu {
 
 		var wasInverted = foreignKey.isWeightInverted();
 		var invertedRect = new Rect(160, cur_y, contentWidth-165, 20);
-		var isInverted = GUI.Toggle(invertedRect, wasInverted, " Inverted");
+		var isInverted = GuiPlus.Toggle(invertedRect, wasInverted, " Inverted");
 		if (wasInverted != isInverted) {
 			foreignKey.setWeightInverted(isInverted);
 		}
@@ -172,19 +172,19 @@ class FkeyMenu extends BaseMenu {
 			var content = new GUIContent(from_attr.getColumnName());
    			var size = GUI.skin.label.CalcSize(content);
 			var attr_box = new Rect(20, cur_y, size.x+20, keyPairHeight);
-			GUI.Button(attr_box, content);
+			GuiPlus.Button(attr_box, content);
 			
 			attr_box.x += size.x+25;
-			GUI.Label(attr_box, " > ");
+			GuiPlus.Label(attr_box, " > ");
 			
 			attr_box.x += 25;
 			content = new GUIContent(to_attr.getColumnName());
    			size = GUI.skin.label.CalcSize(content);
    			attr_box.width = size.x+20;
-			GUI.Button(attr_box, content);
+			GuiPlus.Button(attr_box, content);
 
 			//deletes the key pair.
-			if (GUI.Button(new Rect(contentWidth-30, cur_y, 20, 20), "X")){
+			if (GuiPlus.Button(new Rect(contentWidth-30, cur_y, 20, 20), "X")){
 				foreignKey.removeKeyPair(from_attr, to_attr);
 				return; //stop rendering, otherwise you get an invalid pointer from the deletion.
 			}
@@ -196,7 +196,7 @@ class FkeyMenu extends BaseMenu {
 		var isAdding = (addingFkey == foreignKey);
 		var addText = (isAdding) ? "Cancel" : "Add Attribute Pair";
 
-		if (GUI.Button(addBox, addText)){
+		if (GuiPlus.Button(addBox, addText)){
 			if (isAdding) {
 				addingFkey = null;
 				addingFkeyStep = 0;
@@ -211,7 +211,7 @@ class FkeyMenu extends BaseMenu {
 	private function DrawAddingBox(cur_y : int) {
 		var addingBox = new Rect(1, cur_y, contentWidth, addingBoxHeight);
 		var addingText = (addingFkeyStep == 1) ? "Select Attribute from Origin File..." : "Select Attribute from Target File...";
-		GUI.Box(addingBox, addingText);
+		GuiPlus.Box(addingBox, addingText);
 
 		var file = (addingFkeyStep == 1) ? addingFkey.getSourceFile() : addingFkey.getToFile();
 		var attributes = file.getAttributes();
@@ -225,13 +225,13 @@ class FkeyMenu extends BaseMenu {
 		var innerWidth = (innerHeight > addingBoxHeight - titleSpacing) ? contentWidth-17 : contentWidth;
 		var innerBox = new Rect(0, 0, innerWidth, innerHeight);
 
-		addingScrollPosition = GUI.BeginScrollView (outerBox, 
+		addingScrollPosition = GuiPlus.BeginScrollView (outerBox, 
 				addingScrollPosition, innerBox);
 
 			var scroll_y = 0;
 			for (attribute in attributes) {
 				var attrRect = new Rect(0, scroll_y, innerWidth, attrRectHeight);
-				if (GUI.Button(attrRect, attribute.getRestrictedName(innerWidth - 20))) {
+				if (GuiPlus.Button(attrRect, attribute.getRestrictedName(innerWidth - 20))) {
 					if (addingFkeyStep == 1) {
 						addingFromAttr = attribute;
 						addingFkeyStep = 2;
@@ -245,7 +245,7 @@ class FkeyMenu extends BaseMenu {
 				scroll_y += attrRectHeight;
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 
 
 		return cur_y + addingBoxHeight;

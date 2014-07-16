@@ -102,7 +102,7 @@ class FilePicker extends MonoBehaviour {
 	}
 
 	private static function RenderFilePicker() : String {		
-		GUI.Box(outerRect, "");
+		GuiPlus.Box(outerRect, "");
 
 		//Update directory contents if the string has changed.
 		if (fileString != this.fileString) {
@@ -130,7 +130,7 @@ class FilePicker extends MonoBehaviour {
 		var headerWidth = outerRect.width-margin;
 		var upRect = new Rect(outerRect.x+leftSide+5, cur_y, textRectHeight, textRectHeight);
 
-		if (GUI.Button(upRect, upDirectoryTexture_s)) {
+		if (GuiPlus.Button(upRect, upDirectoryTexture_s)) {
 			moveUpDirectory();
 		}
 
@@ -185,7 +185,7 @@ class FilePicker extends MonoBehaviour {
 		var selectionTop = 0;
 		var selectionBottom = 0;
 
-		scrollPosition = GUI.BeginScrollView (scrollOuterRect, scrollPosition, scrollInnerRect);			
+		scrollPosition = GuiPlus.BeginScrollView (scrollOuterRect, scrollPosition, scrollInnerRect);			
 
 			var bothLists = new List.<LinkedList.<Icon> >();
 			bothLists.Add(matching_directories); 
@@ -226,27 +226,27 @@ class FilePicker extends MonoBehaviour {
 
 					//Render box if selected
 					if (selected) {
-						GUI.Box(selectRect, "");
+						GuiPlus.Box(selectRect, "");
 						selectionTop = selectRect.y;
 						selectionBottom = selectionTop + selectRect.height;
 					}
 
 					//Render button
-					if (GUI.Button(buttonRect, image) || (selected && pressedEnter) ) {
+					if (GuiPlus.Button(buttonRect, image) || (selected && pressedEnter) ) {
 						setFileString(icon.getFullName());
-						GUI.EndScrollView(); return;
+						GuiPlus.EndScrollView(); return;
 					}
 
 					// Select the icon if the user clicks the button, it will change the folder and override this. 
 					GUI.color.a = 0.5;
-					if (GUI.Button(selectRect, "")) {
+					if (GuiPlus.Button(selectRect, "")) {
 						selectedIndex = iconIndex;
 						selected = true;
 					}
 					GUI.color.a = 1;
 
 					//Render label
-					GUI.Label(textRect, text);
+					GuiPlus.Label(textRect, text);
 
 					iconIndex++;
 					colIndex++;
@@ -257,7 +257,7 @@ class FilePicker extends MonoBehaviour {
 				}
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 
 		if (selectionChanged) {
 			// Decide if you need to scroll to see the selection.
@@ -278,17 +278,17 @@ class FilePicker extends MonoBehaviour {
 	static function DrawSelectButtons(cur_y : float) {
 
 		var titleRect = new Rect(10, cur_y, 500, selectButtonsHeight-10);
-		GUI.Label(titleRect, title);
+		GuiPlus.Label(titleRect, title);
 
 		var buttonWidth = 80;
 		var buttonRect = new Rect(outerRect.width-175, cur_y, buttonWidth, selectButtonsHeight-10);
-		if (GUI.Button(buttonRect, "Select")) {
+		if (GuiPlus.Button(buttonRect, "Select")) {
 			onSelectFunction();
 			clearFunctions();
 		}
 
 		buttonRect.x += buttonWidth+10;
-		if (GUI.Button(buttonRect, "Cancel")) {
+		if (GuiPlus.Button(buttonRect, "Cancel")) {
 			onCancelFunction();
 			clearFunctions();
 		}

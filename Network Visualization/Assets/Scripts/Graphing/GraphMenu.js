@@ -39,7 +39,7 @@ class GraphMenu extends BaseMenu {
 			GUI.color = new Color(.4, 1, .4);
 			button_text = "Enable Graphing";
 		}
-		if (GUI.Button(new Rect(x+10, cur_y, width-20, 30), button_text)) {
+		if (GuiPlus.Button(new Rect(x+10, cur_y, width-20, 30), button_text)) {
 			GraphController.toggleGraphing();
 		}
 
@@ -95,7 +95,7 @@ class GraphMenu extends BaseMenu {
 
 		for (var i = 0 ; i < numButtons ; i++) {
 			var buttonRect = new Rect(buttonX, cur_y, buttonWidth, buttonHeight);
-			if (GUI.Button(buttonRect, "")) {
+			if (GuiPlus.Button(buttonRect, "")) {
 				GraphingCamera.setPositionIndex(i);
 			}
 			buttonX += buttonWidth + spacing;
@@ -113,7 +113,7 @@ class GraphMenu extends BaseMenu {
 			var oldLabelAlignment = GUI.skin.label.alignment;
 			GUI.skin.label.alignment = TextAnchor.MiddleCenter;
 
-			GUI.Label(new Rect(x+5, cur_y, width-10, 20), "Cannot graph linking tables.");
+			GuiPlus.Label(new Rect(x+5, cur_y, width-10, 20), "Cannot graph linking tables.");
 			
 			//restore alignment and return
 			GUI.skin.label.alignment = oldLabelAlignment;
@@ -123,11 +123,11 @@ class GraphMenu extends BaseMenu {
 		cur_y += 5;
 
 		var optionsRect = new Rect(x+5, cur_y, width-10, 70);
-		GUI.Box(optionsRect, "");
+		GuiPlus.Box(optionsRect, "");
 
 		var sizeRect = new Rect(x+10, cur_y+5, width/2-10, 20);
 		var isForcingNodeSize = GraphController.isForcingNodeSize();
-		if (GUI.Toggle(sizeRect, isForcingNodeSize, "Fix Node Size") != isForcingNodeSize) {
+		if (GuiPlus.Toggle(sizeRect, isForcingNodeSize, "Fix Node Size") != isForcingNodeSize) {
 			GraphController.setForcingNodeSize(!isForcingNodeSize);
 		}
 
@@ -145,7 +145,7 @@ class GraphMenu extends BaseMenu {
 
 		var axesRect = new Rect(x+width/2, cur_y+5, width/2, 20);
 		var isDrawingAxes = AxisController.isDrawingAxes();
-		if (GUI.Toggle(axesRect, isDrawingAxes, "Draw Axes") != isDrawingAxes) {
+		if (GuiPlus.Toggle(axesRect, isDrawingAxes, "Draw Axes") != isDrawingAxes) {
 			AxisController.setDrawingAxes(!isDrawingAxes);
 		}
 
@@ -173,7 +173,7 @@ class GraphMenu extends BaseMenu {
 		var attrs = file.getAttributes();
 
 		var axesRect = new Rect(x+5, cur_y, width-10, MenuController.getScreenHeight()-cur_y-5);
-		GUI.Box(axesRect, "Select Axes");
+		GuiPlus.Box(axesRect, "Select Axes");
 
 		var axes = GraphController.getAxes();
 		var axis_spacing = 25; //horizontal space between radio buttons
@@ -189,7 +189,7 @@ class GraphMenu extends BaseMenu {
 		}		
 
 		axesRect.height -= 40; axesRect.y+=40;
-		axesScrollPosition = GUI.BeginScrollView (axesRect, 
+		axesScrollPosition = GuiPlus.BeginScrollView (axesRect, 
 				axesScrollPosition, Rect (0, 0, width-26, 20*attrs.Count+innerHeightAdjust));
 
 			var scroll_y = 0;
@@ -205,20 +205,20 @@ class GraphMenu extends BaseMenu {
 				scroll_y += 20;
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 		GUI.color = Color.white;
 		return cur_y;
 	}
 
 	private function DrawAxisSelectionHeaders(cur_y : int, axis_spacing : int, axes : Attribute[]) {		
 		if (axes[0] != null) {GUI.color = colors[0];} else {GUI.color = Color.white;}
-		GUI.Label(new Rect(x+width/2+18, cur_y, axis_spacing, 20), "X");
+		GuiPlus.Label(new Rect(x+width/2+18, cur_y, axis_spacing, 20), "X");
 
 		if (axes[1] != null) {GUI.color = colors[1];} else {GUI.color = Color.white;}
-		GUI.Label(new Rect(x+width/2+axis_spacing+18, cur_y, axis_spacing, 20), "Y");
+		GuiPlus.Label(new Rect(x+width/2+axis_spacing+18, cur_y, axis_spacing, 20), "Y");
 
 		if (axes[2] != null) {GUI.color = colors[2];} else {GUI.color = Color.white;}
-		GUI.Label(new Rect(x+width/2+axis_spacing*2+18, cur_y, axis_spacing, 20), "Z");
+		GuiPlus.Label(new Rect(x+width/2+axis_spacing*2+18, cur_y, axis_spacing, 20), "Z");
 
 		GUI.color = Color.white;
 	}
@@ -231,11 +231,11 @@ class GraphMenu extends BaseMenu {
 			var countRect = new Rect(attrRect);
 			countRect.y-=2; countRect.height+=4;
 			countRect.x = 5; countRect.width = width-20;
-			GUI.Box(countRect, "");
-			GUI.Label(attrRect, "Number of Matches:");
+			GuiPlus.Box(countRect, "");
+			GuiPlus.Label(attrRect, "Number of Matches:");
 		} else {
 			GUI.color = getColorForAttribute(attribute, axes);
-			GUI.Label(attrRect, attribute.getRestrictedName(width/2-10));
+			GuiPlus.Label(attrRect, attribute.getRestrictedName(width/2-10));
 		}
 
 		attrRect.x+=width/2; attrRect.width = 15;

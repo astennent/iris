@@ -46,7 +46,7 @@ class AttributeMenu extends BaseMenu {
 
 	function DrawBasicInfo(cur_y : int) {		
 		var name_box :Rect = new Rect(x+10, cur_y, 60, 20);
-		GUI.Label(name_box, "Name:");
+		GuiPlus.Label(name_box, "Name:");
 		name_box.width=width-70;
 		name_box.x += 50;
 
@@ -61,11 +61,11 @@ class AttributeMenu extends BaseMenu {
 		
 		//Shown Toggle
 		var large_box = new Rect(x+5, cur_y, width-10, 50);
-		GUI.Box(large_box, "");
+		GuiPlus.Box(large_box, "");
 		var toggle_box = new Rect(x+10, cur_y+5, width-20, 20);
 
 		GUI.color = (attribute.is_shown) ? Attribute.SHOWN_COLOR : Color.white;
-		var shown_toggle = GUI.Toggle (toggle_box, attribute.is_shown, " Shown in 3D view");
+		var shown_toggle = GuiPlus.Toggle (toggle_box, attribute.is_shown, " Shown in 3D view");
 		if (shown_toggle != attribute.is_shown){
 			file.ToggleShown(selected_index);
 		}
@@ -90,7 +90,7 @@ class AttributeMenu extends BaseMenu {
 		}
 		var large_box = new Rect(x+5, cur_y, width-10, box_height);
 		
-		GUI.Box(large_box, "");
+		GuiPlus.Box(large_box, "");
 
 		//Draw Start Date
 		cur_y += 5;
@@ -112,16 +112,16 @@ class AttributeMenu extends BaseMenu {
 			//Draw options for adding and removing from TimeFrame
 			if (attribute.getFile().timeFrame.usesAttribute(attribute, isStart)) {
 				//The attribute is present in the TimeFrame.
-				GUI.Label(label_box, "Part of " + name + " Date");
+				GuiPlus.Label(label_box, "Part of " + name + " Date");
 				GUI.color = Attribute.TIME_SERIES_COLOR;
-				if (GUI.Button(button_box, "Remove")) {
+				if (GuiPlus.Button(button_box, "Remove")) {
 					attribute.getFile().timeFrame.removeColumn(attribute, isStart);
 				}
 			} else {
 				//The attribute is not in the TimeFrame.
-				GUI.Label(label_box, "Not part of " + name + " Date");
+				GuiPlus.Label(label_box, "Not part of " + name + " Date");
 				GUI.color = Attribute.TIME_SERIES_COLOR;
-				if (GUI.Button(button_box, "Add")) {
+				if (GuiPlus.Button(button_box, "Add")) {
 					attribute.getFile().timeFrame.addColumn(attribute, isStart);
 				}
 			}
@@ -133,7 +133,7 @@ class AttributeMenu extends BaseMenu {
 		if (present) {
 			var DROPDOWN_ID = getDropdownId(attribute);
 			GUI.color = Color.white;
-			GUI.Label(label_box, "Format:");
+			GuiPlus.Label(label_box, "Format:");
 
 			//Draw the format textbox
 			var text_box = new Rect(x+58, label_box.y, 80, 20);
@@ -168,12 +168,12 @@ class AttributeMenu extends BaseMenu {
 			if (!attribute.hasValidTimeFrameFormat()) {
 				cur_y += 25;
 				var warning_rect = new Rect(x+5, dropdown_box.y+25, width-10, 20);
-				GUI.Box(warning_rect, "");
+				GuiPlus.Box(warning_rect, "");
 				GUI.color = Color.red;
 
 				var oldAlignment = GUI.skin.label.alignment;
 				GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-				GUI.Label(warning_rect, attribute.getTimeFrameFormatWarning());
+				GuiPlus.Label(warning_rect, attribute.getTimeFrameFormatWarning());
 				GUI.skin.label.alignment = oldAlignment;
 			}		
 
@@ -222,11 +222,11 @@ class AttributeMenu extends BaseMenu {
 			weightDropdownOptions[i] = file_attributes[i].getRestrictedName(weightWidth-10);
 		}
 
-		fkeyScrollPosition = GUI.BeginScrollView (outerBox, 
+		fkeyScrollPosition = GuiPlus.BeginScrollView (outerBox, 
 				fkeyScrollPosition, innerBox);
 
 			GUI.color = new Color(1, 1, 1, .5);
-			GUI.Box(innerBox, "Single-Attribute Foreign Keys");
+			GuiPlus.Box(innerBox, "Single-Attribute Foreign Keys");
 			GUI.color = Color.white;
 
 			var oldAlignment = GUI.skin.label.alignment;
@@ -237,12 +237,12 @@ class AttributeMenu extends BaseMenu {
 				var to_attr = fkey.getKeyPairs()[0][1];
 
 				//Draw the box that surrounds the fkey options.
-				GUI.Box(fkeyRect, fkey.getToFile().shortName() + " / " + to_attr.getRestrictedName(80));
+				GuiPlus.Box(fkeyRect, fkey.getToFile().shortName() + " / " + to_attr.getRestrictedName(80));
 
 
 				//Draw the weight attribute label
 				var weightLabelRect = new Rect(fkeyRect.x+5, fkeyRect.y+25, weightLabelWidth, 20);
-				GUI.Label(weightLabelRect, "Weight Attribute: ");
+				GuiPlus.Label(weightLabelRect, "Weight Attribute: ");
 
 				//Draw the dropdown for choosing the weight attribute
 				var weightRect = new Rect(weightLabelRect.x+weightLabelWidth, fkeyRect.y+25, weightWidth, 20);
@@ -258,7 +258,7 @@ class AttributeMenu extends BaseMenu {
 				}
 
 				// Draw the delete button.
-				if (GUI.Button(new Rect(fkeyRect.width-30, fkeyRect.y+20, 25, 25), "X")) {
+				if (GuiPlus.Button(new Rect(fkeyRect.width-30, fkeyRect.y+20, 25, 25), "X")) {
 					file.destroySimpleFkey(attribute, to_attr);
 					return;
 				}
@@ -267,7 +267,7 @@ class AttributeMenu extends BaseMenu {
 				var old_weight_modifier = fkey.getWeightModifier();
 				var weightScaleLabelRect = new Rect(fkeyRect.x+5, fkeyRect.y+45, weightScaleLabelWidth, 20);
 				var sliderRect = new Rect(weightScaleLabelRect.x+weightScaleLabelWidth, fkeyRect.y+50, weightScaleWidth, 20);
-				GUI.Label(weightScaleLabelRect, "Strength: " + old_weight_modifier.ToString("f1"));
+				GuiPlus.Label(weightScaleLabelRect, "Strength: " + old_weight_modifier.ToString("f1"));
 				var new_weight_modifier = GUI.HorizontalSlider(sliderRect, old_weight_modifier, 
 						ForeignKey.MIN_WEIGHT_MODIFIER,  ForeignKey.MAX_WEIGHT_MODIFIER);
 				if (old_weight_modifier != new_weight_modifier) {
@@ -284,7 +284,7 @@ class AttributeMenu extends BaseMenu {
 				}
 
 				var invertedRect = new Rect(sliderRect.x+sliderRect.width+5, fkeyRect.y+45, invertedWidth, 20);
-				var isInverted = GUI.Toggle(invertedRect, wasInverted, invertedText);
+				var isInverted = GuiPlus.Toggle(invertedRect, wasInverted, invertedText);
 				if (wasInverted != isInverted) {
 					fkey.setWeightInverted(isInverted);
 				}
@@ -294,7 +294,7 @@ class AttributeMenu extends BaseMenu {
 			}
 			GUI.skin.label.alignment = oldAlignment;
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 
 		return cur_y+fkeyRect.y;
 	}

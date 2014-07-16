@@ -8,11 +8,9 @@ static var gameController : GameObject;
 
 static function handleEscapePress() {
 
-	//Escape priority in order: Popup, MainMenu children, Selected Nodes, TimeSeries, MainMenu (Toggles)
+	//Escape priority in order: MainMenu children, Selected Nodes, TimeSeries, MainMenu (Toggles)
 	if (Input.GetButtonDown("Escape")) {
-		if (PopupWindow.isDisplaying()) {
-			BaseMenu.DisableDisplay(PopupWindow);
-		} else if (getInstance(MainMenu).isDisplayingChild()) {
+		 if (getInstance(MainMenu).isDisplayingChild()) {
     		BaseMenu.DisableDisplay(MainMenu, true); //cascade disabling responsibility down the submenus
 	    } else if (getInstance(TimeSeriesMenu).displaying) {
     		BaseMenu.DisableDisplay(TimeSeriesMenu);

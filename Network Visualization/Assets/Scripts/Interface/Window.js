@@ -39,8 +39,8 @@ class Window extends MonoBehaviour {
 	/* 
 		Draws the provided GUI function, but with parameters passed in as an array
 		Usage:
-		GUI.Button(myRectangle, "test") becomes
-		myWindow.Render(GUI.Button, [ myRectangle, "test" ])
+		GuiPlus.Button(myRectangle, "test") becomes
+		myWindow.Render(GuiPlus.Button, [ myRectangle, "test" ])
 
 		Returns the value returned by drawFunc
 	*/
@@ -63,7 +63,7 @@ class Window extends MonoBehaviour {
 
 		GuiPlus.Box(bounds, "");
 
-		GUI.BeginScrollView (bounds, Vector2.zero, innerRect);
+		GuiPlus.BeginScrollView (bounds, Vector2.zero, innerRect);
 			switch(params.length) {
 				case 0:
 					result = render0(drawFunc);
@@ -77,7 +77,7 @@ class Window extends MonoBehaviour {
 				default:
 					throw("I don't support that many arguments! If you want to add that function, just edit this class.");		
 			}
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 
 		GUI.depth = previousDepth;
 

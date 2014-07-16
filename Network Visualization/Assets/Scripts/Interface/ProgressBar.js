@@ -26,9 +26,9 @@ function OnGUI() {
 	var backgroundRect = new Rect(0, bottom-height, Screen.width, height);
 	var progressRect = new Rect(0, bottom-height, Screen.width*(progress*progress), height);
 	GUI.color = new Color(0, 0, 0, .1);
-	GUI.Box(backgroundRect, "");
+	GuiPlus.Box(backgroundRect, "");
 	GUI.color = ColorController.GenFractionalColor(1-(progress*progress));
-	GUI.Button(progressRect, "");
+	GuiPlus.Button(progressRect, "");
 }
 
 static function setProgress(input : float) {

@@ -62,11 +62,11 @@ class RightClickMenu extends MonoBehaviour {
 
 			if (height < cur_y+30-y) return; //break early.
 			if (node.isSelected()) {
-				if (GUI.Button(button_rect, "Unselect Node")){
+				if (GuiPlus.Button(button_rect, "Unselect Node")){
 					SelectionController.deselectNode(node);
 				}
 			} else {
-				if (GUI.Button(button_rect, "Select Node")){
+				if (GuiPlus.Button(button_rect, "Select Node")){
 					SelectionController.selectNode(node);
 				}
 			}
@@ -75,7 +75,7 @@ class RightClickMenu extends MonoBehaviour {
 			if (height < cur_y+30-y) return; //break early.
 
 			var clusterSize = RightClickController.getCurrentClusterSize();
-			if (GUI.Button(button_rect, "Select Cluster (" + clusterSize + ")")){
+			if (GuiPlus.Button(button_rect, "Select Cluster (" + clusterSize + ")")){
 				SelectionController.selectAllInGroup(node.cluster_id, true);
 				DisableDisplay();
 			}

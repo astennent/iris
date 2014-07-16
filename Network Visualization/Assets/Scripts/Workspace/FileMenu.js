@@ -80,7 +80,7 @@ class FileMenu extends BaseMenu {
 			image = plus;
 			GUI.color = Color.green;
 		}
-		if (GUI.Button(selection_rect, image)){
+		if (GuiPlus.Button(selection_rect, image)){
 			toggleCreatingFile();
 		}
 		GUI.color = Color.white;			
@@ -106,7 +106,7 @@ class FileMenu extends BaseMenu {
 		} else {
 			title = "Loaded File";
 		}
-		GUI.Box(menuRect, title);
+		GuiPlus.Box(menuRect, title);
 		cur_y += 20;
 		var toggle_box = new Rect(x+5, cur_y, 150, 25);
 		var using_headers = GuiPlus.LockableToggle(toggle_box, file.using_headers, " File uses headers", file.isActivated() || file.isActivating());
@@ -120,12 +120,12 @@ class FileMenu extends BaseMenu {
 		cur_y+=28;
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
 		GUI.color = Attribute.FKEY_COLOR;
-		if (GUI.Button(fkey_box, "Foreign Keys")){
+		if (GuiPlus.Button(fkey_box, "Foreign Keys")){
 			FkeyMenu.ToggleDisplay(FkeyMenu);
 		}
 		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);
 		GUI.color = Attribute.TIME_SERIES_COLOR;
-		if (GUI.Button(details_box, "Time Series")){
+		if (GuiPlus.Button(details_box, "Time Series")){
 			TimeFrameMenu.ToggleDisplay(TimeFrameMenu);
 		}
 		
@@ -134,18 +134,18 @@ class FileMenu extends BaseMenu {
 		cur_y += 35;
 
 		var label_box = new Rect(x+10, cur_y, width-10, 20);
-		GUI.Label(label_box, "Shown");
+		GuiPlus.Label(label_box, "Shown");
 		label_box.x += 50;
-		GUI.Label(label_box, "PKey");
+		GuiPlus.Label(label_box, "PKey");
 		label_box.x += 117;
-		GUI.Label(label_box, "Name");
+		GuiPlus.Label(label_box, "Name");
 
 		cur_y += 25;
 
 		var file_attributes = file.getAttributes();
 
 		//File Attributes (columns)
-		attributeScrollPosition = GUI.BeginScrollView (Rect (x+5,cur_y,width-10,MenuController.getScreenHeight()-cur_y-50), 
+		attributeScrollPosition = GuiPlus.BeginScrollView (Rect (x+5,cur_y,width-10,MenuController.getScreenHeight()-cur_y-50), 
 			attributeScrollPosition, Rect (0, 0, width-30, 20*file_attributes.Count+20));
 		
 		
@@ -158,7 +158,7 @@ class FileMenu extends BaseMenu {
 			if (attribute.is_shown){ GUI.color = Attribute.SHOWN_COLOR; } 
 			else { GUI.color = Color.white; }		
 			var is_name_box = new Rect(17, attribute_y, 20, 20);
-			var is_shown_value = GUI.Toggle (is_name_box, attribute.is_shown, "");	
+			var is_shown_value = GuiPlus.Toggle (is_name_box, attribute.is_shown, "");	
 			if (is_shown_value != attribute.is_shown){
 				attribute.ToggleShown();
 			}		
@@ -175,7 +175,7 @@ class FileMenu extends BaseMenu {
 			//attribute buttons			
 			GUI.color = attribute.getAspectColor();			
 			var display_string :String = attribute.getRestrictedName(140);
-	   		if (GUI.Button(new Rect(100, attribute_y, 180, 20), display_string)){
+	   		if (GuiPlus.Button(new Rect(100, attribute_y, 180, 20), display_string)){
 	   			DisableDisplay(FkeyMenu);
 	   			AttributeMenu.setSelectedIndex(i);
 	   		}
@@ -183,7 +183,7 @@ class FileMenu extends BaseMenu {
 			attribute_y += 20;
 		}
 		
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 		
 		var import_button : Rect;
 		if (file.isActivated()){
@@ -191,7 +191,7 @@ class FileMenu extends BaseMenu {
 			GUI.color = new Color(1, .7, 0);
 			cur_y += 30;
 			import_button = new Rect(x+10, MenuController.getScreenHeight()-40, width/2-10, 30);
-			if (GUI.Button(import_button, "Deactivate File")){
+			if (GuiPlus.Button(import_button, "Deactivate File")){
 				FileManager.DeactivateFile(selected_file_index);
 			}
 		} else {
@@ -199,7 +199,7 @@ class FileMenu extends BaseMenu {
 			GUI.color = new Color(0, 1, 0);
 			cur_y += 30;
 			import_button = new Rect(x+10, MenuController.getScreenHeight()-40, width/2-10, 30);
-			if (GUI.Button(import_button, "Activate File")){
+			if (GuiPlus.Button(import_button, "Activate File")){
 				FileManager.ActivateFile(selected_file_index);
 			}
 		}
@@ -208,7 +208,7 @@ class FileMenu extends BaseMenu {
 		GUI.color = Color.red;
 		cur_y += 30;
 		var remove_button = new Rect(x+width/2+5, MenuController.getScreenHeight()-40, width/2-12.5, 30);
-		if (GUI.Button(remove_button, "Remove File")) {
+		if (GuiPlus.Button(remove_button, "Remove File")) {
 			FileManager.RemoveFile(selected_file_index);
 			setSelectedFileIndex(-1);
 		}

@@ -43,24 +43,24 @@ class SearchMenu extends BaseMenu {
 			}
 		}
 		var top_display = GUIContent(title);		
-		scrollPosition = GUI.BeginScrollView (Rect (x+width*.05,60,width*.9,MenuController.getScreenHeight()-60),
+		scrollPosition = GuiPlus.BeginScrollView (Rect (x+width*.05,60,width*.9,MenuController.getScreenHeight()-60),
 	    scrollPosition, Rect (0, 0, 400, matches.Count*30));
 	    
 	    var count = 0;
 	    GUI.skin.button.alignment = TextAnchor.MiddleLeft;
 	    for (var match : Node in matches) {
 	    	GUI.color = match.getMenuColor();
-	    	if (GUI.Button(Rect (10,count*30,width,30), match.getDisplayName())){
+	    	if (GuiPlus.Button(Rect (10,count*30,width,30), match.getDisplayName())){
 	    		Camera.main.GetComponent(NetworkCamera).setTarget(match);
 	    	}
 	    	if (count == match_index){
-	    		GUI.Button (Rect (0,count*30,10,30), "");
+	    		GuiPlus.Button (Rect (0,count*30,10,30), "");
 	    	}
 	    	count+=1;
 	    }
 	    GUI.skin.button.alignment = TextAnchor.MiddleCenter;
 		
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 			
 		if (displaying){
 								

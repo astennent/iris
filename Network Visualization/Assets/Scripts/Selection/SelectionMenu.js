@@ -39,7 +39,7 @@ class SelectionMenu extends BaseMenu {
 			//var button_position : Rect = new Rect(Screen.width, 5, 35, 35);
 			handlePosition = new Rect(x-15, MenuController.getScreenTop(), 15, MenuController.getScreenHeight());
 			GuiPlus.Box(handlePosition, ""); //capture mouse clicks so menu isn't closed.
-			if (GUI.Button(handlePosition, more)){
+			if (GuiPlus.Button(handlePosition, more)){
 				ToggleDisplay(SelectionMenu);
 			}	
 
@@ -72,7 +72,7 @@ class SelectionMenu extends BaseMenu {
 			contentWidth = width;
 		}
 
-		nodeScrollPosition = GUI.BeginScrollView (Rect (x, cur_y, width, outBoxHeight), 
+		nodeScrollPosition = GuiPlus.BeginScrollView (Rect (x, cur_y, width, outBoxHeight), 
 				nodeScrollPosition, Rect (0, 0, contentWidth, contentHeight));
 
 			var node_scroll_y = 0;
@@ -83,7 +83,7 @@ class SelectionMenu extends BaseMenu {
 
 				//draw the main button
 				var button_rect = new Rect(0, node_scroll_y, contentWidth-nodeButtonHeight, nodeButtonHeight);
-				if (GUI.Button(button_rect, node.getDisplayName())){
+				if (GuiPlus.Button(button_rect, node.getDisplayName())){
 					SelectionController.selectPrimaryNode(node);
 				}
 
@@ -93,7 +93,7 @@ class SelectionMenu extends BaseMenu {
 
 				//Draw the remove button
 				var remove_button_rect = new Rect(contentWidth-nodeButtonHeight, node_scroll_y, nodeButtonHeight, nodeButtonHeight);
-				if (GUI.Button(remove_button_rect, "")) {
+				if (GuiPlus.Button(remove_button_rect, "")) {
 					removedNode = node; //queue removal, since you can't unselect while iterating
 				}
 
@@ -104,7 +104,7 @@ class SelectionMenu extends BaseMenu {
 				SelectionController.deselectNode(removedNode);
 			}
 
-			GUI.EndScrollView();
+			GuiPlus.EndScrollView();
 		return cur_y + outBoxHeight;
 
 	}
@@ -118,10 +118,10 @@ class SelectionMenu extends BaseMenu {
 
 		var extra_vertical_space : int;
 		if (numNodes > 1) {
-			GUI.Box(outerRect, node.getDisplayName());
+			GuiPlus.Box(outerRect, node.getDisplayName());
 			extra_vertical_space = 30; 
 		} else {
-			GUI.Box(outerRect, ""); //Don't display the title again.
+			GuiPlus.Box(outerRect, ""); //Don't display the title again.
 			extra_vertical_space = 0;
 		}
 
@@ -142,7 +142,7 @@ class SelectionMenu extends BaseMenu {
 
 		var innerRect = new Rect(0, 0, contentWidth-16, innerHeight);
 
-		dataScrollPosition = GUI.BeginScrollView (outerRect, 
+		dataScrollPosition = GuiPlus.BeginScrollView (outerRect, 
 				dataScrollPosition, innerRect);
 			
 			var data_scroll_y = 0;
@@ -151,11 +151,11 @@ class SelectionMenu extends BaseMenu {
 				var attribute = source_attrs[index];
 
 				GUI.color = attribute.genFractionalColor(node); 
-				GUI.Box(new Rect(0, data_scroll_y, contentWidth, data_height), "");
+				GuiPlus.Box(new Rect(0, data_scroll_y, contentWidth, data_height), "");
 
 				var attr_name = attribute.getRestrictedName(width/2-10);	
 				var attr_rect = new Rect(5, data_scroll_y, contentWidth/2, data_height);
-				GUI.Label(attr_rect, attr_name);
+				GuiPlus.Label(attr_rect, attr_name);
 
 				var attr_value_rect : Rect = attr_rect;
 				attr_value_rect.x = contentWidth/2-10;
@@ -172,7 +172,7 @@ class SelectionMenu extends BaseMenu {
 				data_scroll_y += data_height;
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 	}
 
 	// Used by menu controller to find the right side of the screen.

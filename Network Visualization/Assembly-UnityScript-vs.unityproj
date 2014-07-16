@@ -83,7 +83,6 @@
      <Compile Include="Assets\Scripts\Interface\MainMenu.js" />
      <Compile Include="Assets\Scripts\Interface\MenuController.js" />
      <Compile Include="Assets\Scripts\Interface\PopupOption.js" />
-     <Compile Include="Assets\Scripts\Interface\PopupWindow.js" />
      <Compile Include="Assets\Scripts\Interface\ProgressBar.js" />
      <Compile Include="Assets\Scripts\Interface\RightClickController.js" />
      <Compile Include="Assets\Scripts\Interface\RightClickMenu.js" />

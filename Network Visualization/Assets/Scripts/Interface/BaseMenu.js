@@ -43,7 +43,7 @@ class BaseMenu extends MonoBehaviour {
 		GuiPlus.Box(menuRect, title);
 
 		var box = new Rect(x+width-30, MenuController.getScreenTop()+4, 26, 26);
-		if (GUI.Button(box, "X")){
+		if (GuiPlus.Button(box, "X")){
 			DisableDisplay();
 		};
 	}

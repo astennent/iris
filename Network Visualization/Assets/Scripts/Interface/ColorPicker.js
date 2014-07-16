@@ -48,7 +48,7 @@ function OnGUI(){
 	if (displaying){
 
 		if(drawBox) {
-			GUI.Box(new Rect(left, top, width, height), "");
+			GuiPlus.Box(new Rect(left, top, width, height), "");
 		}
 
 		var hueRect = new Rect(left+10, top+10, width-20, 10);
@@ -78,57 +78,57 @@ function OnGUI(){
 
 		var presetRect = new Rect(left+15, top+160, 20, 20);
 		GUI.color = Color.red;
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 0; brightnessValue = maxBrightness/2;
 		}
 		
 		presetRect.x+=25;
 		GUI.color = new Color(1, .5, 0); //orange
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 32; brightnessValue = maxBrightness/2;
 		}
 
 		presetRect.x+=25;
 		GUI.color = Color.yellow;
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 60; brightnessValue = maxBrightness/2;
 		}
 
 		presetRect.x+=25;
 		GUI.color = Color.green;
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 120; brightnessValue = maxBrightness/2;
 		}
 
 		presetRect.x+=25;
 		GUI.color = Color.blue;
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 216; brightnessValue = maxBrightness/2;
 		}
 
 		presetRect.x+=25;
 		GUI.color = new Color(.8, 0.0, 1.0); //purple
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 270; brightnessValue = maxBrightness/2;
 		}
 
 		presetRect.x+=25;
 		GUI.color = Color.magenta;
-		if (GUI.Button(presetRect, "")){
+		if (GuiPlus.Button(presetRect, "")){
 			hueValue = 300; brightnessValue = maxBrightness/2;
 		}
 
 		if (drawBox){
 			GUI.color = Color.white;
 			var cancelRect = new Rect(left+20, top+190, 75, 20);
-			if (GUI.Button(cancelRect, "Cancel")){
+			if (GuiPlus.Button(cancelRect, "Cancel")){
 				setColor(initialColor);
 			}
 
 			GUI.color = newChosenColor;
 			GUI.color.a = 1;
 	 		var selectRect = new Rect(left+105, top+190, 75, 20);
-			if (GUI.Button(selectRect, "Apply")){
+			if (GuiPlus.Button(selectRect, "Apply")){
 				
 			}
 		}

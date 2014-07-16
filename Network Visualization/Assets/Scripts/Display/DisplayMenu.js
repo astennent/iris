@@ -14,6 +14,11 @@ class DisplayMenu extends BaseMenu {
 
 	function OnGUI(){
 		super.OnGUI();	
+
+		if (!displaying) {
+			return;
+		}
+		
 		var y = DrawFallback(35);
 		y = DrawRules(y);
 	}
@@ -22,8 +27,9 @@ class DisplayMenu extends BaseMenu {
 		if (ColorController.rules.Count == 0) {
 			ColorController.Init();
 		}
+
 		var fallbackRule : ColorRule = ColorController.rules[0];
-		if (GUI.Button(new Rect(x+5, y, width-10, 30), "Change Fallback Colors")){
+		if (GuiPlus.Button(new Rect(x+5, y, width-10, 30), "Change Fallback Colors")){
 			if (rule_index == 0) {
 				setRuleIndex(-1);
 			} else {
@@ -40,7 +46,7 @@ class DisplayMenu extends BaseMenu {
 		var temp_x = 10;
 		for (var i : int = 0 ; i < 3 ; i++) {
 			var filter_method_name = ColorRule.filter_methods[i];
-			var selected = GUI.Toggle (Rect (x+temp_x, y, 100, 20), (filter_method == i), "By " + filter_method_name);
+			var selected = GuiPlus.Toggle (Rect (x+temp_x, y, 100, 20), (filter_method == i), "By " + filter_method_name);
 			if (selected && filter_method != i) {
 				rule.setFilterMethod(i);
 				break;
@@ -57,11 +63,11 @@ class DisplayMenu extends BaseMenu {
 		var rules = ColorController.rules;
 
 		var ruleRect = new Rect(x, y, width, MenuController.getScreenHeight() - y);
-		GUI.Box(ruleRect, "Rules");
+		GuiPlus.Box(ruleRect, "Rules");
 
 		y+=25;
 
-		if (GUI.Button(new Rect(x+5, y, 100, 25), "Add Rule")){
+		if (GuiPlus.Button(new Rect(x+5, y, 100, 25), "Add Rule")){
 			var createdRule = ColorController.createRule();
 			setRuleIndex(ColorController.rules.Count-1);
 			var createdRuleRect = new Rect(35, 0, width-85, 30);
@@ -69,7 +75,7 @@ class DisplayMenu extends BaseMenu {
 
 		}
 
-		if (GUI.Button(new Rect(x+120, y, 120, 25), "Apply All Rules")){
+		if (GuiPlus.Button(new Rect(x+120, y, 120, 25), "Apply All Rules")){
 			ColorController.ApplyAllRules();
 		}
 
@@ -77,7 +83,7 @@ class DisplayMenu extends BaseMenu {
 		ruleRect.y += 55;
 		ruleRect.height = MenuController.getScreenHeight() - ruleRect.y;
 
-		scrollPosition = GUI.BeginScrollView (ruleRect, 
+		scrollPosition = GuiPlus.BeginScrollView (ruleRect, 
 			scrollPosition, Rect (0, 0, width-20, 30*rules.Count+20));
 
 		var temp_y = 0;
@@ -91,7 +97,7 @@ class DisplayMenu extends BaseMenu {
 			buttonRect.y = Mathf.Lerp(buttonRect.y, temp_y, .3);
 			ruleRects[rule] = buttonRect;
 
-			if (GUI.Button(buttonRect, rule.getDisplayName())){
+			if (GuiPlus.Button(buttonRect, rule.getDisplayName())){
 				if (rule_index == i) {
 					setRuleIndex(-1);
 				} else {
@@ -102,7 +108,7 @@ class DisplayMenu extends BaseMenu {
 			var upRect = new Rect(5, buttonRect.y, 30, 15);
 			var downRect = new Rect(5, buttonRect.y+15, 30, 15);
 
-			if (GUI.Button(upRect, "")) { //TODO make graphics for these.
+			if (GuiPlus.Button(upRect, "")) { //TODO make graphics for these.
 				if (i > 1) {
 					ColorController.moveRuleUp(i);
 					if (rule_index == i) {
@@ -112,7 +118,7 @@ class DisplayMenu extends BaseMenu {
 					}
 				}
 			}
-			if (GUI.Button(downRect, "")) {
+			if (GuiPlus.Button(downRect, "")) {
 				if (i < rules.Count - 1) {
 					ColorController.moveRuleDown(i);
 					if (rule_index == i) {
@@ -130,7 +136,7 @@ class DisplayMenu extends BaseMenu {
 				GUI.color = Color.white;
 			}
 
-			if (GUI.Button(new Rect(width-50, buttonRect.y, 35, 30), "X")){
+			if (GuiPlus.Button(new Rect(width-50, buttonRect.y, 35, 30), "X")){
 				ColorController.removeRule(i);
 				if (i == rule_index){
 					setRuleIndex(-1);
@@ -144,7 +150,7 @@ class DisplayMenu extends BaseMenu {
 			temp_y+=30;
 		}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 		return y+temp_y;
 
 	}

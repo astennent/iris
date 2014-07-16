@@ -20,10 +20,6 @@ class TimeFrameMenu extends BaseMenu {
 	function OnGUI() {
 		super.OnGUI();
 
-		// if (GuiPlus.Button(new Rect(200, 200, 300, 300), "Popup?")){
-		// 	PopupWindow.createWindow("messsage!", new PopupOption("test", testFunction));
-		// }
-
 		//get the currently selected file
 		cur_file = FileMenu.getSelectedFile();
 		if (cur_file == null || !displaying) {
@@ -83,7 +79,7 @@ class TimeFrameMenu extends BaseMenu {
 		if (!timeFrame.isValid(isStart)){
 			GUI.color = Color.red;
 		}
-		GUI.Box(timeframe_box, box_text);
+		GuiPlus.Box(timeframe_box, box_text);
 		GUI.color = Color.white;
 
 		//Draw the column headers.
@@ -91,9 +87,9 @@ class TimeFrameMenu extends BaseMenu {
 			//Draw the headers
 			cur_y += 30;
 			var header_rect = new Rect(x+12, cur_y, 80, 20);
-			GUI.Label(header_rect, "Name");
+			GuiPlus.Label(header_rect, "Name");
 			header_rect.x += 63;
-			GUI.Label(header_rect, "Format");
+			GuiPlus.Label(header_rect, "Format");
 
 		}
 
@@ -110,7 +106,7 @@ class TimeFrameMenu extends BaseMenu {
 			GUI.color = column.getAspectColor();
 			
 			//Draw the attribute label
-			GUI.Label(column_rect, column.getRestrictedName(column_rect.width));
+			GuiPlus.Label(column_rect, column.getRestrictedName(column_rect.width));
 
 			//Draw the format textbox
 			column_rect.x += 63;
@@ -147,7 +143,7 @@ class TimeFrameMenu extends BaseMenu {
 			//Draw the Remove button
 			column_rect.x += 85;
 			column_rect.width = 20;
-			if (GUI.Button(column_rect, "x")) {
+			if (GuiPlus.Button(column_rect, "x")) {
 				timeFrame.removeColumn(column_index, isStart);
 			}
 
@@ -159,7 +155,7 @@ class TimeFrameMenu extends BaseMenu {
 
 		var add_column_rect = new Rect(x+width/9, cur_y+5, width/3, 20);
 		if (creatingStart && isStart || creatingEnd && !isStart) { //Draw a cancel button to undo the column adding click.
-			if (GUI.Button(add_column_rect, "Done")) {
+			if (GuiPlus.Button(add_column_rect, "Done")) {
 				if (isStart) {
 					creatingStart = false;
 				} else {
@@ -167,7 +163,7 @@ class TimeFrameMenu extends BaseMenu {
 				}
 			}
 		} else { //You are not creating already.
-			if (GUI.Button(add_column_rect, "Add Columns")) {
+			if (GuiPlus.Button(add_column_rect, "Add Columns")) {
 				if (isStart) {
 					creatingStart = true;
 					creatingEnd = false;
@@ -186,7 +182,7 @@ class TimeFrameMenu extends BaseMenu {
 			var attributes = cur_file.getAttributes();
 			var attributes_box = new Rect(x+10, cur_y, width-20, 100);
 
-			attrScrollPosition = GUI.BeginScrollView (attributes_box, 
+			attrScrollPosition = GuiPlus.BeginScrollView (attributes_box, 
 					attrScrollPosition, Rect (0, 0, width-40, 20*attributes.Count));	
 
 				var scroll_y = 0;
@@ -195,7 +191,7 @@ class TimeFrameMenu extends BaseMenu {
 					GUI.color = attribute.getAspectColor(); //Use aspect color.
 					var attr_rect = new Rect(0, scroll_y, width-35, 20);
 
-					if (GUI.Button(attr_rect, attribute.getRestrictedName(attr_rect.width))) {
+					if (GuiPlus.Button(attr_rect, attribute.getRestrictedName(attr_rect.width))) {
 						timeFrame.addColumn(attribute, isStart);
 					}
 
@@ -204,7 +200,7 @@ class TimeFrameMenu extends BaseMenu {
 
 				GUI.color = Color.white;
 			
-			GUI.EndScrollView();
+			GuiPlus.EndScrollView();
 			cur_y += 105; //adjust cur_y
 		}
 

@@ -133,7 +133,7 @@ function OnGUI(){
 
 		if ( (right-left)*(bottom-top) > 50){ //only draw if the box is big enough
 			var rect = new Rect(left, top, right-left, bottom-top);
-			GUI.Box(rect, "");
+			GuiPlus.Box(rect, "");
 			if (!clearedSelectionSinceBoxStart && !Input.GetButton("Ctrl")){
 				clearedSelectionSinceBoxStart = true;
 				clearSelectedNodes();

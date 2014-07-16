@@ -64,7 +64,7 @@ class Dropdown extends MonoBehaviour {
 			//Draw the dropdown button
 			var position = optionBox.position;
 			GUI.skin.button.alignment = TextAnchor.MiddleRight; //right-align the arrow.
-			if (GUI.Button(position, s_dropdownArrow)) {
+			if (GuiPlus.Button(position, s_dropdownArrow)) {
 				optionBox.open = !optionBox.open;
 			}
 
@@ -73,11 +73,10 @@ class Dropdown extends MonoBehaviour {
 			var selectedIndex = dropdown.selectedIndex;
 			var blankText = dropdown.blankText;
 			var selectedText = (selectedIndex < 0 || selectedIndex > options.length) ? blankText : options[selectedIndex];
-			GUI.Label(position, selectedText);
+			GuiPlus.Label(position, selectedText);
 
 			//show the other options if dropdown is open.
 			if (optionBox.open) {
-				GUI.depth = 2; //open dropdowns should be on "top"
 
 				var outerBox = new Rect(position.x, position.y + position.height, position.width, dropdown.dropHeight);
 				var requiredHeight = options.length * position.height;
@@ -93,8 +92,9 @@ class Dropdown extends MonoBehaviour {
 				}
 
 				//Draw a Box to darken the background behind the buttons.
-				GUI.Box(outerBox, "");
-				GUI.Box(outerBox, "");
+				GUI.depth = oldDepth+2; //open dropdowns should be on "top"
+				GuiPlus.Box(outerBox, "");
+				GuiPlus.Box(outerBox, "");
 
 				// Check if the user has clicked outside to close the menu
 				if (Input.GetMouseButtonDown(0)) {
@@ -110,7 +110,7 @@ class Dropdown extends MonoBehaviour {
 				//Create a scroll pane the size of the outer box.
 				var innerBox = new Rect(0, 0, position.width-3, requiredHeight);
 				
-				dropdown.scrollPosition = GUI.BeginScrollView (outerBox, 
+				dropdown.scrollPosition = GuiPlus.BeginScrollView (outerBox, 
 						dropdown.scrollPosition, innerBox);
 
 					position.x = position.y = 0; //move to the top left of the scrollable pane.
@@ -122,7 +122,8 @@ class Dropdown extends MonoBehaviour {
 
 					//Create a button for the blank option.
 					GUI.skin.button.alignment = TextAnchor.MiddleCenter; //center the contents (since the arrow was right-aligned)
-					if (GUI.Button(position, "- " * (hypenCount * hypenRatio))) {
+					GUI.depth = oldDepth+3;
+					if (GuiPlus.Button(position, "- " * (hypenCount * hypenRatio))) {
 						optionBox.open = false;
 						dropdown.selectedIndex = -1;
 					}
@@ -131,7 +132,7 @@ class Dropdown extends MonoBehaviour {
 					for (var optionIndex = 0 ; optionIndex < options.length ; optionIndex ++) {
 
 						//Create a button for the current option.
-						if (GUI.Button(position, options[optionIndex])) {
+						if (GuiPlus.Button(position, options[optionIndex])) {
 							optionBox.open = false;
 							dropdown.selectedIndex = optionIndex;
 						}
@@ -140,7 +141,7 @@ class Dropdown extends MonoBehaviour {
 						position.y += position.height;
 					}
 
-				GUI.EndScrollView();
+				GuiPlus.EndScrollView();
 			} //end if (optionBox.open && dropdown.showing)
 		} //end loop over optionboxes
 

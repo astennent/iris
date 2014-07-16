@@ -45,7 +45,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 	function DrawColoringMethodSelection(cur_y : int) {
 		var is_fallback = rule.isFallback();
 		var box_height = (is_fallback) ? 80 : 100;
-		GUI.Box(Rect(x+5, cur_y, width-10, box_height), "");
+		GuiPlus.Box(Rect(x+5, cur_y, width-10, box_height), "");
 		var toggle_rect = new Rect(x+20, cur_y+10, width, 20);
 
 		var current_method = rule.getColoringMethod();
@@ -59,7 +59,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 				continue;
 			}
 
-			if (GUI.Toggle(toggle_rect, current_method==i, coloring_method_name) && current_method != i){
+			if (GuiPlus.Toggle(toggle_rect, current_method==i, coloring_method_name) && current_method != i){
 				rule.setColoringMethod(i);
 			}
 			toggle_rect.y+=20;
@@ -74,7 +74,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 
 		cur_y += 190;
 		var original_variation = rule.variation;
-		GUI.Label(new Rect(x+10, cur_y, 130, 20), "Randomness: " + rule.variation.ToString("f2"));
+		GuiPlus.Label(new Rect(x+10, cur_y, 130, 20), "Randomness: " + rule.variation.ToString("f2"));
 		rule.variation = GUI.HorizontalSlider(Rect(x+130, cur_y+5, width-140, 20), rule.variation, 0.0, 1.0);
 
 		if (rule.color != original_color || rule.variation != original_variation){
@@ -89,7 +89,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 
 		var schemeNames = ColorController.getSchemeNames();
 
-		schemeScrollPosition = GUI.BeginScrollView (Rect (x,y,width,MenuController.getScreenHeight()-33), 
+		schemeScrollPosition = GuiPlus.BeginScrollView (Rect (x,y,width,MenuController.getScreenHeight()-33), 
 			schemeScrollPosition, Rect (0, 0, width, 30*schemeNames.length+20));
 
 		var cur_y = 0;
@@ -105,13 +105,13 @@ class ColorRuleOptionsMenu extends BaseMenu {
 				GUI.color = Color.white; 
 			}
 
-			if (GUI.Button(schemeRect, schemeName)){
+			if (GuiPlus.Button(schemeRect, schemeName)){
 				rule.setScheme(i);
 			}
 			cur_y+=30;
 		}
 		GUI.color = Color.white;
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 		y+=cur_y;
 		return y;
 	}
@@ -119,7 +119,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 	function DrawCentrality(cur_y : int) {
 		cur_y += 5;
 
-		GUI.Box(Rect(x+5, cur_y, width-10, 155), "");
+		GuiPlus.Box(Rect(x+5, cur_y, width-10, 155), "");
 		var centrality_types = CentralityController.centrality_types;
 
 		var wasInverted = rule.getInvertCentrality();
@@ -130,22 +130,22 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		}
 
 		cur_y+=5;
-		GUI.Label(new Rect(x+10, cur_y, 85, 20), "Invert Colors: ");
-		if (GUI.Toggle(new Rect(x+95, cur_y, width, 20), wasInverted, inversion_text) != wasInverted){
+		GuiPlus.Label(new Rect(x+10, cur_y, 85, 20), "Invert Colors: ");
+		if (GuiPlus.Toggle(new Rect(x+95, cur_y, width, 20), wasInverted, inversion_text) != wasInverted){
 			rule.toggleInvertCentrality();
 		}
 		cur_y += 20;
 		var inter_cluster = rule.getInterCluster();
-		if (GUI.Toggle(new Rect(x+10, cur_y, width/2-20, 20), inter_cluster, " Inter-Cluster")  && !inter_cluster) {
+		if (GuiPlus.Toggle(new Rect(x+10, cur_y, width/2-20, 20), inter_cluster, " Inter-Cluster")  && !inter_cluster) {
 			rule.toggleInterCluster();
 		} 
-		if (GUI.Toggle(new Rect(x+width/2, cur_y, width/2, 20), !inter_cluster, " Intra-Cluster") && inter_cluster) {
+		if (GuiPlus.Toggle(new Rect(x+width/2, cur_y, width/2, 20), !inter_cluster, " Intra-Cluster") && inter_cluster) {
 			rule.toggleInterCluster();
 		}
 
 		cur_y += 25;
 
-		GUI.Label(new Rect(x+10, cur_y, 120, 20), "Centrality Method: ");
+		GuiPlus.Label(new Rect(x+10, cur_y, 120, 20), "Centrality Method: ");
 		cur_y += 20;
 
 		for (var index : int = 0 ; index < centrality_types.length ; index++){
@@ -157,7 +157,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 				GUI.color = Color.white;
 			}		
 
-			if (GUI.Toggle(new Rect(x+15, cur_y, width, 20), selected, centrality_types[index]) && !selected ) {
+			if (GuiPlus.Toggle(new Rect(x+15, cur_y, width, 20), selected, centrality_types[index]) && !selected ) {
 				rule.setCentralityType(index);
 			}
 			cur_y +=20;
@@ -172,7 +172,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		var scrollBoxHeight = 200;
 		var outerBox = new Rect(x+5, cur_y, width-10, scrollBoxHeight);
 
-		GUI.Box(outerBox, "");
+		GuiPlus.Box(outerBox, "");
 		var line_count = 0;
 
 		for (var file : DataFile in FileManager.files){
@@ -182,14 +182,14 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		var innerBoxWidth = (line_count*20 + 20 < scrollBoxHeight) ? outerBox.width-5 : outerBox.width-23;
 		var innerBox = new Rect(0, 0, innerBoxWidth, 20*line_count);
 
-		attributeScrollPosition = GUI.BeginScrollView (outerBox, attributeScrollPosition, innerBox);
+		attributeScrollPosition = GuiPlus.BeginScrollView (outerBox, attributeScrollPosition, innerBox);
 			var scroll_y = 0;
 			for (var file : DataFile in FileManager.files){
-				GUI.Label(Rect (5, scroll_y, width-5, 20), file.shortName() + ":");
+				GuiPlus.Label(Rect (5, scroll_y, width-5, 20), file.shortName() + ":");
 				scroll_y += 20;
 
 				for (var attribute in file.getAttributes()){
-					if (GUI.Toggle (Rect (5, scroll_y, width-5, 20), (attribute == rule.getContinuousAttribute()), attribute.getColumnName())){
+					if (GuiPlus.Toggle (Rect (5, scroll_y, width-5, 20), (attribute == rule.getContinuousAttribute()), attribute.getColumnName())){
 						if (rule.getContinuousAttribute() != attribute) {
 							rule.setContinuousAttribute(attribute);
 						}
@@ -199,19 +199,19 @@ class ColorRuleOptionsMenu extends BaseMenu {
 				scroll_y += 20;
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 		return cur_y + scrollBoxHeight;
 	}
 
 	function DrawHaloOptions (cur_y : int) {
 		cur_y += 5;
-		GUI.Box(Rect(x+5, cur_y, width-10, 30), "");
+		GuiPlus.Box(Rect(x+5, cur_y, width-10, 30), "");
 		cur_y+=5;
 		var original_node = rule.coloring_node;
 		var original_halo = rule.coloring_halo;
 
-		rule.coloring_node = GUI.Toggle (Rect (x+width/2+10, cur_y, width/2-10, 20), rule.coloring_node, " Color Node");
-		rule.coloring_halo = GUI.Toggle (Rect (x+10, cur_y, width/2-10, 20), rule.coloring_halo, " Color Halo");
+		rule.coloring_node = GuiPlus.Toggle (Rect (x+width/2+10, cur_y, width/2-10, 20), rule.coloring_node, " Color Node");
+		rule.coloring_halo = GuiPlus.Toggle (Rect (x+10, cur_y, width/2-10, 20), rule.coloring_halo, " Color Halo");
 
 		if ( (!rule.coloring_halo && original_halo) || (!rule.coloring_node && original_node)) {
 			ColorController.ApplyAllRules(true, false);
@@ -232,7 +232,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		} else {
 			changingText = " Not changing node size.";
 		}
-		if (GUI.Toggle(Rect (x+10, cur_y, width-20, 20), wasChangingSize, changingText) != wasChangingSize) {
+		if (GuiPlus.Toggle(Rect (x+10, cur_y, width-20, 20), wasChangingSize, changingText) != wasChangingSize) {
 			rule.setChangingSize(!wasChangingSize);
 			ruleChanged = true;
 		}
@@ -249,7 +249,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 
 		if (rule.isChangingSize() && (rule.getSizingType() == ColorRule.SIZING_ATTRIBUTE || rule.getSizingType() == ColorRule.SIZING_FIXED)) {
 			cur_y += 20;
-			GUI.Label(new Rect(x+10, cur_y, width, 20), "Scale: " + rule.getSizingScale().ToString("f2"));
+			GuiPlus.Label(new Rect(x+10, cur_y, width, 20), "Scale: " + rule.getSizingScale().ToString("f2"));
 			var oldScale = rule.getSizingScale();
 			var newScale = GUI.HorizontalSlider(Rect(x+90, cur_y+5, width-110, 20), oldScale, 0.01, 50.0);
 			if (newScale != oldScale) {

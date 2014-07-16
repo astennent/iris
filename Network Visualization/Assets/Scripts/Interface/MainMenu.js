@@ -40,7 +40,7 @@ class MainMenu extends BaseMenu {
 		
 		GUI.color = Color.white;
 		var button_position : Rect = new Rect(5, MenuController.getScreenTop()+5, 35, 35);
-		if (GUI.Button(button_position, more)){
+		if (GuiPlus.Button(button_position, more)){
 			DisableDisplay(TimeSeriesMenu);
 			ToggleDisplay(MainMenu);
 		}	
@@ -55,14 +55,14 @@ class MainMenu extends BaseMenu {
 			var cur_y = 60 + MenuController.getScreenTop();
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
-			if (GUI.Button(button_position, upload)){
+			if (GuiPlus.Button(button_position, upload)){
 				chooseMenu(FileMenu);
 			}	
 
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(.7, .7, .4);
-			if (GUI.Button(button_position, save)){
+			if (GuiPlus.Button(button_position, save)){
 				WorkspaceManager.toggleSelectingSaveFile();
 			}
 			if (button_position.Contains(mousePosition)){} //TODO: tooltips
@@ -70,7 +70,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
-			if (GUI.Button(button_position, load)){
+			if (GuiPlus.Button(button_position, load)){
 				WorkspaceManager.toggleSelectingLoadFile();				
 			}
 			if (button_position.Contains(mousePosition)){} //TODO: tooltips
@@ -78,7 +78,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 80;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.white;
-			if (GUI.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){
+			if (GuiPlus.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){
 				chooseMenu(SearchMenu);
 			}
 			if (button_position.Contains(mousePosition)){} //TODO: tooltips
@@ -86,7 +86,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.magenta;
-			if (GUI.Button(button_position, display)){
+			if (GuiPlus.Button(button_position, display)){
 				chooseMenu(DisplayMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
@@ -94,7 +94,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.yellow;
-			if (GUI.Button(button_position, gear)){
+			if (GuiPlus.Button(button_position, gear)){
 				chooseMenu(TerminalMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
@@ -103,7 +103,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(1, .7, 0);
-			if (GUI.Button(button_position, graph)){
+			if (GuiPlus.Button(button_position, graph)){
 				chooseMenu(GraphMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
@@ -111,7 +111,7 @@ class MainMenu extends BaseMenu {
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = new Color(.2, .7, .7);
-			if (GUI.Button(button_position, plane)){
+			if (GuiPlus.Button(button_position, plane)){
 				PlanarityController.toggleFlat();
 			}
 			if (button_position.Contains(mousePosition)){}
@@ -127,7 +127,7 @@ class MainMenu extends BaseMenu {
 				lock_pic = locked;
 				tooltip = "Unlock Camera";
 			}
-			if (GUI.Button(button_position, lock_pic)){
+			if (GuiPlus.Button(button_position, lock_pic)){
 				CameraController.toggleFree();
 			}
 
@@ -144,7 +144,7 @@ class MainMenu extends BaseMenu {
 				playpause = pause;
 				tooltip = "Pause";
 			}
-			if (GUI.Button(button_position, playpause)){
+			if (GuiPlus.Button(button_position, playpause)){
 				NetworkController.TogglePause();
 			}
 
@@ -159,7 +159,7 @@ class MainMenu extends BaseMenu {
 			} else {
 				next_speed = NetworkController.gameSpeed*2;
 			}	
-			if (GUI.Button(button_position, ff)){
+			if (GuiPlus.Button(button_position, ff)){
 				NetworkController.gameSpeed=next_speed;
 			}
 				
@@ -167,7 +167,7 @@ class MainMenu extends BaseMenu {
 
 			button_position = new Rect(x+5, Screen.height-50, 35, 35);
 			GUI.color = Attribute.TIME_SERIES_COLOR;
-			if (GUI.Button(button_position, clock)){
+			if (GuiPlus.Button(button_position, clock)){
 				TimeSeriesMenu.ToggleDisplay(TimeSeriesMenu);
 			}
 

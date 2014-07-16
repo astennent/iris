@@ -56,8 +56,8 @@ class TerminalMenu extends BaseMenu {
 		var timeRect = new Rect(x+10, top, 200, headerOptionsHeight-5);
 		var contextRect = new Rect(x+210, top, 200, headerOptionsHeight-5);
 
-		displaying_time = new GUI.Toggle(timeRect, displaying_time, " Display Timestamp");
-		displaying_context = new GUI.Toggle(contextRect, displaying_context, " Display Context");
+		displaying_time = new GuiPlus.Toggle(timeRect, displaying_time, " Display Timestamp");
+		displaying_context = new GuiPlus.Toggle(contextRect, displaying_context, " Display Context");
 	}
 
 	function DrawBuffer(top : float) {
@@ -68,14 +68,10 @@ class TerminalMenu extends BaseMenu {
 		var innerWidth = outerWidth-16;
 		var innerRect = new Rect(0, 0, innerWidth, 20*Terminal.bufferSize());
 
-		bufferScrollPosition = GUI.BeginScrollView (outerRect, 
+		bufferScrollPosition = GuiPlus.BeginScrollView (outerRect, 
 				bufferScrollPosition, innerRect);
 
-			if (displaying_time) {
-				var timeWidth = 70;
-			} else {
-				timeWidth = 0;
-			}
+			var timeWidth = (displaying_time) ? 70 : 0;
 
 			if (displaying_context) {
 				var contextWidth = 120;
@@ -112,7 +108,7 @@ class TerminalMenu extends BaseMenu {
 				textRect.y+=20; timeRect.y+=20; contextRect.y+=20; boxRect.y+=20;
 			}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 	}
 
 	function DrawCommandPrompt(top : float) {
@@ -125,7 +121,7 @@ class TerminalMenu extends BaseMenu {
 		GUI.color = Color.white;
 
 		var promptRect = new Rect(x+5, top, promptWidth, commandPromptHeight);
-		GUI.Label(promptRect, promptLabel);
+		GuiPlus.Label(promptRect, promptLabel);
 
 		// Check if the user pressed Enter, Up, or Down
 		var pressedEnter = false;

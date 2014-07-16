@@ -37,7 +37,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 		var y = 25;
 		for (var i : int = 0 ; i < ColorRule.filter_methods.length ; i++){
 			var type_name : String = ColorRule.filter_methods[i];
-			var selected_current = GUI.Toggle(Rect (x+5, y, width-5, 20), (i == rule.getFilterMethod()), type_name);
+			var selected_current = GuiPlus.Toggle(Rect (x+5, y, width-5, 20), (i == rule.getFilterMethod()), type_name);
 
 			if (selected_current && ! (rule.getFilterMethod() == i)) {
 				rule.setFilterMethod(i);
@@ -47,7 +47,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 
 		var scrollBox = new Rect(x, y, width, 200);
 
-		GUI.Box(scrollBox, "Available Options");
+		GuiPlus.Box(scrollBox, "Available Options");
 		
 		scrollBox.y += 20;
 		scrollBox.height -= 20;
@@ -69,20 +69,20 @@ class ColorRuleFilterMenu extends BaseMenu {
 	function DrawFilterBySource(rule : ColorRule, scrollBox : Rect) {
 		var files = FileManager.files;
 
-		sourceScrollPosition = GUI.BeginScrollView (scrollBox, 
+		sourceScrollPosition = GuiPlus.BeginScrollView (scrollBox, 
 				sourceScrollPosition, Rect (0, 0, width, 20*files.Count+20));
 
 		var temp_y = 0;
 		for (var file : DataFile in files) {
 			var usedSourceBefore = rule.usesSource(file.uuid);
-			var usedSourceAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.uuid)), file.shortName());
+			var usedSourceAfter = GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.uuid)), file.shortName());
 			if (usedSourceAfter != usedSourceBefore) {
 				rule.toggleSource(file.uuid);
 			}			
 			temp_y+=20;
 		}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 	}
 
 	function DrawFilterByCluster(rule : ColorRule, scrollBox : Rect, y : int) {
@@ -94,7 +94,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 		found_unconnected_cluster = false;
 		var cluster_dict = ClusterController.group_dict;
 
-		clusterScrollPosition = GUI.BeginScrollView (scrollBox, 
+		clusterScrollPosition = GuiPlus.BeginScrollView (scrollBox, 
 				clusterScrollPosition, Rect (0, 0, width, 20*cluster_dict.Count+20));
 
 		var temp_y = 0;
@@ -115,7 +115,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 			}
 
 			var usedClusterBefore = rule.usesCluster(cluster_key);
-			var usedClusterAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), rule.usesCluster(cluster_key), display_string);
+			var usedClusterAfter = GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), rule.usesCluster(cluster_key), display_string);
 			if (usedClusterBefore != usedClusterAfter) {
 				rule.toggleCluster(cluster_key);
 			}
@@ -123,7 +123,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 			temp_y+=20;
 		}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 
 		if (found_unconnected_cluster){
 			if (hiding_unconnected_clusters){
@@ -131,7 +131,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 			} else {
 				display_string = "Hide Unconnected Clusters";
 			}
-			if (GUI.Button( new Rect(x, y+20, width-20, 20), display_string)){
+			if (GuiPlus.Button( new Rect(x, y+20, width-20, 20), display_string)){
 				hiding_unconnected_clusters = !hiding_unconnected_clusters;
 			}
 		}
@@ -143,7 +143,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 			line_count += file.getNodes().Count + 3;
 		}
 
-		clusterScrollPosition = GUI.BeginScrollView (scrollBox, 
+		clusterScrollPosition = GuiPlus.BeginScrollView (scrollBox, 
 				clusterScrollPosition, Rect (0, 0, width, 20*line_count+20));
 
 		var temp_y = 0;
@@ -152,7 +152,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 				var node = entry.Value;
 				var key = entry.Key;
 				var usedNodeBefore = rule.usesNode(node);
-				var usedNodeAfter = GUI.Toggle (Rect (5, temp_y, width-5, 20), rule.usesNode(node), key);
+				var usedNodeAfter = GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), rule.usesNode(node), key);
 				if (usedNodeBefore != usedNodeAfter) {
 					rule.toggleNode(node);
 				}
@@ -161,7 +161,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 			
 		}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 	}
 
 	function DrawFilterByAttribute(rule : ColorRule, scrollBox : Rect, y:int) {
@@ -170,17 +170,17 @@ class ColorRuleFilterMenu extends BaseMenu {
 			line_count += file.getAttributeCount() + 1;
 		}
 
-		attributeScrollPosition = GUI.BeginScrollView (scrollBox, 
+		attributeScrollPosition = GuiPlus.BeginScrollView (scrollBox, 
 				attributeScrollPosition, Rect (0, 0, width, 20*line_count+20));
 
 		var temp_y = -20;
 		for (var file : DataFile in FileManager.files){
 			temp_y += 20;
-			GUI.Label(Rect (5, temp_y, width-5, 20), file.shortName() + ":");
+			GuiPlus.Label(Rect (5, temp_y, width-5, 20), file.shortName() + ":");
 			temp_y += 20;
 
 			for (var attribute in file.getAttributes()){
-				if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.getAttribute()), attribute.getColumnName())){
+				if (GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), (attribute == rule.getAttribute()), attribute.getColumnName())){
 					if (attribute != rule.getAttribute()) {
 						updateCachedAttributeValues(attribute);
 					}
@@ -190,11 +190,11 @@ class ColorRuleFilterMenu extends BaseMenu {
 			}
 		}
 
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 		y+=200;
 
 		scrollBox = new Rect(x, y, width, 120);
-		GUI.Box(scrollBox, "Available Values");
+		GuiPlus.Box(scrollBox, "Available Values");
 
 		var searchRect = new Rect(x, y+20, width-10, 20);
 		searchString = GUI.TextField(searchRect, searchString, 20);
@@ -208,13 +208,13 @@ class ColorRuleFilterMenu extends BaseMenu {
 
 		line_count = Mathf.Min(20, attributeMatchCount);
 
-		attributeScrollPosition2 = GUI.BeginScrollView (scrollBox, 
+		attributeScrollPosition2 = GuiPlus.BeginScrollView (scrollBox, 
 			attributeScrollPosition2, Rect (0, 0, width, 20*line_count+40));
 		
 		temp_y = 0;
 
 		for (var value in attributeValueCache){
-			if (GUI.Toggle (Rect (5, temp_y, width-5, 20), (value == rule.getAttributeValue()), value)){
+			if (GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), (value == rule.getAttributeValue()), value)){
 				rule.setAttributeValue(value);
 			}
 			temp_y += 20;
@@ -222,14 +222,14 @@ class ColorRuleFilterMenu extends BaseMenu {
 
 		var message_box = new Rect(5, temp_y, width-5, 20);
 		if (rule.getAttribute() == null){
-			GUI.Label(message_box, "Select an attribute");
+			GuiPlus.Label(message_box, "Select an attribute");
 		} else if (attributeMatchCount == 0){
-			GUI.Label(message_box, "No Matches");
+			GuiPlus.Label(message_box, "No Matches");
 		} else if (attributeMatchCount > 20){
-			GUI.Label(message_box, attributeMatchCount-20 + " more...");
+			GuiPlus.Label(message_box, attributeMatchCount-20 + " more...");
 		}
 			
-		GUI.EndScrollView();
+		GuiPlus.EndScrollView();
 	}
 
 	static function updateCachedAttributeValues(attribute : Attribute){

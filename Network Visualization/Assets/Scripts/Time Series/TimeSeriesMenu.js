@@ -39,7 +39,7 @@ public class TimeSeriesMenu extends BaseMenu {
 			enableText = "Enable\nTime Series";
 		}
 
-		if (GUI.Button(enableRect, enableText)){
+		if (GuiPlus.Button(enableRect, enableText)){
 			TimeSeriesController.toggleEnabled();
 		}
 		GUI.color = Color.white;
@@ -66,17 +66,17 @@ public class TimeSeriesMenu extends BaseMenu {
 		var timeLineBox = new Rect(lineX, y+10, lineWidth, height-20);
 
 		GUI.color = new Color(1, 1, 1, .5);
-		GUI.Box(timeLineBox, "");
+		GuiPlus.Box(timeLineBox, "");
 		GUI.color = Color.white;
 
 		var dates = TimeSeriesController.getDates(lineWidth);
 		
 		//Stop if there are less than two dates.
 		if (dates.Count == 0) {
-			GUI.Label(timeLineBox, "No valid dates found.", centeredStyle);
+			GuiPlus.Label(timeLineBox, "No valid dates found.", centeredStyle);
 			return;
 		} else if (dates.Count == 1) {
-			GUI.Label(timeLineBox, ""+dates[0], centeredStyle);
+			GuiPlus.Label(timeLineBox, ""+dates[0], centeredStyle);
 			return;
 		}
 
@@ -89,7 +89,7 @@ public class TimeSeriesMenu extends BaseMenu {
 			var ratio : float = dateRatio.ratio;
 			var date_x = lineX + ratio*lineWidth;
 			var rect = new Rect(date_x-5, timeLineBox.y, 10, timeLineBox.height);
-			if (GUI.Button(rect, "")) {
+			if (GuiPlus.Button(rect, "")) {
 				locked = true;
 				TimeSeriesController.setCurrentDate(dateRatio.date);
 			}
@@ -99,7 +99,7 @@ public class TimeSeriesMenu extends BaseMenu {
 
 		//Draw Current Date
 		var current_date_text = getDateText(TimeSeriesController.getCurrentDate());
-		GUI.Label(timeLineBox, current_date_text, centeredStyle);
+		GuiPlus.Label(timeLineBox, current_date_text, centeredStyle);
 
 		//Restore Alignment.
 		centeredStyle.alignment = oldAlignment;
@@ -126,7 +126,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		if (TimeSeriesController.getEnabled()) {
 			GUI.color = Attribute.TIME_SERIES_COLOR;
 		}
-		GUI.Button(sliderRect, ""); 
+		GuiPlus.Button(sliderRect, ""); 
 		GUI.color = Color.white;
 
 		//Decide if it should be sliding next frame.
@@ -150,7 +150,7 @@ public class TimeSeriesMenu extends BaseMenu {
 		var buttonSide = (width*.15 - 30)/3;
 		var buttonRect = new Rect(buttonLeft+5, y+(Screen.height - y - buttonSide)/2 , buttonSide, buttonSide);
 		//BackButton
-		if (GUI.Button(buttonRect, prev)) {
+		if (GuiPlus.Button(buttonRect, prev)) {
 			TimeSeriesController.skipToPrev();
 		}
 
@@ -160,12 +160,12 @@ public class TimeSeriesMenu extends BaseMenu {
 		} else {
 			image = play;
 		}
-		if (GUI.Button(buttonRect, image)) {
+		if (GuiPlus.Button(buttonRect, image)) {
 			TimeSeriesController.togglePlaying();
 		}
 
 		buttonRect.x+=buttonSide+5;
-		if (GUI.Button(buttonRect, next)) {
+		if (GuiPlus.Button(buttonRect, next)) {
 			TimeSeriesController.skipToNext();
 		}
 	}
