@@ -4,6 +4,8 @@ public class GuiPlus extends MonoBehaviour {
 	private static var functionQueue = new List.<GUIFunction>();
 	static var seenDepths = new HashSet.<int>();
 
+	private static var scrollPaneStack = new LinkedList.<Vector2>();
+
 	static var BEGIN_SCROLL_VIEW = 0;
 	static var END_SCROLL_VIEW = 1;
 	static var BUTTON = 2;
@@ -11,10 +13,18 @@ public class GuiPlus extends MonoBehaviour {
 	static var LABEL = 4;
 	static var TOGGLE = 5;
 
+	function LateUpdate(){
+		boxes = new List.<Rect>(); //TODO: Move this to OnGUI?
+		functionQueue.Clear();
+		seenDepths.Clear();
+	}
+
+
+	////////////////// Extra GuiPlus functions /////////////////////////
+
 	static function isBlocked() {
+		var mousePosition = getMousePosition();
 		for (var box in boxes) {
-			var mousePosition = Input.mousePosition;
-			mousePosition.y = Screen.height - mousePosition.y; //Stupid unity.
 			if (box.Contains(mousePosition)){
 				return true;
 			}
@@ -22,11 +32,18 @@ public class GuiPlus extends MonoBehaviour {
 		return false;
 	}
 
-	function LateUpdate(){
-		boxes = new List.<Rect>(); //TODO: Move this to OnGUI?
-		functionQueue.Clear();
-		seenDepths.Clear();
+	//Returns the coordinates of the mouse position with respect to the scroll panes.
+	static function getMousePosition() : Vector2{
+		var mousePosition = Input.mousePosition;
+		mousePosition.y = Screen.height - mousePosition.y; 	
+
+		for (var topLeftCornerCoords in scrollPaneStack) {
+			mousePosition -= topLeftCornerCoords;
+		}
+
+		return mousePosition;
 	}
+
 
 	///////////////// BEGIN GUIPLUS FUNCTION PASSTHROUGHS /////////////////
 
@@ -51,10 +68,20 @@ public class GuiPlus extends MonoBehaviour {
 		return guiFunction.execute(true);
 	}
 
+	static function Button(param0, param1, param2) : boolean {
+		var guiFunction =  new GUIFunction(BUTTON, param0, param1, param2);
+		functionQueue.Add(guiFunction);
+		return guiFunction.execute(true);
+	}
+
 	static function BeginScrollView(outerBox : Rect, scrollPosition : Vector2, innerBox : Rect) : Vector2 {
 		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, outerBox, scrollPosition, innerBox);
 		guiFunction.isScrollPane = true;
 		functionQueue.Add(guiFunction);
+
+		//Append to the end of the scroll stack.
+		scrollPaneStack.AddLast(new Vector2(outerBox.x, outerBox.y)); 
+
 		return guiFunction.execute(true);
 	}
 
@@ -62,6 +89,10 @@ public class GuiPlus extends MonoBehaviour {
 		var guiFunction = new GUIFunction(END_SCROLL_VIEW);
 		guiFunction.isScrollPane = true;
 		functionQueue.Add(guiFunction);
+
+		//Pop from the end of the scroll stack.
+		scrollPaneStack.RemoveLast(); 
+
 		guiFunction.execute(true);
 	}
 
@@ -200,38 +231,38 @@ public class GuiPlus extends MonoBehaviour {
 		}
 
 		private function Draw() {
-			if (args.length == 0) {
-				if (func == END_SCROLL_VIEW) {
+			var result : Object;
+			switch (func) {
+				case (BEGIN_SCROLL_VIEW):
+					result = GUI.BeginScrollView(args[0], args[1], args[2]);
+					break;
+				case (END_SCROLL_VIEW):
 					GUI.EndScrollView();
-					return;
-				}
-				throw("I don't know that function! Add me: " + func);
-			} else if (args.length == 1) {
-				throw("I don't know that function! Add me: " + func);
-			} else if (args.length == 2) {
-				if (func == BUTTON) {
-					return GUI.Button(args[0], args[1]);
-				} else if (func == BOX) {
-					return GUI.Box(args[0], args[1]);
-				} else if (func == LABEL) {
-					GUI.Label(args[0], args[1]);
-					return;
-				}
-				throw("I don't know that function! Add me: " + func);
-			} else if (args.length == 3) {
-				if (func == BEGIN_SCROLL_VIEW) {
-					return GUI.BeginScrollView(args[0], args[1], args[2]);
-				} else if (func == TOGGLE) {
-					return GUI.Toggle(args[0], args[1], args[2]);
-				} else if (func == LABEL) {
-					GUI.Label(args[0], args[1], args[2]);
-					return;
-				}
-				throw("I don't know that function! Add me: " + func);
-			} else {
-				throw("I don't support that many arguments! Time to add more.");
-			}
-			return null;
+					break;
+				case (BUTTON): 
+					if (args.length == 2) {
+						result = GUI.Button(args[0], args[1]);
+					} else if (args.length == 3) {
+						result = GUI.Button(args[0], args[1], args[2]);
+					}
+					break;
+				case (BOX):
+					result = GUI.Box(args[0], args[1]);
+					break;
+				case (LABEL):
+					if (args.length == 2) {
+						GUI.Label(args[0], args[1]);
+					} else if (args.length == 3) {
+						GUI.Label(args[0], args[1], args[2]);
+					}
+					break;
+				case (TOGGLE):
+					result = GUI.Toggle(args[0], args[1], args[2]);
+					break;
+				default:
+					throw("I don't support that function! Time to add more.");
+			} 
+			return result;
 		}
 
 	}

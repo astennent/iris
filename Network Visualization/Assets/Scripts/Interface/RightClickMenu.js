@@ -35,8 +35,7 @@ class RightClickMenu extends MonoBehaviour {
 
 			//decides when to close the menu.
 			var menuRect = new Rect(x, y, width, height);
-			var mouseCoords = Input.mousePosition;
-			mouseCoords.y = Screen.height - mouseCoords.y;
+			var mouseCoords = GuiPlus.getMousePosition();
 			if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && !menuRect.Contains(mouseCoords) && Time.time - lastClickTime > 0.5 ||
 					Input.GetButtonDown("Escape")) {
 		    	DisableDisplay();

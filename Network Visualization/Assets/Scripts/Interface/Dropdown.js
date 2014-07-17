@@ -17,19 +17,20 @@ class Dropdown extends MonoBehaviour {
 
 	//Called in the OnGUI function of other scripts.
 	static function Select(position : Rect, dropHeight : int, options : String[], selectedIndex : int, id : String, blankText : String) {
+		var dropdown : DropdownMenu;
 		if (!dropdowns.ContainsKey(id)) {
-			dropdowns[id] = new DropdownMenu(position, dropHeight, options, selectedIndex, id, blankText);
-			return selectedIndex;
+			dropdown = new DropdownMenu(position, dropHeight, options, selectedIndex, id, blankText);
+			dropdowns[id] = dropdown;
 		} else {
-			var dropdown = dropdowns[id];
+			dropdown = dropdowns[id];
 			dropdown.showing = true;
 			dropdown.addPosition(position);
 			dropdown.dropHeight = dropHeight;
 			dropdown.options = options;
 			dropdown.blankText = blankText;
-			DrawDropdown(dropdown);
-			return dropdown.selectedIndex;
 		}
+		DrawDropdown(dropdown);
+		return dropdown.selectedIndex;
 	}
 
 	static function setSelectedIndex(id : String, selectedIndex : int) {
@@ -52,19 +53,14 @@ class Dropdown extends MonoBehaviour {
 		//Set special GUI properties.
 		var oldDepth = GUI.depth;
 
-		//aligns the arrow image to the right side and the label to the center.
-		var oldButtonAlignment = GUI.skin.button.alignment;
-		var oldLabelAlignment = GUI.skin.label.alignment;
-		GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-
-
 		//Note that most of the time there will only be one optionBox displayed.
 		for (var optionBox in dropdown.optionBoxes) {
 
 			//Draw the dropdown button
 			var position = optionBox.position;
-			GUI.skin.button.alignment = TextAnchor.MiddleRight; //right-align the arrow.
-			if (GuiPlus.Button(position, s_dropdownArrow)) {
+			var rightAlignStyle = new GUIStyle(GUI.skin.button);
+			rightAlignStyle.alignment = TextAnchor.MiddleRight; //right-align the arrow.
+			if (GuiPlus.Button(position, s_dropdownArrow, rightAlignStyle)) {
 				optionBox.open = !optionBox.open;
 			}
 
@@ -73,11 +69,13 @@ class Dropdown extends MonoBehaviour {
 			var selectedIndex = dropdown.selectedIndex;
 			var blankText = dropdown.blankText;
 			var selectedText = (selectedIndex < 0 || selectedIndex > options.length) ? blankText : options[selectedIndex];
-			GuiPlus.Label(position, selectedText);
+
+			var centerAlignStyle = new GUIStyle(GUI.skin.label);
+			centerAlignStyle.alignment = TextAnchor.MiddleCenter; //right-align the arrow.
+			GuiPlus.Label(position, selectedText, centerAlignStyle);
 
 			//show the other options if dropdown is open.
 			if (optionBox.open) {
-
 				var outerBox = new Rect(position.x, position.y + position.height, position.width, dropdown.dropHeight);
 				var requiredHeight = options.length * position.height;
 				
@@ -98,8 +96,7 @@ class Dropdown extends MonoBehaviour {
 
 				// Check if the user has clicked outside to close the menu
 				if (Input.GetMouseButtonDown(0)) {
-					var mousePosition = Input.mousePosition;
-					mousePosition.y = Screen.height - mousePosition.y; 	
+					var mousePosition = GuiPlus.getMousePosition();
 
 					// The mouse is in neither the optionBox nor in any of the dropdown buttons
 					if (!outerBox.Contains(mousePosition) && !position.Contains(mousePosition)) {
@@ -121,8 +118,6 @@ class Dropdown extends MonoBehaviour {
 					var hypenRatio = 1.3; //arbitrary number that looks pretty good.
 
 					//Create a button for the blank option.
-					GUI.skin.button.alignment = TextAnchor.MiddleCenter; //center the contents (since the arrow was right-aligned)
-					GUI.depth = oldDepth+3;
 					if (GuiPlus.Button(position, "- " * (hypenCount * hypenRatio))) {
 						optionBox.open = false;
 						dropdown.selectedIndex = -1;
@@ -145,10 +140,6 @@ class Dropdown extends MonoBehaviour {
 			} //end if (optionBox.open && dropdown.showing)
 		} //end loop over optionboxes
 
-
-		//Restore alignment
-		GUI.skin.button.alignment = oldButtonAlignment;
-		GUI.skin.label.alignment = oldLabelAlignment;
 
 		//Restore GUI properties
 		GUI.depth = oldDepth;

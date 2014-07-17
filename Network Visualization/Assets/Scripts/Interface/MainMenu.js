@@ -33,8 +33,7 @@ class MainMenu extends BaseMenu {
 		var centeredStyle = GUI.skin.GetStyle("Label");
 		centeredStyle.alignment = TextAnchor.MiddleLeft;
 		
-		var mousePosition = Input.mousePosition;
-		mousePosition.y = Screen.height - mousePosition.y;
+		var mousePosition = GuiPlus.getMousePosition();
 		
 		var label_position : Rect = new Rect(50, 0, 100, 35);
 		

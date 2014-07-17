@@ -107,8 +107,7 @@ private function ProcessBoxing(){
 private function startBoxing() {
 	boxing = true;
 	clearedSelectionSinceBoxStart = false;
-	startCoords = Input.mousePosition;
-	startCoords.y = Screen.height - startCoords.y; //stupid unity.
+	startCoords = GuiPlus.getMousePosition();
 }
 
 private function stopBoxing(){
@@ -123,8 +122,7 @@ static function isDragging() {
 function OnGUI(){
 	if (boxing){
 		GUI.color = Color.red;
-		var mouseCoords = Input.mousePosition;
-		mouseCoords.y = Screen.height - mouseCoords.y; //stupid unity.
+		var mouseCoords = GuiPlus.getMousePosition();
 
 		var left = Mathf.Min(mouseCoords.x, startCoords.x);
 		var right = Mathf.Max(mouseCoords.x, startCoords.x);
@@ -147,9 +145,8 @@ private function selectBoxedItems(){
 		clearSelectedNodes();
 	}
 
-	var mouseCoords = Input.mousePosition;
-	mouseCoords.y = Screen.height - mouseCoords.y; //stupid unity.
-
+	var mouseCoords = GuiPlus.getMousePosition();
+	
 	var left = Mathf.Min(mouseCoords.x, startCoords.x);
 	var right = Mathf.Max(mouseCoords.x, startCoords.x);
 	var top = Mathf.Min(mouseCoords.y, startCoords.y);

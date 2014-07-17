@@ -103,15 +103,12 @@ public class TimeSeriesMenu extends BaseMenu {
 
 		//Restore Alignment.
 		centeredStyle.alignment = oldAlignment;
-
-
 	}
 
 	function DrawSlider(timeLineBox : Rect, locked : boolean) {
 
 		var sliderX : int;
-		var mousePosition = Input.mousePosition;
-		mousePosition.y = Screen.height - mousePosition.y; //Stupid Unity.
+		var mousePosition = GuiPlus.getMousePosition();
 
 		if (sliding) {
 			sliderX = Mathf.Clamp(mousePosition.x, timeLineBox.x, timeLineBox.x+timeLineBox.width);
