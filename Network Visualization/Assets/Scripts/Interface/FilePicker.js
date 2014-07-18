@@ -20,8 +20,10 @@ class FilePicker extends MonoBehaviour {
 	static var matching_directories = new LinkedList.<Icon>();
 	static var matching_files = new LinkedList.<Icon>();
 
-	static var iconSize = 70; 
-	static var iconNameHeight = 45;
+	static var gridIconSize = 70; 
+	static var gridIconNameHeight = 45;
+	static var listIconSize = 30;
+
 	static var textRectHeight = 25;
 
 	static var selectButtonsHeight = 40;
@@ -40,6 +42,9 @@ class FilePicker extends MonoBehaviour {
 	static var onSelectFunction : Function;
 	static var onCancelFunction : Function;
 	static var title : String;
+
+	// Toggles between icons and a list.
+	private static var isUsingListView : boolean = true;
 
 	function Start() {
 		folderTexture_s = folderTexture;
@@ -162,17 +167,24 @@ class FilePicker extends MonoBehaviour {
 
 		var innerWidth = scrollOuterRect.width-scrollbarAdjust;
 		var numIcons = matching_directories.Count + matching_files.Count;
+		var iconSize = getIconSize();
+		var iconNameHeight = (isUsingListView) ? 0 : gridIconNameHeight;
 		
-		//Calculate the number of icons in a row
-		var iconsPerRow = 0;
-		var iconRight = margin + iconSize;
-		while (iconRight < innerWidth) {
-			iconRight += iconSize + padding;
-			iconsPerRow++;
-		}
+		//Calculate the number of icons in a row.
+		var iconsPerRow : int;
+		if (isUsingListView) {
+			iconsPerRow = 1;
+		} else {
+			iconsPerRow = 0;
+			var iconRight = margin + iconSize;
+			while (iconRight < innerWidth) {
+				iconRight += iconSize + padding;
+				iconsPerRow++;
+			}
 
-		//Ensure there is at least 1 icon, even if it's huge.
-		iconsPerRow = Mathf.Max(1, iconsPerRow);
+			//Ensure there is at least 1 icon, even if it's huge.
+			iconsPerRow = Mathf.Max(1, iconsPerRow);
+		}
 
 
 		var numRows = (numIcons+iconsPerRow-1)/iconsPerRow;
@@ -213,18 +225,31 @@ class FilePicker extends MonoBehaviour {
 
 					//Adjust label
 					var textRect = buttonRect;
-					textRect.y += buttonRect.height;
-					textRect.height = iconNameHeight;
+
+					if (isUsingListView) {
+						var labelBuffer = 5;
+						textRect.width = innerWidth - iconSize - 2*labelBuffer;
+						textRect.x = margin + padding + iconSize + labelBuffer;
+					} else {
+						textRect.y += buttonRect.height;
+						textRect.height = gridIconNameHeight;
+					}
 					
 					//Determine the color of the button
 					GUI.color = icon.getColor();
 
 					// Calculate the size of the box around the icon.
 					var selectRect = buttonRect;
-					selectRect.height+=textRect.height+4;
-					selectRect.x -= 2;
-					selectRect.width += 4;
-					selectRect.y -= 2;
+
+					if (isUsingListView) {
+						selectRect.width = innerWidth - iconSize - padding - 4;
+						selectRect.x = margin + padding + iconSize - padding;
+					} else {
+						selectRect.height+=textRect.height+4;
+						selectRect.x -= 2;
+						selectRect.width += 4;
+						selectRect.y -= 2;
+					}
 
 					//Render box if selected
 					if (selected) {
@@ -277,13 +302,29 @@ class FilePicker extends MonoBehaviour {
 		focusHeader();
 	}
 
+	private static function getIconSize() {
+		return (isUsingListView) ? listIconSize : gridIconSize;
+	}
+
 	static function DrawSelectButtons(cur_y : float) {
 
 		var titleRect = new Rect(10, cur_y, 500, selectButtonsHeight-10);
 		GuiPlus.Label(titleRect, title);
 
+		var styleIconSize = selectButtonsHeight-10;
+		var styleIconRect = new Rect(outerRect.width-270, cur_y, styleIconSize, styleIconSize);
+		
+		// TODO: Icons....
+		if (GUI.Button(styleIconRect, "L")) {
+			isUsingListView = true;
+		} 
+		styleIconRect.x += styleIconSize;
+		if (GUI.Button(styleIconRect, "G")) {
+			isUsingListView = false;
+		} 
+
 		var buttonWidth = 80;
-		var buttonRect = new Rect(outerRect.width-175, cur_y, buttonWidth, selectButtonsHeight-10);
+		var buttonRect = new Rect(outerRect.width-175, cur_y, buttonWidth, styleIconSize);
 		if (GuiPlus.Button(buttonRect, "Select")) {
 			onSelectFunction();
 			clearFunctions();
@@ -579,6 +620,7 @@ class FilePicker extends MonoBehaviour {
 		function getAndUpdateLocation(desiredCoords : Vector2) {
 			//Adjust location
 			currentLocation = Vector2.Lerp(currentLocation, desiredCoords, 0.15);
+			var iconSize = FilePicker.getIconSize();
 			var iconRect = new Rect(currentLocation.x, currentLocation.y, iconSize, iconSize);
 			return iconRect;
 		}
