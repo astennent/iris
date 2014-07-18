@@ -149,14 +149,14 @@ class GraphMenu extends BaseMenu {
 			AxisController.setDrawingAxes(!isDrawingAxes);
 		}
 
-		var gridRect = new Rect(x+width/2+30, cur_y+25, width/2-30, 20);
+		var gridRect = new Rect(x+width/2+15, cur_y+25, width/2-25, 20);
 		var wasDrawingGrid = AxisController.isDrawingGrid();
 		var isDrawingGrid = GuiPlus.LockableToggle(gridRect, wasDrawingGrid, "Draw Grid", !isDrawingAxes);
 		if (wasDrawingGrid != isDrawingGrid) {
 			AxisController.setDrawingGrid(isDrawingGrid);			
 		}
 
-		var labelsRect = new Rect(x+width/2+30, cur_y+45, width/2-30, 20);
+		var labelsRect = new Rect(x+width/2+15, cur_y+45, width/2-25, 20);
 		var wasDrawingLabels = AxisController.isDrawingLabels();
 		var isDrawingLabels = GuiPlus.LockableToggle(labelsRect, wasDrawingLabels, "Draw Labels", !isDrawingAxes);
 		if (wasDrawingLabels != isDrawingLabels) {

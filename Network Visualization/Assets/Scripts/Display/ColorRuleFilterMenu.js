@@ -45,12 +45,12 @@ class ColorRuleFilterMenu extends BaseMenu {
 			y+=20;
 		}
 
-		var scrollBox = new Rect(x, y, width, 200);
+		var scrollBox = new Rect(x, y, width, 205);
 
 		GuiPlus.Box(scrollBox, "Available Options");
 		
-		scrollBox.y += 20;
-		scrollBox.height -= 20;
+		scrollBox.y += 25;
+		scrollBox.height -= 25;
 		var temp_y = 0;
 
 		var rule_type = rule.getFilterMethod(); 

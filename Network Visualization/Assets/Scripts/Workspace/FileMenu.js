@@ -17,6 +17,9 @@ class FileMenu extends BaseMenu {
 	static var selected_file_index : int = -1; //used to decide what to display below the line.
 	static var creating_file : boolean = false;
 
+
+	private static var attrRowHeight = 25;
+
 	function Start(){
 		parent = GetComponent(MainMenu);
 		super.Start();
@@ -107,7 +110,7 @@ class FileMenu extends BaseMenu {
 			title = "Loaded File";
 		}
 		GuiPlus.Box(menuRect, title);
-		cur_y += 20;
+		cur_y += 22;
 		var toggle_box = new Rect(x+5, cur_y, 150, 25);
 		var using_headers = GuiPlus.LockableToggle(toggle_box, file.using_headers, " File uses headers", file.isActivated() || file.isActivating());
 		if (file.using_headers != using_headers){
@@ -146,7 +149,7 @@ class FileMenu extends BaseMenu {
 
 		//File Attributes (columns)
 		attributeScrollPosition = GuiPlus.BeginScrollView (Rect (x+5,cur_y,width-10,MenuController.getScreenHeight()-cur_y-50), 
-			attributeScrollPosition, Rect (0, 0, width-30, 20*file_attributes.Count+20));
+			attributeScrollPosition, Rect (0, 0, width-30, attrRowHeight*(file_attributes.Count+1)));
 		
 		
 		var attribute_y = 0;
@@ -157,7 +160,7 @@ class FileMenu extends BaseMenu {
 			//is shown toggles
 			if (attribute.is_shown){ GUI.color = Attribute.SHOWN_COLOR; } 
 			else { GUI.color = Color.white; }		
-			var is_name_box = new Rect(17, attribute_y, 20, 20);
+			var is_name_box = new Rect(17, attribute_y, 20, attrRowHeight);
 			var is_shown_value = GuiPlus.Toggle (is_name_box, attribute.is_shown, "");	
 			if (is_shown_value != attribute.is_shown){
 				attribute.ToggleShown();
@@ -166,7 +169,7 @@ class FileMenu extends BaseMenu {
 			//pkey toggles
 			if (attribute.is_pkey){ GUI.color = Attribute.PKEY_COLOR; } 
 			else { GUI.color = Color.white; }		
-			var is_pkey_box = new Rect(63, attribute_y, 20, 20);
+			var is_pkey_box = new Rect(63, attribute_y, 20, attrRowHeight);
 			var pkey_value = GuiPlus.LockableToggle (is_pkey_box, attribute.is_pkey, "", file.isActivated() || file.isActivating());	
 			if (pkey_value != attribute.is_pkey){
 				attribute.TogglePkey();
@@ -175,12 +178,13 @@ class FileMenu extends BaseMenu {
 			//attribute buttons			
 			GUI.color = attribute.getAspectColor();			
 			var display_string :String = attribute.getRestrictedName(140);
-	   		if (GuiPlus.Button(new Rect(100, attribute_y, 180, 20), display_string)){
+	   		if (GuiPlus.Button(new Rect(100, attribute_y, 180, attrRowHeight), display_string)){
 	   			DisableDisplay(FkeyMenu);
+	   			DisableDisplay(TimeSeriesMenu);
 	   			AttributeMenu.setSelectedIndex(i);
 	   		}
 		
-			attribute_y += 20;
+			attribute_y += attrRowHeight;
 		}
 		
 		GuiPlus.EndScrollView();

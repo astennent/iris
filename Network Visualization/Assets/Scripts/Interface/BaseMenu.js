@@ -39,6 +39,8 @@ class BaseMenu extends MonoBehaviour {
 	}
 
 	function OnGUI() {
+		GUI.skin = MenuController.getSkin();
+
 		var menuRect = new Rect(x, MenuController.getScreenTop(), width, MenuController.getScreenHeight());
 		GuiPlus.Box(menuRect, title);
 

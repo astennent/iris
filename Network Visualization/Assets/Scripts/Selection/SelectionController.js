@@ -107,7 +107,7 @@ private function ProcessBoxing(){
 private function startBoxing() {
 	boxing = true;
 	clearedSelectionSinceBoxStart = false;
-	startCoords = GuiPlus.getMousePosition();
+	startCoords = GuiPlus.getMousePosition(true);
 }
 
 private function stopBoxing(){
@@ -145,8 +145,8 @@ private function selectBoxedItems(){
 		clearSelectedNodes();
 	}
 
-	var mouseCoords = GuiPlus.getMousePosition();
-	
+	var mouseCoords = GuiPlus.getMousePosition(true);
+
 	var left = Mathf.Min(mouseCoords.x, startCoords.x);
 	var right = Mathf.Max(mouseCoords.x, startCoords.x);
 	var top = Mathf.Min(mouseCoords.y, startCoords.y);

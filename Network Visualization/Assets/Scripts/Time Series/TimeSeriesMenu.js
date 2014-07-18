@@ -28,6 +28,8 @@ public class TimeSeriesMenu extends BaseMenu {
 			return;
 		}
 
+		GUI.skin = MenuController.getSkin();
+
 		//Draw the enable button
 		var enabled = TimeSeriesController.getEnabled();
 		var enableRect = new Rect(x+10, y+10, width*.1-20, height-20);

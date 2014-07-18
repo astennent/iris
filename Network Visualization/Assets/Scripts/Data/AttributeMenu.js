@@ -18,8 +18,9 @@ class AttributeMenu extends BaseMenu {
 	static function setSelectedIndex(index : int){
 		if (index < 0 || index == selected_index){
 			DisableDisplay(AttributeMenu);
+			selected_index = -1;
 		} else {
-			super.EnableDisplay(AttributeMenu);
+			EnableDisplay(AttributeMenu);
 			file = FileManager.files[FileMenu.selected_file_index];
 			selected_index = index;
 			attribute = file.getAttribute(selected_index);
@@ -95,8 +96,8 @@ class AttributeMenu extends BaseMenu {
 		//Draw Start Date
 		cur_y += 5;
 
-		var label_box = new Rect(x+10, cur_y, 130, 20);
-		var button_box = new Rect(x+140, cur_y, 60, 20);
+		var label_box = new Rect(x+10, cur_y, 150, 20);
+		var button_box = new Rect(x+160, cur_y, 60, 20);
 		for (var onStartIndex = 0 ; onStartIndex < 2 ; onStartIndex++) {
 			GUI.color = Color.white;
 
@@ -306,10 +307,5 @@ class AttributeMenu extends BaseMenu {
 	static function getFkeyDropdownId(fkey : ForeignKey) {
 		return "4" + fkey.uuid;
 	}
-
-	static function OnDisableDisplay(){
-		selected_index = -1;
-	}
-
 
 }

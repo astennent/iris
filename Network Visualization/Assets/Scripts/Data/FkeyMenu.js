@@ -4,14 +4,14 @@
 
 class FkeyMenu extends BaseMenu {
 
-	private static var fkeyBoxHeight = 140;
+	private static var fkeyBoxHeight = 160;
 	private static var fkeyBoxSpacing = 8;
 	private static var keyPairHeight = 20;
 	private static var keyPairPreSpace = 35;
 	private static var keyPairSpacing = 1;
 	private static var keyPairAddSpace = 5;
 	private static var addingBoxPreSpace = 5;
-	private static var addingBoxHeight = 100;
+	private static var addingBoxHeight = 130;
 
 	private static var contentWidth : int;
 
@@ -93,15 +93,15 @@ class FkeyMenu extends BaseMenu {
 		}
 
 
-		foreignKey.isBidirectional = GuiPlus.Toggle(new Rect(10, cur_y+6, 100, 20),
-				foreignKey.isBidirectional, "bi-directional");
+		foreignKey.isBidirectional = GuiPlus.Toggle(new Rect(10, cur_y+6, 130, 20),
+				foreignKey.isBidirectional, "Bi-directional");
 					
 		cur_y += 32;
 
 		//Draw the weight attribute label
-		var weightLabelWidth = 105;
+		var weightLabelWidth = 65;
 		var weightLabelRect = new Rect(10, cur_y, weightLabelWidth, 20);
-		GuiPlus.Label(weightLabelRect, "Weight Attribute: ");
+		GuiPlus.Label(weightLabelRect, "Weight: ");
 
 		//Draw the dropdown for choosing the weight attribute
 		var weightWidth = contentWidth-weightLabelWidth-20;
@@ -129,16 +129,21 @@ class FkeyMenu extends BaseMenu {
 		cur_y += 20;
 
 		var old_weight_modifier = foreignKey.getWeightModifier();
-		GuiPlus.Label(new Rect(10, cur_y, contentWidth, 20), "Strength: " + old_weight_modifier.ToString("f1"));
-		var new_weight_modifier = GUI.HorizontalSlider(Rect(95, cur_y+5, 60, 20), old_weight_modifier, 
+		var strengthLabelWidth = 100;
+		var strengthLabelRect = new Rect(10, cur_y, strengthLabelWidth, 20);
+		GuiPlus.Label(strengthLabelRect, "Strength: " + old_weight_modifier.ToString("f1"));
+		var sliderWidth = contentWidth-strengthLabelWidth-20;
+		var new_weight_modifier = GUI.HorizontalSlider(Rect(strengthLabelWidth+10, cur_y+5, sliderWidth, 20), old_weight_modifier, 
 				ForeignKey.MIN_WEIGHT_MODIFIER, ForeignKey.MAX_WEIGHT_MODIFIER);
 		if (old_weight_modifier != new_weight_modifier) {
 			foreignKey.setWeightModifier(new_weight_modifier);
 		}
 
+		cur_y += 20;
+
 		var wasInverted = foreignKey.isWeightInverted();
-		var invertedRect = new Rect(160, cur_y, contentWidth-165, 20);
-		var isInverted = GuiPlus.Toggle(invertedRect, wasInverted, " Inverted");
+		var invertedRect = new Rect(10, cur_y, 130, 20);
+		var isInverted = GuiPlus.Toggle(invertedRect, wasInverted, " Invert Weight");
 		if (wasInverted != isInverted) {
 			foreignKey.setWeightInverted(isInverted);
 		}
@@ -153,6 +158,9 @@ class FkeyMenu extends BaseMenu {
 		var replacementFile = (replacementFileIndex >= 0) ? FileManager.files[replacementFileIndex] : null;
 		if (foreignKey.getToFile() != replacementFile) {
 			foreignKey.setToFile(replacementFile);
+			if (replacementFile == null) {
+				resetAdding();
+			}
 		}
 		
 		cur_y = DrawKeyPairs(foreignKey, cur_y + keyPairPreSpace);
@@ -196,10 +204,10 @@ class FkeyMenu extends BaseMenu {
 		var isAdding = (addingFkey == foreignKey);
 		var addText = (isAdding) ? "Cancel" : "Add Attribute Pair";
 
-		if (GuiPlus.Button(addBox, addText)){
+		var isLocked = (foreignKey.getToFile() == null);
+		if (GuiPlus.LockableButton(addBox, addText, isLocked)){
 			if (isAdding) {
-				addingFkey = null;
-				addingFkeyStep = 0;
+				resetAdding();
 			} else {
 	 			addingFkey = foreignKey;
 				addingFkeyStep = 1;
@@ -210,14 +218,14 @@ class FkeyMenu extends BaseMenu {
 
 	private function DrawAddingBox(cur_y : int) {
 		var addingBox = new Rect(1, cur_y, contentWidth, addingBoxHeight);
-		var addingText = (addingFkeyStep == 1) ? "Select Attribute from Origin File..." : "Select Attribute from Target File...";
+		var addingText = (addingFkeyStep == 1) ? "Select Attribute from Origin File" : "Select Attribute from Target File";
 		GuiPlus.Box(addingBox, addingText);
 
 		var file = (addingFkeyStep == 1) ? addingFkey.getSourceFile() : addingFkey.getToFile();
 		var attributes = file.getAttributes();
 
 		var outerBox = addingBox;
-		var titleSpacing = 20;
+		var titleSpacing = 25;
 		outerBox.y += titleSpacing; outerBox.height -= titleSpacing;
 
 		var attrRectHeight = 20;
@@ -249,5 +257,10 @@ class FkeyMenu extends BaseMenu {
 
 
 		return cur_y + addingBoxHeight;
+	}
+
+	private function resetAdding() {
+		addingFkey = null;
+		addingFkeyStep = 0;
 	}
 }

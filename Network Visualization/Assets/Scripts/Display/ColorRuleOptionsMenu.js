@@ -75,7 +75,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		cur_y += 190;
 		var original_variation = rule.variation;
 		GuiPlus.Label(new Rect(x+10, cur_y, 130, 20), "Randomness: " + rule.variation.ToString("f2"));
-		rule.variation = GUI.HorizontalSlider(Rect(x+130, cur_y+5, width-140, 20), rule.variation, 0.0, 1.0);
+		rule.variation = GUI.HorizontalSlider(Rect(x+140, cur_y+5, width-150, 20), rule.variation, 0.0, 1.0);
 
 		if (rule.color != original_color || rule.variation != original_variation){
 			ColorController.ApplyRule(rule);
@@ -120,32 +120,22 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		cur_y += 5;
 
 		GuiPlus.Box(Rect(x+5, cur_y, width-10, 155), "");
+		cur_y += 5;
+
 		var centrality_types = CentralityController.centrality_types;
-
 		var wasInverted = rule.getInvertCentrality();
-		if (wasInverted) {
-			var inversion_text = " On";
-		} else {
-			inversion_text = " Off";
-		}
-
-		cur_y+=5;
-		GuiPlus.Label(new Rect(x+10, cur_y, 85, 20), "Invert Colors: ");
-		if (GuiPlus.Toggle(new Rect(x+95, cur_y, width, 20), wasInverted, inversion_text) != wasInverted){
+		if (GuiPlus.Toggle(new Rect(x+10, cur_y, 200, 20), wasInverted, " Invert Coloring") != wasInverted){
 			rule.toggleInvertCentrality();
 		}
 		cur_y += 20;
 		var inter_cluster = rule.getInterCluster();
-		if (GuiPlus.Toggle(new Rect(x+10, cur_y, width/2-20, 20), inter_cluster, " Inter-Cluster")  && !inter_cluster) {
+		if (GuiPlus.Toggle(new Rect(x+10, cur_y, 200, 20), inter_cluster, " Inter-Cluster")  != inter_cluster) {
 			rule.toggleInterCluster();
 		} 
-		if (GuiPlus.Toggle(new Rect(x+width/2, cur_y, width/2, 20), !inter_cluster, " Intra-Cluster") && inter_cluster) {
-			rule.toggleInterCluster();
-		}
 
 		cur_y += 25;
 
-		GuiPlus.Label(new Rect(x+10, cur_y, 120, 20), "Centrality Method: ");
+		GuiPlus.Label(new Rect(x+10, cur_y, 160, 20), "Centrality Method: ");
 		cur_y += 20;
 
 		for (var index : int = 0 ; index < centrality_types.length ; index++){
@@ -206,12 +196,12 @@ class ColorRuleOptionsMenu extends BaseMenu {
 	function DrawHaloOptions (cur_y : int) {
 		cur_y += 5;
 		GuiPlus.Box(Rect(x+5, cur_y, width-10, 30), "");
-		cur_y+=5;
+		cur_y += 5;
 		var original_node = rule.coloring_node;
 		var original_halo = rule.coloring_halo;
 
-		rule.coloring_node = GuiPlus.Toggle (Rect (x+width/2+10, cur_y, width/2-10, 20), rule.coloring_node, " Color Node");
 		rule.coloring_halo = GuiPlus.Toggle (Rect (x+10, cur_y, width/2-10, 20), rule.coloring_halo, " Color Halo");
+		rule.coloring_node = GuiPlus.Toggle (Rect (x+width/2, cur_y, width/2-10, 20), rule.coloring_node, " Color Node");
 
 		if ( (!rule.coloring_halo && original_halo) || (!rule.coloring_node && original_node)) {
 			ColorController.ApplyAllRules(true, false);

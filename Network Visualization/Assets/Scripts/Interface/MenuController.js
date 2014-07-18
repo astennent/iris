@@ -1,7 +1,14 @@
 #pragma strict
 
+var currentSkin : GUISkin;
+static var s_currentSkin;
+
 function Update() {
 	handleEscapePress();
+}
+
+function Start() {
+	s_currentSkin = currentSkin;
 }
 
 static var gameController : GameObject;
@@ -52,3 +59,6 @@ static function getInstance(menuClass : System.Type) : BaseMenu {
 	return gameController.GetComponent(menuClass);
 }
 
+static function getSkin() {
+	return s_currentSkin;
+}

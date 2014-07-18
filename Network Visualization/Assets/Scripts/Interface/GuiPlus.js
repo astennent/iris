@@ -32,13 +32,18 @@ public class GuiPlus extends MonoBehaviour {
 		return false;
 	}
 
-	//Returns the coordinates of the mouse position with respect to the scroll panes.
-	static function getMousePosition() : Vector2{
+	//Returns the coordinates of the mouse position, optionally with respect to the scroll panes.
+	static function getMousePosition() {
+		return getMousePosition(false);
+	}
+	static function getMousePosition(ignoreScrollPanes : boolean) : Vector2 {
 		var mousePosition = Input.mousePosition;
 		mousePosition.y = Screen.height - mousePosition.y; 	
 
-		for (var topLeftCornerCoords in scrollPaneStack) {
-			mousePosition -= topLeftCornerCoords;
+		if (!ignoreScrollPanes) {
+			for (var topLeftCornerCoords in scrollPaneStack) {
+				mousePosition -= topLeftCornerCoords;
+			}
 		}
 
 		return mousePosition;
@@ -124,6 +129,16 @@ public class GuiPlus extends MonoBehaviour {
 		var result = GuiPlus.Toggle(r, on, text);
 		GUI.color = originalColor;
 		return (locked) ? on : result;
+	}
+
+	static function LockableButton(r : Rect, text : String, locked : boolean) {
+		var originalColor = GUI.color;
+		if (locked) {
+			GUI.color = ColorController.darkenColor(originalColor);
+		}
+		var result = GuiPlus.Button(r, text);
+		GUI.color = originalColor;
+		return (locked) ? false : result;
 	}
 
 

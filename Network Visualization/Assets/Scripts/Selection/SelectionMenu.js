@@ -22,6 +22,7 @@ class SelectionMenu extends BaseMenu {
 	}
 
 	function OnGUI(){
+		GUI.skin = MenuController.getSkin();
 		var numNodes = SelectionController.getNumSelected();
 		desired_x = Screen.width-width;
 		if (numNodes > 0) {

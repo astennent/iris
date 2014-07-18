@@ -98,7 +98,7 @@ class TimeFrameMenu extends BaseMenu {
  		cur_y += 20;
 		for (var column_index : int = 0 ; column_index < columns.Count ; column_index++) {
 			var column = columns[column_index];
-			var column_rect = new Rect(x+12, cur_y, 80, 20);
+			var column_rect = new Rect(x+12, cur_y, 85, 20);
 
 			var DROPDOWN_ID = AttributeMenu.getDropdownId(column);
 
@@ -106,10 +106,10 @@ class TimeFrameMenu extends BaseMenu {
 			GUI.color = column.getAspectColor();
 			
 			//Draw the attribute label
-			GuiPlus.Label(column_rect, column.getRestrictedName(column_rect.width));
+			GuiPlus.Label(column_rect, column.getRestrictedName(column_rect.width-5));
 
 			//Draw the format textbox
-			column_rect.x += 63;
+			column_rect.x += 68;
 			if (!column.hasValidTimeFrameFormat()) {
 				GUI.color = Color.red;
 			}
@@ -153,7 +153,7 @@ class TimeFrameMenu extends BaseMenu {
 		GUI.color = Color.white;
 
 
-		var add_column_rect = new Rect(x+width/9, cur_y+5, width/3, 20);
+		var add_column_rect = new Rect(x+width/9, cur_y+5, width*.5, 25);
 		if (creatingStart && isStart || creatingEnd && !isStart) { //Draw a cancel button to undo the column adding click.
 			if (GuiPlus.Button(add_column_rect, "Done")) {
 				if (isStart) {
@@ -173,7 +173,7 @@ class TimeFrameMenu extends BaseMenu {
 				}
 			}
 		}
-		cur_y += 15;
+		cur_y += 20;
 
 		//Draw the column selection box.
 		if (creating) {
@@ -189,7 +189,7 @@ class TimeFrameMenu extends BaseMenu {
 
 				for (var attribute in attributes) {
 					GUI.color = attribute.getAspectColor(); //Use aspect color.
-					var attr_rect = new Rect(0, scroll_y, width-35, 20);
+					var attr_rect = new Rect(0, scroll_y, width-30, 22);
 
 					if (GuiPlus.Button(attr_rect, attribute.getRestrictedName(attr_rect.width))) {
 						timeFrame.addColumn(attribute, isStart);

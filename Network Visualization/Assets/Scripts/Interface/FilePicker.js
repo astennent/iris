@@ -4,6 +4,7 @@ import System.IO;
 
 class FilePicker extends MonoBehaviour {
 
+	var customSkin : GUISkin;
 	var folderTexture : Texture;
 	var fileTexture : Texture;
 	var upDirectoryTexture : Texture;
@@ -55,6 +56,7 @@ class FilePicker extends MonoBehaviour {
 	}
 
 	function OnGUI() {
+		GUI.skin = customSkin;
 		if (rendering) {
 			fileString = "" + fileStringWindow.Render(RenderFilePicker);		
 		}

@@ -105,8 +105,7 @@ class Window extends MonoBehaviour {
 
 		GuiPlus.Button(headerRect, title);
 
-		var currentMousePosition = Input.mousePosition;
-		currentMousePosition.y = Screen.height - currentMousePosition.y;
+		var currentMousePosition = GuiPlus.getMousePosition();
 
 		if (!dragging && Input.GetMouseButtonDown(0) && headerRect.Contains(currentMousePosition)) {
 			startDragging();
