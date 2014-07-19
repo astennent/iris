@@ -257,7 +257,6 @@ public class GuiPlus extends MonoBehaviour {
 			if (args.length > 0 && !isScrollPane) {
 				ScrollView.AddElement(args[0]);
 			}
-
 		}
 
 		function execute(hidden : boolean) {
