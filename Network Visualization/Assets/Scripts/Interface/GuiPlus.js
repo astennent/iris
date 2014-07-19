@@ -41,85 +41,11 @@ public class GuiPlus extends MonoBehaviour {
 		mousePosition.y = Screen.height - mousePosition.y; 	
 
 		if (!ignoreScrollPanes) {
-			for (var topLeftCornerCoords in scrollPaneStack) {
-				mousePosition -= topLeftCornerCoords;
-			}
+			mousePosition -= ScrollView.getPositionAdjustment();
 		}
 
 		return mousePosition;
 	}
-
-
-	///////////////// BEGIN GUIPLUS FUNCTION PASSTHROUGHS /////////////////
-
-
-	// Draw a GuiBox which prevents the Selection
-	// Controller from interacting with nodes
-	static function Box(r : Rect, text : String) {
-		Box(r, text, true);
-	}
-	static function Box(r : Rect, text:String, drawBox : boolean){
-		boxes.Add(r);
-
-		if (drawBox) {
-			var guiFunction = new GUIFunction(BOX, r, text);
-			functionQueue.Add(guiFunction);
-		}
-	}
-
-	static function Button(param0, param1) : boolean {
-		var guiFunction =  new GUIFunction(BUTTON, param0, param1);
-		functionQueue.Add(guiFunction);
-		return guiFunction.execute(true);
-	}
-
-	static function Button(param0, param1, param2) : boolean {
-		var guiFunction =  new GUIFunction(BUTTON, param0, param1, param2);
-		functionQueue.Add(guiFunction);
-		return guiFunction.execute(true);
-	}
-
-	static function BeginScrollView(outerBox : Rect, scrollPosition : Vector2, innerBox : Rect) : Vector2 {
-		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, outerBox, scrollPosition, innerBox);
-		guiFunction.isScrollPane = true;
-		functionQueue.Add(guiFunction);
-
-		//Append to the end of the scroll stack.
-		scrollPaneStack.AddLast(new Vector2(outerBox.x, outerBox.y)); 
-
-		return guiFunction.execute(true);
-	}
-
-	static function EndScrollView() {
-		var guiFunction = new GUIFunction(END_SCROLL_VIEW);
-		guiFunction.isScrollPane = true;
-		functionQueue.Add(guiFunction);
-
-		//Pop from the end of the scroll stack.
-		scrollPaneStack.RemoveLast(); 
-
-		guiFunction.execute(true);
-	}
-
-	static function Label(param0, param1) {
-		var guiFunction =  new GUIFunction(LABEL, param0, param1);
-		functionQueue.Add(guiFunction);
-		guiFunction.execute(true);
-	}
-
-	static function Label(param0, param1, param2) {
-		var guiFunction =  new GUIFunction(LABEL, param0, param1, param2);
-		functionQueue.Add(guiFunction);
-		guiFunction.execute(true);
-	}
-
-	static function Toggle(param0, param1, param2) : boolean {
-		var guiFunction =  new GUIFunction(TOGGLE, param0, param1, param2);
-		functionQueue.Add(guiFunction);
-		return guiFunction.execute(true);
-	}
-
-	/////////////// END GUIPLUS FUNCTION PASSTHROUGHS ////////////////
 
 	static function LockableToggle(r : Rect, on : boolean, text : String, locked : boolean) {
 		var originalColor = GUI.color;
@@ -140,6 +66,100 @@ public class GuiPlus extends MonoBehaviour {
 		GUI.color = originalColor;
 		return (locked) ? false : result;
 	}
+
+
+
+
+	///////////////// BEGIN GUIPLUS FUNCTION PASSTHROUGHS /////////////////
+
+
+	// Draw a GuiBox which prevents the Selection
+	// Controller from interacting with nodes
+	static function Box(r : Rect, text : String) {
+		Box(r, text, true);
+	}
+	static function Box(r : Rect, text:String, drawBox : boolean){
+		boxes.Add(r);
+
+		if (drawBox) {
+			var guiFunction = new GUIFunction(BOX, r, text);
+			functionQueue.Add(guiFunction);
+		}
+	}
+
+	static function Button(position : Rect, param1) : boolean {
+		var guiFunction =  new GUIFunction(BUTTON, position, param1);
+		functionQueue.Add(guiFunction);
+		return guiFunction.execute(true);
+	}
+
+	static function Button(position : Rect, param1, param2) : boolean {
+		var guiFunction =  new GUIFunction(BUTTON, position, param1, param2);
+		functionQueue.Add(guiFunction);
+		return guiFunction.execute(true);
+	}
+
+
+	static function Label(position : Rect, param1) {
+		var guiFunction =  new GUIFunction(LABEL, position, param1);
+		functionQueue.Add(guiFunction);
+		guiFunction.execute(true);
+	}
+
+	static function Label(position : Rect, param1, param2) {
+		var guiFunction =  new GUIFunction(LABEL, position, param1, param2);
+		functionQueue.Add(guiFunction);
+		guiFunction.execute(true);
+	}
+
+	static function Toggle(position : Rect, param1, param2) : boolean {
+		var guiFunction =  new GUIFunction(TOGGLE, position, param1, param2);
+		functionQueue.Add(guiFunction);
+		return guiFunction.execute(true);
+	}
+
+
+	static function BeginScrollView(position : Rect, scrollPosition : Vector2, innerBox : Rect) : Vector2 {
+
+		// Even with user-curated dropdowns, this is still necessary for the mouse position scrollpane stack.
+		ScrollView.Begin(position, scrollPosition, innerBox);		
+		
+		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, position, scrollPosition, innerBox);
+		guiFunction.isScrollPane = true;
+		functionQueue.Add(guiFunction);
+
+		return guiFunction.execute(true);
+	}
+
+	// TOOD: Better documentation: This returns the innerSize, not the scrollPosition.
+	static function BeginScrollView(position : Rect, id : String) : Vector2 {
+		var scrollPaneRect = ScrollView.Begin(position, id);
+		var scrollPosition = new Vector2(scrollPaneRect.x, scrollPaneRect.y);
+		var innerBox = new Rect(0, 0, scrollPaneRect.width, scrollPaneRect.height);
+
+		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, position, scrollPosition, innerBox);
+		guiFunction.isScrollPane = true;
+		functionQueue.Add(guiFunction);
+		guiFunction.execute(true);
+
+		var innerSize = new Vector2(scrollPaneRect.width, scrollPaneRect.height);
+		return innerSize;
+	}
+
+
+	static function EndScrollView() {
+		ScrollView.End();
+
+		var guiFunction = new GUIFunction(END_SCROLL_VIEW);
+		guiFunction.isScrollPane = true;
+		functionQueue.Add(guiFunction);
+
+		guiFunction.execute(true);
+	}
+
+
+	/////////////// END GUIPLUS FUNCTION PASSTHROUGHS ////////////////
+
 
 
 	function OnGUI() {
