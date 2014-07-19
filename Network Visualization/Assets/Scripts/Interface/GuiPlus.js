@@ -47,27 +47,25 @@ public class GuiPlus extends MonoBehaviour {
 		return mousePosition;
 	}
 
-	static function LockableToggle(r : Rect, on : boolean, text : String, locked : boolean) {
+	static function LockableToggle(position : Rect, on : boolean, text : String, locked : boolean) {
 		var originalColor = GUI.color;
 		if (locked) {
 			GUI.color = ColorController.darkenColor(originalColor);
 		}
-		var result = GuiPlus.Toggle(r, on, text);
+		var result = GuiPlus.Toggle(position, on, text);
 		GUI.color = originalColor;
 		return (locked) ? on : result;
 	}
 
-	static function LockableButton(r : Rect, text : String, locked : boolean) {
+	static function LockableButton(position : Rect, text : String, locked : boolean) {
 		var originalColor = GUI.color;
 		if (locked) {
 			GUI.color = ColorController.darkenColor(originalColor);
 		}
-		var result = GuiPlus.Button(r, text);
+		var result = GuiPlus.Button(position, text);
 		GUI.color = originalColor;
 		return (locked) ? false : result;
 	}
-
-
 
 
 	///////////////// BEGIN GUIPLUS FUNCTION PASSTHROUGHS /////////////////
@@ -75,26 +73,29 @@ public class GuiPlus extends MonoBehaviour {
 
 	// Draw a GuiBox which prevents the Selection
 	// Controller from interacting with nodes
-	static function Box(r : Rect, text : String) {
-		Box(r, text, true);
+	static function Box(position : Rect, text : String) {
+		Box(position, text, true);
 	}
-	static function Box(r : Rect, text:String, drawBox : boolean){
-		boxes.Add(r);
+	static function Box(position : Rect, text:String, drawBox : boolean){
+		boxes.Add(position);
 
 		if (drawBox) {
-			var guiFunction = new GUIFunction(BOX, r, text);
+			var guiFunction = new GUIFunction(BOX, position, text);
+			guiFunction.init();
 			functionQueue.Add(guiFunction);
 		}
 	}
 
 	static function Button(position : Rect, param1) : boolean {
 		var guiFunction =  new GUIFunction(BUTTON, position, param1);
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
 		return guiFunction.execute(true);
 	}
 
 	static function Button(position : Rect, param1, param2) : boolean {
 		var guiFunction =  new GUIFunction(BUTTON, position, param1, param2);
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
 		return guiFunction.execute(true);
 	}
@@ -102,18 +103,21 @@ public class GuiPlus extends MonoBehaviour {
 
 	static function Label(position : Rect, param1) {
 		var guiFunction =  new GUIFunction(LABEL, position, param1);
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
 		guiFunction.execute(true);
 	}
 
 	static function Label(position : Rect, param1, param2) {
 		var guiFunction =  new GUIFunction(LABEL, position, param1, param2);
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
 		guiFunction.execute(true);
 	}
 
 	static function Toggle(position : Rect, param1, param2) : boolean {
 		var guiFunction =  new GUIFunction(TOGGLE, position, param1, param2);
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
 		return guiFunction.execute(true);
 	}
@@ -125,6 +129,7 @@ public class GuiPlus extends MonoBehaviour {
 		ScrollView.Begin(position, scrollPosition, innerBox);		
 		
 		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, position, scrollPosition, innerBox);
+		guiFunction.init();
 		guiFunction.isScrollPane = true;
 		functionQueue.Add(guiFunction);
 
@@ -139,8 +144,11 @@ public class GuiPlus extends MonoBehaviour {
 
 		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, position, scrollPosition, innerBox);
 		guiFunction.isScrollPane = true;
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
-		guiFunction.execute(true);
+
+		var newScrollPosition = guiFunction.execute(true);
+		ScrollView.SetScrollPosition(id, newScrollPosition);
 
 		var innerSize = new Vector2(scrollPaneRect.width, scrollPaneRect.height);
 		return innerSize;
@@ -152,6 +160,7 @@ public class GuiPlus extends MonoBehaviour {
 
 		var guiFunction = new GUIFunction(END_SCROLL_VIEW);
 		guiFunction.isScrollPane = true;
+		guiFunction.init();
 		functionQueue.Add(guiFunction);
 
 		guiFunction.execute(true);
@@ -219,35 +228,36 @@ public class GuiPlus extends MonoBehaviour {
 
 		function GUIFunction(func : int) {
 			this.func = func;
-			init();
 		}
-		function GUIFunction(func : int, arg0) {
+		function GUIFunction(func : int, position : Rect) {
 			this.func = func;
 			args = new Array();
-			args.Push(arg0);
-			init();
+			args.Push(position);
 		}
-		function GUIFunction(func : int, arg0, arg1) {
+		function GUIFunction(func : int, position : Rect, arg1) {
 			this.func = func;
 			args = new Array();
-			args.Push(arg0);
+			args.Push(position);
 			args.Push(arg1);
-			init();
 		}
-		function GUIFunction(func : int, arg0, arg1, arg2) {
+		function GUIFunction(func : int, position : Rect, arg1, arg2) {
 			this.func = func;
 			args = new Array();
-			args.Push(arg0);
+			args.Push(position);
 			args.Push(arg1);
 			args.Push(arg2);
-			init();
 		}
 
-		private function init() {
+		function init() {
 			color = GUI.color;
 			depth = GUI.depth;
 			skin = GUI.skin;
 			GuiPlus.seenDepths.Add(depth);
+
+			if (args.length > 0 && !isScrollPane) {
+				ScrollView.AddElement(args[0]);
+			}
+
 		}
 
 		function execute(hidden : boolean) {

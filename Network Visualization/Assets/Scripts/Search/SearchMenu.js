@@ -6,7 +6,6 @@ class SearchMenu extends BaseMenu {
 	private static var oldSearchString : String = "";
 	static var match_index : int = 0;
 
-	private static var scrollPosition : Vector2 = Vector2.zero;
 	private static var lastScrollTime : float = 0;
 
 	function Start(){
@@ -42,12 +41,11 @@ class SearchMenu extends BaseMenu {
 				title = "Begin typing to search";
 			}
 		}
-		var top_display = GUIContent(title);		
-		scrollPosition = GuiPlus.BeginScrollView (Rect (x+width*.05,60,width*.9,MenuController.getScreenHeight()-60),
-	    scrollPosition, Rect (0, 0, 400, matches.Count*30));
+		var top_display = GUIContent(title);
+		var outerRect = new Rect (x+width*.05,60,width*.9,MenuController.getScreenHeight()-60);
+		var innerSize = GuiPlus.BeginScrollView (outerRect, "SearchMenu");
 	    
 	    var count = 0;
-	    GUI.skin.button.alignment = TextAnchor.MiddleLeft;
 	    for (var match : Node in matches) {
 	    	GUI.color = match.getMenuColor();
 	    	if (GuiPlus.Button(Rect (10,count*30,width,30), match.getDisplayName())){
@@ -58,7 +56,6 @@ class SearchMenu extends BaseMenu {
 	    	}
 	    	count+=1;
 	    }
-	    GUI.skin.button.alignment = TextAnchor.MiddleCenter;
 		
 		GuiPlus.EndScrollView();
 			

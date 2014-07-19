@@ -4,18 +4,19 @@ class ScrollView {
 
 	// Holds a dictionary of all Scroll Panes that were initialized using the id method.
 	private static var paneMap = new Dictionary.<String, ScrollPane>();
-	private static var lowerRight = Vector2.zero;
 	private static var paneStack = new LinkedList.<ScrollPane>();
 
 	static function Begin(position : Rect, id : String) : Rect{
-		var scrollPane = paneMap[id];
-		if (scrollPane == null) {
+		var scrollPane : ScrollPane;
+		if (paneMap.ContainsKey(id)) {
+			scrollPane = paneMap[id];
+		} else {
 			scrollPane = new ScrollPane(position);
 			paneMap[id] = scrollPane;
-		} 
+		}
 		paneStack.AddLast(scrollPane);
-
 		var scrollPaneRect = new Rect(scrollPane.scrollPosition.x, scrollPane.scrollPosition.y, scrollPane.innerSize.x, scrollPane.innerSize.y);
+		scrollPane.resetElements();
 		return scrollPaneRect;
 	}
 
@@ -27,18 +28,19 @@ class ScrollView {
 	}
 
 	static function End() {
-		var scrollPane = paneStack.Last.Value;
-		if (scrollPane.isGenerated) {
-			scrollPane.innerSize = lowerRight;
-		}
-	
-		lowerRight = Vector2.zero;
 		paneStack.RemoveLast();
 	}
 
-	static function AddRect(position : Rect) {
-		lowerRight.x = Mathf.Max(position.x + position.width, lowerRight.x);
-		lowerRight.y = Mathf.Max(position.y + position.height, lowerRight.y);
+	static function SetScrollPosition(id : String, scrollPosition : Vector2) {
+		var scrollPane = paneMap[id];
+		scrollPane.scrollPosition = scrollPosition;
+	}
+
+	static function AddElement(position : Rect) {
+		if (paneStack.Count > 0) {
+			var currentPane = paneStack.Last.Value;
+				currentPane.addElement(position);
+		}
 	}
 
 	static function getPositionAdjustment() {
@@ -70,6 +72,18 @@ class ScrollView {
 			this.scrollPosition = scrollPosition;
 			this.innerSize = innerSize;
 			this.isGenerated = false;
+		}
+
+		function addElement(position : Rect) {
+			if (isGenerated) {
+				innerSize.x = Mathf.Max(position.x + position.width, innerSize.x);
+				innerSize.y = Mathf.Max(position.y + position.height, innerSize.y);
+			}
+		}
+
+		//TODO: Figure out when to call this.
+		function resetElements() {
+			innerSize = Vector2.one;
 		}
 	}
 }
