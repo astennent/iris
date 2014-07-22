@@ -1,7 +1,7 @@
 #pragma strict
 
 var currentSkin : GUISkin;
-static var s_currentSkin;
+static var s_currentSkin : GUISkin;
 
 function Update() {
 	handleEscapePress();

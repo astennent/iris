@@ -44,7 +44,7 @@ class Window extends MonoBehaviour {
 
 		Returns the value returned by drawFunc
 	*/
-	function Render(drawFunc) { //Render with no parameters.
+	function Render(drawFunc : Function) { //Render with no parameters.
 		return Render(drawFunc, []);
 	} 
 	function Render(drawFunc : Function, params : Array) {		
