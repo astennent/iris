@@ -48,7 +48,11 @@ class FreeCamera extends MonoBehaviour {
 
 		//Orient the camera to always be north side up
 		var oldRotation = transform.rotation;
-		transform.LookAt(transform.position + transform.forward, north);
+		var currentNorth = (GraphController.isGraphing()) ? Vector3.up : north;
+		transform.LookAt(transform.position + transform.forward, currentNorth);
+
+		// Only animate rotation for the brief period where you transition between camera states.
+		// Otherwise, the camera will constantly rock around instead of staying upright.
 		if (Time.time - transitionTime < 1) {
 			transform.rotation = Quaternion.Lerp(oldRotation, transform.rotation, 0.3);
 		}
