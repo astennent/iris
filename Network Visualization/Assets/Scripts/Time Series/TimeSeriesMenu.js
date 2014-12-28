@@ -43,6 +43,7 @@ public class TimeSeriesMenu extends BaseMenu {
 
 		if (GuiPlus.Button(enableRect, enableText)){
 			TimeSeriesController.toggleEnabled();
+			Debug.Log("CVlicked");
 		}
 		GUI.color = Color.white;
 
