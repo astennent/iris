@@ -30,14 +30,13 @@ class ColorRule {
 	var clusters : HashSet.<int> = new HashSet.<int>(); //Which cluster does this rule apply to?
 	private var nodes : HashSet.<Node> = new HashSet.<Node>(); //Which nodes does this rule apply to?
 
-
 	//Determines the method by which the rule selects a color for the node.
 	static var coloring_methods = [" Custom Color", " Scheme", " Centrality", " Continuous Attribute"];
 	static var COLORING_CUSTOM = 0;
 	static var COLORING_SCHEME = 1;
 	static var COLORING_CENTRALITY = 2;
 	static var COLORING_CONTINUOUS_ATTR = 3;
-	var coloring_method = COLORING_CUSTOM;	
+	var coloring_method = COLORING_SCHEME;	
 
 	var color : Color;
 	var variation : float;
