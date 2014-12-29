@@ -24,10 +24,6 @@ class DisplayMenu extends BaseMenu {
 	}
 
 	function DrawFallback(y : int) {
-		if (ColorController.rules.Count == 0) {
-			ColorController.Init();
-		}
-
 		var fallbackRule : ColorRule = ColorController.rules[0];
 		if (GuiPlus.Button(new Rect(x+5, y, width-10, 30), "Change Fallback Colors")){
 			if (rule_index == 0) {
@@ -78,7 +74,6 @@ class DisplayMenu extends BaseMenu {
 		if (GuiPlus.Button(new Rect(x+120, y, 120, 25), "Apply All Rules")){
 			ColorController.ApplyAllRules();
 		}
-
 
 		ruleRect.y += 55;
 		ruleRect.height = MenuController.getScreenHeight() - ruleRect.y;

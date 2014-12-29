@@ -10,10 +10,11 @@ static function getSchemeNames() {
 }
 
 //Called by Display Menu or Axis Controller.
-static function Init(){
-	createRule();
-	rules[0].setColoringMethod(1);
-	rules[0].setChangingSize(true);
+function Start(){
+	var fallbackRule = createRule();
+	fallbackRule.setColoringMethod(ColorRule.COLORING_SCHEME);
+	fallbackRule.setFilterMethod(ColorRule.FILTER_NODE);
+	fallbackRule.setChangingSize(true);
 }
 
 static function createRule() : ColorRule {
