@@ -21,6 +21,15 @@ private static var minMaxBetweennessCache : Dictionary.<int, Dictionary.<int, fl
 
 private static var GLOBAL_CLUSTER_ID = int.MaxValue;
 
+static var DEGREE = 0;
+static var CLOSENESS = 1;
+static var BETWEENNESS = 2;
+static var EIGENVECTOR = 3;
+
+static var DEGREE_COLOR = new Color(1, .5, .5);
+static var CLOSENESS_COLOR = new Color(1, 1, .5);
+static var BETWEENNESS_COLOR = new Color(.5, 1, .5);
+static var EIGENVECTOR_COLOR = new Color(.5, 1, 1);
 
 //Helper class used for betweenness and closeness centrality.
 private class Path {
@@ -47,11 +56,11 @@ static function ReInit() {
 
 static function Init(measure : int) {
 	if (!initialized[measure]) {
-		if (measure == 0) {
+		if (measure == DEGREE) {
 			CalculateDegreeCentrality();
-		} else if (measure == 1) {
+		} else if (measure == CLOSENESS) {
 			CalculateClosenessCentrality();
-		} else if (measure == 2) {
+		} else if (measure == BETWEENNESS) {
 			CalculateBetweennessCentrality();
 		} else {
 			CalculateEigenvectorCentrality();
@@ -281,10 +290,10 @@ static function getCentralityFraction(node: Node, rule : ColorRule) {
 	var relevant_dictionary : Dictionary.<Node, float>; //chosen depending on centrality type and subtype.
 	var relevant_cache : Dictionary.<int, Dictionary.<int, float> >;
 
-	if (centrality_type == 0) {
+	if (centrality_type == DEGREE) {
 		relevant_dictionary = degreeCentralities;
 		relevant_cache = minMaxDegreeCache;
-	} else if (centrality_type == 1) {
+	} else if (centrality_type == CLOSENESS) {
 		if (inter_cluster) {
 			relevant_dictionary = invertedDistanceSums;
 			relevant_cache = minMaxInvertedDistanceCache;
@@ -292,7 +301,7 @@ static function getCentralityFraction(node: Node, rule : ColorRule) {
 			relevant_dictionary = distanceSums;
 			relevant_cache = minMaxDistanceCache;
 		}
-	} else if (centrality_type == 2) {
+	} else if (centrality_type == BETWEENNESS) {
 		relevant_dictionary = betweennessCentralities;
 		relevant_cache = minMaxBetweennessCache;
 	} else {
@@ -309,4 +318,23 @@ static function getCentralityFraction(node: Node, rule : ColorRule) {
 
 static function makeFraction(node_centrality : float, min_centrality : float, max_centrality : float) {
 	return (node_centrality - min_centrality + .1) / (max_centrality - min_centrality - .001);
+}
+
+static function getCentralityColor(centrality_type : int) {
+	var output = Color.white;
+	switch (centrality_type) {
+		case DEGREE:
+			output = DEGREE_COLOR;
+			break;
+		case CLOSENESS:
+			output = CLOSENESS_COLOR;
+			break;
+		case BETWEENNESS:
+			output = BETWEENNESS_COLOR;
+			break;
+		case EIGENVECTOR:
+			output = EIGENVECTOR_COLOR;
+			break;
+	}
+	return output;
 }

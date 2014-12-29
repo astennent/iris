@@ -80,24 +80,22 @@ class ColorRule {
 		ColorController.ApplyRule(this, true, false);
 	}
 
-	function getColor(){
-		if (coloring_method == COLORING_CUSTOM) {
-			return color;
-		} else if (coloring_method == COLORING_SCHEME) {
-			return ColorController.GenRandomColor(scheme_index);
-		} else {
-			if (centrality_type == 0) {
-				return new Color(1, .5, .5);
-			} else if (centrality_type == 1) {
-				return new Color(1, 1, .5);
-			} else if (centrality_type == 2) {
-				return new Color(.5, 1, .5);
-			} else {
-				return new Color(.5, 1, 1);
-			}
+	function getColor() {
+		var output = Color.white;
+		switch (coloring_method) {
+			case COLORING_CUSTOM:
+			case COLORING_CONTINUOUS_ATTR:
+				output = color;
+				break;
+			case COLORING_SCHEME:
+				output = ColorController.GenRandomColor(scheme_index);
+				break;
+			case COLORING_CENTRALITY:
+				output = CentralityController.getCentralityColor(centrality_type);
+				break;
 		}
+		return output;
 	}
-
 
 	function setScheme(index : int){
 		setScheme(index, true);
@@ -122,7 +120,6 @@ class ColorRule {
 	function getFilterMethod() {
 		return filter_method;
 	}
-
 
 	//Centrality Variables
 	function setCentralityType(index : int) {
