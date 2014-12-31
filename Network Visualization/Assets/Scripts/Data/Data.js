@@ -4,7 +4,7 @@
 class Data extends MonoBehaviour {
 
 	//Used by Node and Edge.
-	var source : DataFile;
+	protected var source : DataFile;
 	protected var initialized = false;
 
 	private var attr_dict = new Dictionary.<Attribute, Datum>();
@@ -14,12 +14,13 @@ class Data extends MonoBehaviour {
 	// edges to share their parent's data without redundancy.
 	private var dataSource : Data = this;
 
-	//Default Constructor
-	public function Data(){}
-
 	//Used for whenever data should not be duplicated.
 	public function setDataSource(dataSource : Data) {
 		this.dataSource = dataSource;
+	}
+
+	public function getSource() {
+		return source;
 	}
 
 	//set an attribute 

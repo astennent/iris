@@ -99,7 +99,7 @@ class Stats {
 			for (var node in file.getNodes(true)) {
 				for (var edge in node.getEdges(true)) {
 					//check that the edge's data source is this file.
-					if (edge.source == file) {
+					if (edge.getSource() == file) {
 						addValue(edge);
 					}
 				}

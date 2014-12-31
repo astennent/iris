@@ -130,7 +130,7 @@ class SelectionMenu extends BaseMenu {
 		outerRect.y+=extra_vertical_space;
 		outerRect.height-=extra_vertical_space;
 
-		var source_attrs = node.source.getAttributes();
+		var source_attrs = node.getSource().getAttributes();
 		var data_height = 20;
 		var innerHeight = source_attrs.Count * data_height;
 
