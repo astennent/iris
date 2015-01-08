@@ -28,8 +28,8 @@ class FkeyMenu extends BaseMenu {
 	function Start(){
 		parent = GetComponent(FileMenu);
 		super.Start();
-		title = "Foreign Key Manager";
-		width = 250;
+		title = "Edge Manager";
+		width = 300;
 	}
    
 	function OnGUI(){
@@ -40,34 +40,22 @@ class FkeyMenu extends BaseMenu {
 		if (file == null) {
 			return;
 		}		
-		
-		//Determine the height of the scrollable area
-		var totalHeight = 0;
-		var foreignKeys = file.getForeignKeys();
-		for (var foreignKey in foreignKeys){
-			totalHeight += fkeyBoxHeight + foreignKey.getKeyPairs().Count * (keyPairHeight+keyPairSpacing) + keyPairAddSpace;
-		}
-		if (addingFkey) {
-			totalHeight += addingBoxHeight + addingBoxPreSpace;
-		}
 
-	    var cur_y = 40;
+	   var cur_y = 40;
 		var add_box = new Rect(x+20, cur_y, width-40, 30);
 		if (GuiPlus.Button(add_box, "Create Foreign Key")){
 			file.createEmptyFkey();
 		}
 
-
 		var outerBoxHeight = MenuController.getScreenHeight()-cur_y-40;
-		contentWidth = (totalHeight > outerBoxHeight) ? width-17 : width;
-		innerBox = new Rect(0, 0, contentWidth, totalHeight);
-		outerBox = new Rect(x, cur_y+40, width, outerBoxHeight);
+		outerBox =  new Rect(x, cur_y+40, width, outerBoxHeight);
+		var innerSize = GuiPlus.BeginScrollView(outerBox, "FkeyMenu");
 
-		fkeyScrollPosition = GuiPlus.BeginScrollView (outerBox, 
-				fkeyScrollPosition, innerBox);
-					
+			var needsToScroll : boolean = (innerSize.y > outerBoxHeight);
+			contentWidth = (needsToScroll) ? width - 17 : width - 1;
+
 			cur_y = 0;
-			//display all active keys
+			var foreignKeys = file.getForeignKeys();
 			var fkeyCount = foreignKeys.Count;
 			for (var i = 0 ; i < fkeyCount ; i++) {
 				var foreignKey = foreignKeys[i];
@@ -82,8 +70,14 @@ class FkeyMenu extends BaseMenu {
 
 	private function DrawForeignKey(file : DataFile, foreignKey : ForeignKey, cur_y : int) {
 		var pair_count = foreignKey.getKeyPairs().Count;
-		
-		var fkey_box = new Rect(1, cur_y, contentWidth, pair_count*keyPairHeight + fkeyBoxHeight);
+		var boundingBoxHeight = pair_count*keyPairHeight + fkeyBoxHeight;
+
+		var weightAttribute = foreignKey.getWeightAttribute();
+		if (!weightAttribute) {
+			boundingBoxHeight -= 40;
+		}
+
+		var fkey_box = new Rect(1, cur_y, contentWidth, boundingBoxHeight);
 		GuiPlus.Box(fkey_box, ""); 
 
 		//deletes the foreign key.
@@ -117,7 +111,6 @@ class FkeyMenu extends BaseMenu {
 
 		var weightRect = new Rect(weightLabelRect.x+weightLabelWidth, cur_y, weightWidth, 20);
 		var dropdownHeight = 200;
-		var weightAttribute = foreignKey.getWeightAttribute();
 		var selectedIndex = (weightAttribute == null) ? -1 : weightAttribute.column_index;
 		var newSelectedIndex = Dropdown.Select(weightRect, dropdownHeight, 
 				weightDropdownOptions, selectedIndex, AttributeMenu.getFkeyDropdownId(foreignKey), "None");
@@ -126,28 +119,29 @@ class FkeyMenu extends BaseMenu {
 			foreignKey.setWeightAttributeIndex(newSelectedIndex);
 		}
 
-		cur_y += 20;
 
-		var old_weight_modifier = foreignKey.getWeightModifier();
-		var strengthLabelWidth = 100;
-		var strengthLabelRect = new Rect(10, cur_y, strengthLabelWidth, 20);
-		GuiPlus.Label(strengthLabelRect, "Strength: " + old_weight_modifier.ToString("f1"));
-		var sliderWidth = contentWidth-strengthLabelWidth-20;
-		var new_weight_modifier = GUI.HorizontalSlider(Rect(strengthLabelWidth+10, cur_y+5, sliderWidth, 20), old_weight_modifier, 
-				ForeignKey.MIN_WEIGHT_MODIFIER, ForeignKey.MAX_WEIGHT_MODIFIER);
-		if (old_weight_modifier != new_weight_modifier) {
-			foreignKey.setWeightModifier(new_weight_modifier);
+		// Only show details about weight if there is a weight atttribute.
+		if (weightAttribute) {
+			cur_y += 20;
+			var old_weight_modifier = foreignKey.getWeightModifier();
+			var strengthLabelWidth = 100;
+			var strengthLabelRect = new Rect(10, cur_y, strengthLabelWidth, 20);
+			GuiPlus.Label(strengthLabelRect, "Strength: " + old_weight_modifier.ToString("f1"));
+			var sliderWidth = contentWidth-strengthLabelWidth-20;
+			var new_weight_modifier = GUI.HorizontalSlider(Rect(strengthLabelWidth+10, cur_y+5, sliderWidth, 20), old_weight_modifier, 
+					ForeignKey.MIN_WEIGHT_MODIFIER, ForeignKey.MAX_WEIGHT_MODIFIER);
+			if (old_weight_modifier != new_weight_modifier) {
+				foreignKey.setWeightModifier(new_weight_modifier);
+			}
+
+			cur_y += 20;
+			var wasInverted = foreignKey.isWeightInverted();
+			var invertedRect = new Rect(10, cur_y, 130, 20);
+			var isInverted = GuiPlus.Toggle(invertedRect, wasInverted, " Invert Weight");
+			if (wasInverted != isInverted) {
+				foreignKey.setWeightInverted(isInverted);
+			}
 		}
-
-		cur_y += 20;
-
-		var wasInverted = foreignKey.isWeightInverted();
-		var invertedRect = new Rect(10, cur_y, 130, 20);
-		var isInverted = GuiPlus.Toggle(invertedRect, wasInverted, " Invert Weight");
-		if (wasInverted != isInverted) {
-			foreignKey.setWeightInverted(isInverted);
-		}
-
 
 		cur_y += 20;
 		var dropHeight = 112;

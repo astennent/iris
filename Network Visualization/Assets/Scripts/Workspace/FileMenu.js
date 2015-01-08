@@ -123,7 +123,7 @@ class FileMenu extends BaseMenu {
 		cur_y+=28;
 		var fkey_box = new Rect(x+10, cur_y, width/2-10, 32);
 		GUI.color = Attribute.FKEY_COLOR;
-		if (GuiPlus.Button(fkey_box, "Foreign Keys")){
+		if (GuiPlus.Button(fkey_box, "Edges")){
 			FkeyMenu.ToggleDisplay(FkeyMenu);
 		}
 		var details_box = new Rect(x+width/2+5, cur_y, width/2-20, 32);

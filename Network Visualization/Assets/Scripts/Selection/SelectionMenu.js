@@ -9,7 +9,7 @@ class SelectionMenu extends BaseMenu {
 	function Start() {
 		super.Start();
 		displaying = true;
-		width = 250;
+		width = 300;
 	}
 
 	function Update () {
