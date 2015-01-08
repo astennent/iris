@@ -112,6 +112,7 @@
      <Compile Include="Assets\Scripts\Workspace\LoadableFile.js" />
      <Compile Include="Assets\Scripts\Workspace\WorkspaceManager.js" />
      <None Include="Assets\Materials\HeightDependentTint.shader" />
+     <None Include="Assets\Materials\Overdraw.shader" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/tenne_000/Documents/GitHub/iris/Network Visualization/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
