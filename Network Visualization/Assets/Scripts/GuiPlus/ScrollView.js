@@ -10,6 +10,7 @@ class ScrollView {
 		var scrollPane : ScrollPane;
 		if (paneMap.ContainsKey(id)) {
 			scrollPane = paneMap[id];
+			scrollPane.position = position;
 		} else {
 			scrollPane = new ScrollPane(position);
 			paneMap[id] = scrollPane;

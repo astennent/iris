@@ -151,10 +151,6 @@ public class GuiPlus extends MonoBehaviour {
 		ScrollView.SetScrollPosition(id, newScrollPosition);
 
 		var innerSize = new Vector2(scrollPaneRect.width, scrollPaneRect.height);
-
-		ScrollView.End();
-		ScrollView.Begin(position, newScrollPosition, innerBox);
-
 		return innerSize;
 	}
 
