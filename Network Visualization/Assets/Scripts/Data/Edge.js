@@ -53,9 +53,17 @@ class Edge extends TimeObject {
 		lineRenderer.SetPosition(1, to.transform.position + incomingAdjust);	
 	}
 
-	function setColor(c : Color) {
+	private function setColor(c : Color) {
 		color = c;
 		GetComponent(LineRenderer).material.color = c;
+	}
+
+	function updateColor() {
+		if (foreignKey.isUsingCustomColor()) {
+			setColor(foreignKey.color);
+		} else {
+			setColor(from.getColor());
+		}
 	}
 
 	function Deactivate(){

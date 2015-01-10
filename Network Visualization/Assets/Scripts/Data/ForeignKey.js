@@ -18,6 +18,9 @@ var weightAttribute : Attribute = null;
 var weightModifier : float = 1.0;
 var weightInverted = false;
 
+var usingCustomColor = false;
+var color = Color.white;
+
 static var MIN_WEIGHT_MODIFIER : float = 0.01;
 static var MAX_WEIGHT_MODIFIER : float = 10;
 
@@ -139,6 +142,42 @@ class ForeignKey {
 		return source_file.linking_table;
 	}
 
+	function isUsingCustomColor() {
+		return usingCustomColor;
+	}
+
+	function setUsingCustomColor(usingCustomColor : boolean) {
+		if (usingCustomColor == this.usingCustomColor) {
+			return;
+		}
+		this.usingCustomColor = usingCustomColor;
+		updateEdgeColors();
+	}
+
+	function setColor(color : Color) {
+		if (color == this.color) {
+			return;
+		}
+
+		this.color = color;
+		if (usingCustomColor) {
+			updateEdgeColors();
+		}
+	}
+
+	function updateEdgeColors() {
+		var relevantFile = (isLinking()) ? to_file : from_file;
+		var nodes = relevantFile.getNodes();
+		for (var node in nodes) {
+			var edges = node.getEdges(false);
+			for (var edge in edges) {
+				if (edge.foreignKey == this) {
+					edge.updateColor();
+				}
+			}
+		}
+	}
+
 	function getToFile() {
 		return to_file;
 	}
@@ -162,5 +201,4 @@ class ForeignKey {
 			addKeyPair(attr1, attr2);
 		}
 	}
-
 }

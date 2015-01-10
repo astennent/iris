@@ -63,7 +63,7 @@ class Node extends TimeObject {
 		renderer.material.color = color;
 		if (colorEdges){
 			for (edge in edges){
-				edge.setColor(c);
+				edge.updateColor();
 			}
 		}
 	}
@@ -331,6 +331,10 @@ class Node extends TimeObject {
 		haloColor = c;
 	}
 
+	function getColor() {
+		return color;
+	}
+	
 	function getHaloColor() {
 		return haloColor;
 	}
@@ -422,12 +426,16 @@ class Node extends TimeObject {
 		dateValidationResizeRequired = true;
 	}
 
-	//TODO: Cache this
+	function getEdges() {
+		return getEdges(false);
+	}
+
 	function getEdges(respectTimeSeries : boolean) {
 		if (!respectTimeSeries) {
 			return edges;
 		}
 
+		//TODO: Cache this
 		var output = new LinkedList.<Edge>();
 		for (var edge in edges) {
 			if (edge.hasValidTime() && edge.to.hasValidTime()) {

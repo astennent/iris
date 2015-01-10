@@ -4,14 +4,15 @@
 
 class FkeyMenu extends BaseMenu {
 
-	private static var fkeyBoxHeight = 160;
-	private static var fkeyBoxSpacing = 8;
+	private static var fkeyBoxHeight = 230;
+	private static var fkeyBoxSpacing = 50;
 	private static var keyPairHeight = 20;
 	private static var keyPairPreSpace = 35;
 	private static var keyPairSpacing = 1;
 	private static var keyPairAddSpace = 5;
 	private static var addingBoxPreSpace = 5;
 	private static var addingBoxHeight = 130;
+	private static var colorSelectionPadding = 40;
 
 	private static var contentWidth : int;
 
@@ -75,6 +76,11 @@ class FkeyMenu extends BaseMenu {
 		var weightAttribute = foreignKey.getWeightAttribute();
 		if (!weightAttribute) {
 			boundingBoxHeight -= 40;
+		}
+
+		var isUsingCustomColor = foreignKey.isUsingCustomColor();
+		if (!isUsingCustomColor) {
+			boundingBoxHeight -= colorSelectionPadding;
 		}
 
 		var fkey_box = new Rect(1, cur_y, contentWidth, boundingBoxHeight);
@@ -161,6 +167,9 @@ class FkeyMenu extends BaseMenu {
 		if (addingFkey == foreignKey) {
 			cur_y = DrawAddingBox(cur_y + addingBoxPreSpace);
 		}
+
+		cur_y = DrawColorSelection(foreignKey, cur_y);
+
 		return cur_y + fkeyBoxSpacing;
 	}
 
@@ -194,7 +203,7 @@ class FkeyMenu extends BaseMenu {
 			cur_y += keyPairHeight + keyPairSpacing;
 		}
 		cur_y += keyPairAddSpace;
-		var addBox = new Rect(20, cur_y, 140, 20);		
+		var addBox = new Rect(20, cur_y, 160, 20);		
 		var isAdding = (addingFkey == foreignKey);
 		var addText = (isAdding) ? "Cancel" : "Add Attribute Pair";
 
@@ -256,5 +265,58 @@ class FkeyMenu extends BaseMenu {
 	private function resetAdding() {
 		addingFkey = null;
 		addingFkeyStep = 0;
+	}
+
+	private function DrawColorSelection(foreignKey : ForeignKey, cur_y : int) {
+		var originalColor = GUI.color;
+		var isUsingCustomColor = foreignKey.isUsingCustomColor();
+		var toggleRectHeight = 20;
+		var toggleRectPadding = 10;
+		var toggleRect = new Rect(toggleRectPadding, cur_y, contentWidth - 2*toggleRectPadding, toggleRectHeight);
+		var toggleText = " Use Custom Color";
+		var newUsingCustomColor = GuiPlus.Toggle(toggleRect, isUsingCustomColor, toggleText);
+		if (newUsingCustomColor != isUsingCustomColor) {
+			foreignKey.setUsingCustomColor(newUsingCustomColor);
+		}
+
+		cur_y += toggleRectHeight;
+
+		if (newUsingCustomColor) {
+
+			// TODO: Make this a real color selector.
+			var colorOptions = [Color.red, Color.blue, Color.green, Color.yellow, Color.white];
+
+			// Calculate how to center the buttons.
+			var colorOptionInnerPadding = 10;
+			var colorOptionOuterPadding = 30;
+			var totalWidth = contentWidth - colorOptionOuterPadding*2;
+			totalWidth -= colorOptionInnerPadding*(colorOptions.length-1);
+			var buttonWidth = totalWidth / colorOptions.length;
+
+			var buttonRect = new Rect(colorOptionOuterPadding, cur_y, buttonWidth, buttonWidth);
+
+			var currentColor = foreignKey.color;
+			for (var color in colorOptions) {
+				GUI.color = color;
+				
+				var isCurrentColor = (currentColor == color);
+				if (!isCurrentColor) {
+					GUI.color.a = .5;
+				}
+				
+				if (GuiPlus.Button(buttonRect, "")) {
+					foreignKey.setColor(color);
+				}
+
+				buttonRect.x += buttonWidth + colorOptionInnerPadding;
+			}
+
+			var coloringPadding = colorSelectionPadding;
+			cur_y += coloringPadding;
+		}
+
+		GUI.color = originalColor;
+		return cur_y;
+
 	}
 }
