@@ -26,7 +26,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 	function OnGUI(){
 		super.OnGUI();
 
-		var rule_index = DisplayMenu.rule_index;
+		var rule_index = ColorRuleMenu.rule_index;
 
 		if (!displaying) {
 			return;
@@ -261,8 +261,8 @@ class ColorRuleFilterMenu extends BaseMenu {
 
 	static function OnDisableDisplay(){
 		//special case: when you're on the fallback rule, don't reset the rule when you close.
-		if (DisplayMenu.rule_index != 0) {
-			DisplayMenu.setRuleIndex(-1);
+		if (ColorRuleMenu.rule_index != 0) {
+			ColorRuleMenu.setRuleIndex(-1);
 		}
 	}
 }

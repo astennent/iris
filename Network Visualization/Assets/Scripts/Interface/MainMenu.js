@@ -86,7 +86,7 @@ class MainMenu extends BaseMenu {
 			button_position = new Rect(x+5, cur_y, 35, 35);
 			GUI.color = Color.magenta;
 			if (GuiPlus.Button(button_position, display)){
-				chooseMenu(DisplayMenu);
+				chooseMenu(ColorRuleMenu);
 			}
 			if (button_position.Contains(mousePosition)){}
 			
@@ -181,10 +181,10 @@ class MainMenu extends BaseMenu {
 			DisableDisplay(SearchMenu);
 		}
 
-		if (chosenMenu == DisplayMenu) {
-			ToggleDisplay(DisplayMenu);
+		if (chosenMenu == ColorRuleMenu) {
+			ToggleDisplay(ColorRuleMenu);
 		} else {
-			DisableDisplay(DisplayMenu);
+			DisableDisplay(ColorRuleMenu);
 		}
 
 		if (chosenMenu == FileMenu) {

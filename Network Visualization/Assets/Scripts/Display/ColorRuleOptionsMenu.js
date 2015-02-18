@@ -5,7 +5,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 	private static var attributeScrollPosition : Vector2 = Vector2.zero;
 	private static var rule : ColorRule;
 	function Start(){
-		parent = GetComponent(DisplayMenu);
+		parent = GetComponent(ColorRuleMenu);
 		super.Start();
 		width = 220;
 		title = "Rule Options";
@@ -17,8 +17,8 @@ class ColorRuleOptionsMenu extends BaseMenu {
 			var button_text : String;
 			var label_text : String;
 
-			var rule_index = DisplayMenu.rule_index;
-			rule = ColorController.rules[DisplayMenu.rule_index];
+			var rule_index = ColorRuleMenu.rule_index;
+			rule = ColorController.rules[ColorRuleMenu.rule_index];
 
 			var y = DrawColoringMethodSelection(35);
 
@@ -258,6 +258,6 @@ class ColorRuleOptionsMenu extends BaseMenu {
 	}
 
 	static function OnDisableDisplay(){
-		DisplayMenu.setRuleIndex(-1);
+		ColorRuleMenu.setRuleIndex(-1);
 	}
 }

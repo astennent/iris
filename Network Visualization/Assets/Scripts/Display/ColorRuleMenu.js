@@ -1,6 +1,6 @@
 #pragma strict
 
-class DisplayMenu extends BaseMenu {
+class ColorRuleMenu extends BaseMenu {
 	private static var scrollPosition : Vector2 = Vector2.zero;
 	private static var ruleRects = new Dictionary.<ColorRule, Rect>();
 
@@ -9,7 +9,7 @@ class DisplayMenu extends BaseMenu {
 	function Start(){
 		parent = GetComponent(MainMenu);
 		super.Start();
-		title = "Display Settings";
+		title = "Coloring Rules";
 	}
 
 	function OnGUI(){

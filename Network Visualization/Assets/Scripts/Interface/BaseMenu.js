@@ -41,6 +41,11 @@ class BaseMenu extends MonoBehaviour {
 	function OnGUI() {
 		GUI.skin = MenuController.getSkin();
 
+		// // Scale GUI to match DPI settings.
+		// var scale = 10;//Screen.dpi / 96.0;
+		// if (scale > 0 )
+		// 	GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1));
+
 		var menuRect = new Rect(x, MenuController.getScreenTop(), width, MenuController.getScreenHeight());
 		GuiPlus.Box(menuRect, title);
 
