@@ -27,6 +27,8 @@ class MainMenu extends BaseMenu {
 	}
 
 	function OnGUI() {
+		GUI.skin = MenuController.getSkin();
+
 		var menuRect = new Rect(x, MenuController.getScreenTop(), width, Screen.height - MenuController.getScreenTop());
 		GuiPlus.Box(menuRect, title);
 		

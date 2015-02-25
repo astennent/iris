@@ -249,12 +249,15 @@ public class GuiPlus extends MonoBehaviour {
 		}
 
 		function CalculateDrawResult() {
+			var preservedColor = GUI.color;
 			var retVal : Object;
 			switch (func) {
 				case (BEGIN_SCROLL_VIEW):
+					GUI.color = HIDDEN_COLOR;
 					retVal = GUI.BeginScrollView(args[0], args[1], args[2]);
 					break;
 				case (END_SCROLL_VIEW):
+					GUI.color = HIDDEN_COLOR;
 					GUI.EndScrollView();
 					break;
 				case (BUTTON): 
@@ -281,6 +284,7 @@ public class GuiPlus extends MonoBehaviour {
 				default:
 					throw "I don't know that function!";
 			}
+			GUI.color = preservedColor;
 			return retVal;
 		}
 

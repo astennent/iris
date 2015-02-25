@@ -36,6 +36,8 @@ class TerminalMenu extends BaseMenu {
 	}	
 
 	function OnGUI() {
+
+		GUI.skin = MenuController.getSkin();
 		
 		desired_x = (Screen.width - width)/2;
 		height = MenuController.getScreenHeight()*.7;
