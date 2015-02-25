@@ -13,12 +13,17 @@ public class GuiPlus extends MonoBehaviour {
 	static var LABEL = 4;
 	static var TOGGLE = 5;
 
+	private static var leftButtonUp = false;
+
 	function LateUpdate(){
 		boxes = new List.<Rect>(); //TODO: Move this to OnGUI?
 		functionQueue.Clear();
 		seenDepths.Clear();
 	}
 
+	function Update() {
+		leftButtonUp = Input.GetMouseButtonUp(0);
+	}
 
 	////////////////// Extra GuiPlus functions /////////////////////////
 
@@ -81,45 +86,37 @@ public class GuiPlus extends MonoBehaviour {
 
 		if (drawBox) {
 			var guiFunction = new GUIFunction(BOX, position, text);
-			guiFunction.init();
 			functionQueue.Add(guiFunction);
 		}
 	}
 
 	static function Button(position : Rect, param1) : boolean {
 		var guiFunction =  new GUIFunction(BUTTON, position, param1);
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
-		return guiFunction.execute(true);
+		return guiFunction.CalculateDrawResult();
 	}
 
 	static function Button(position : Rect, param1, param2) : boolean {
 		var guiFunction =  new GUIFunction(BUTTON, position, param1, param2);
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
-		return guiFunction.execute(true);
+		return guiFunction.CalculateDrawResult();
 	}
 
 
 	static function Label(position : Rect, param1) {
 		var guiFunction =  new GUIFunction(LABEL, position, param1);
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
-		guiFunction.execute(true);
 	}
 
 	static function Label(position : Rect, param1, param2) {
 		var guiFunction =  new GUIFunction(LABEL, position, param1, param2);
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
-		guiFunction.execute(true);
 	}
 
 	static function Toggle(position : Rect, param1, param2) : boolean {
 		var guiFunction =  new GUIFunction(TOGGLE, position, param1, param2);
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
-		return guiFunction.execute(true);
+		return guiFunction.CalculateDrawResult();
 	}
 
 
@@ -129,11 +126,10 @@ public class GuiPlus extends MonoBehaviour {
 		ScrollView.Begin(position, scrollPosition, innerBox);		
 		
 		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, position, scrollPosition, innerBox);
-		guiFunction.init();
 		guiFunction.isScrollPane = true;
 		functionQueue.Add(guiFunction);
 
-		return guiFunction.execute(true);
+		return guiFunction.CalculateDrawResult();
 	}
 
 	// TOOD: Better documentation: This returns the innerSize, not the scrollPosition.
@@ -144,10 +140,9 @@ public class GuiPlus extends MonoBehaviour {
 
 		var guiFunction = new GUIFunction(BEGIN_SCROLL_VIEW, position, scrollPosition, innerBox);
 		guiFunction.isScrollPane = true;
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
 
-		var newScrollPosition = guiFunction.execute(true);
+		var newScrollPosition = guiFunction.CalculateDrawResult();
 		ScrollView.SetScrollPosition(id, newScrollPosition);
 
 		var innerSize = new Vector2(scrollPaneRect.width, scrollPaneRect.height);
@@ -160,35 +155,27 @@ public class GuiPlus extends MonoBehaviour {
 
 		var guiFunction = new GUIFunction(END_SCROLL_VIEW);
 		guiFunction.isScrollPane = true;
-		guiFunction.init();
 		functionQueue.Add(guiFunction);
 
-		guiFunction.execute(true);
+		guiFunction.CalculateDrawResult();
 	}
 
 
 	/////////////// END GUIPLUS FUNCTION PASSTHROUGHS ////////////////
 
 
-
 	function OnGUI() {
-		flush();	
-	}
-
-	//Flush all saved gui objects, in order.
-	private function flush() {
 		var seenDepthKeys = getSortedKeys();
 		for (var depth in seenDepthKeys) {
 			for (var guiFunction in functionQueue) {
 				if (guiFunction.isScrollPane || guiFunction.depth == depth) {
-					guiFunction.execute(false); // Draw the buttons, but don't bother using the return values.
+					guiFunction.Draw(); // Draw the buttons, but don't bother using the return values.
 				}
 			}
 		}
 	}
 
 	private function getSortedKeys() {
-
 		var keys = new List.<int>();
 		for (var value in seenDepths) {
 			keys.Add(value);
@@ -211,8 +198,6 @@ public class GuiPlus extends MonoBehaviour {
 		}
 
 		return keys;
-
-
 	}
 
 	// Class to hold a function/parameter combination.
@@ -228,17 +213,20 @@ public class GuiPlus extends MonoBehaviour {
 
 		function GUIFunction(func : int) {
 			this.func = func;
+			init();
 		}
 		function GUIFunction(func : int, position : Rect) {
 			this.func = func;
 			args = new Array();
 			args.Push(position);
+			init();
 		}
 		function GUIFunction(func : int, position : Rect, arg1) {
 			this.func = func;
 			args = new Array();
 			args.Push(position);
 			args.Push(arg1);
+			init();
 		}
 		function GUIFunction(func : int, position : Rect, arg1, arg2) {
 			this.func = func;
@@ -246,9 +234,10 @@ public class GuiPlus extends MonoBehaviour {
 			args.Push(position);
 			args.Push(arg1);
 			args.Push(arg2);
+			init();
 		}
 
-		function init() {
+		private function init() {
 			color = GUI.color;
 			depth = GUI.depth;
 			skin = GUI.skin;
@@ -259,39 +248,66 @@ public class GuiPlus extends MonoBehaviour {
 			}
 		}
 
-		function execute(hidden : boolean) {
-			var preservedColor = GUI.color;
-			var preservedSkin = GUI.skin;
-
-			GUI.color = (hidden) ? HIDDEN_COLOR : this.color;
-			GUI.skin = this.skin;
-
-			var retVal = this.Draw();
-			
-			GUI.color = preservedColor;
-			GUI.skin = preservedSkin;
-
+		function CalculateDrawResult() {
+			var retVal : Object;
+			switch (func) {
+				case (BEGIN_SCROLL_VIEW):
+					retVal = GUI.BeginScrollView(args[0], args[1], args[2]);
+					break;
+				case (END_SCROLL_VIEW):
+					GUI.EndScrollView();
+					break;
+				case (BUTTON): 
+					var mousePosition = GuiPlus.getMousePosition(); 
+					var rect = args[0];
+					if (GuiPlus.leftButtonUp && rect.Contains(mousePosition)) {
+						GuiPlus.leftButtonUp = false;
+						retVal = true;
+					} else {
+						retVal = false;
+					}
+					break;
+				case (TOGGLE):
+					mousePosition = GuiPlus.getMousePosition();
+					rect = args[0];
+					var wasSelected = args[1];
+					if (leftButtonUp && rect.Contains(mousePosition)) {
+						GuiPlus.leftButtonUp = false;
+						retVal = !wasSelected;
+					} else {
+						retVal = wasSelected;
+					}
+					break;
+				default:
+					throw "I don't know that function!";
+			}
 			return retVal;
 		}
 
-		private function Draw() {
-			var result : Object;
+		function Draw() {
+
+			var preservedColor = GUI.color;
+			var preservedSkin = GUI.skin;
+
+			GUI.color = this.color;
+			GUI.skin = this.skin;
+
 			switch (func) {
 				case (BEGIN_SCROLL_VIEW):
-					result = GUI.BeginScrollView(args[0], args[1], args[2]);
+					GUI.BeginScrollView(args[0], args[1], args[2]);
 					break;
 				case (END_SCROLL_VIEW):
 					GUI.EndScrollView();
 					break;
 				case (BUTTON): 
 					if (args.length == 2) {
-						result = GUI.Button(args[0], args[1]);
+						GUI.Button(args[0], args[1]);
 					} else if (args.length == 3) {
-						result = GUI.Button(args[0], args[1], args[2]);
+						GUI.Button(args[0], args[1], args[2]);
 					}
 					break;
 				case (BOX):
-					result = GUI.Box(args[0], args[1]);
+					GUI.Box(args[0], args[1]);
 					break;
 				case (LABEL):
 					if (args.length == 2) {
@@ -301,12 +317,14 @@ public class GuiPlus extends MonoBehaviour {
 					}
 					break;
 				case (TOGGLE):
-					result = GUI.Toggle(args[0], args[1], args[2]);
+					GUI.Toggle(args[0], args[1], args[2]);
 					break;
 				default:
 					throw("I don't support that function! Time to add more.");
 			} 
-			return result;
+
+			GUI.color = preservedColor;
+			GUI.skin = preservedSkin;
 		}
 
 	}

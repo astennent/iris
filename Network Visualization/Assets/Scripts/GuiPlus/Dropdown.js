@@ -90,7 +90,7 @@ class Dropdown extends MonoBehaviour {
 				}
 
 				//Draw a Box to darken the background behind the buttons.
-				GUI.depth = oldDepth+2; //open dropdowns should be on "top"
+				GUI.depth = oldDepth+1; //open dropdowns should be on "top"
 				GuiPlus.Box(outerBox, "");
 				GuiPlus.Box(outerBox, "");
 
@@ -124,15 +124,13 @@ class Dropdown extends MonoBehaviour {
 					}
 					position.y+=position.height;
 
-					for (var optionIndex = 0 ; optionIndex < options.length ; optionIndex ++) {
+					for (var optionIndex = 0 ; optionIndex < options.length ; optionIndex++) {
 
 						//Create a button for the current option.
 						if (GuiPlus.Button(position, options[optionIndex])) {
 							optionBox.open = false;
 							dropdown.selectedIndex = optionIndex;
 						}
-
-						//adjust the y value
 						position.y += position.height;
 					}
 

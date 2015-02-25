@@ -1,7 +1,6 @@
 #pragma strict
 
 var node : Node;
-private var primary : boolean;
 
 function Init (n : Node){
 	node = n;

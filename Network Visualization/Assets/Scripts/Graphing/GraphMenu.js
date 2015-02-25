@@ -19,16 +19,19 @@ class GraphMenu extends BaseMenu {
 	function OnGUI(){
 		super.OnGUI();	
 
-		if (displaying) {
-			var cur_y = DrawEnableButton(40);
-			cur_y = DrawCameraButtons(cur_y);
-			cur_y = DrawFileSelection(cur_y);
-			if (GraphController.getFile() != null) {
-				cur_y = DrawMethodSelection(cur_y);
-				cur_y = DrawOptions(cur_y);
-				cur_y = DrawAxesSelection(cur_y);
-			}
+		if (!displaying) {
+			return;
 		}
+		
+		var cur_y = DrawEnableButton(40);
+		cur_y = DrawCameraButtons(cur_y);
+		cur_y = DrawFileSelection(cur_y);
+		if (GraphController.getFile() != null) {
+			cur_y = DrawMethodSelection(cur_y);
+			cur_y = DrawOptions(cur_y);
+			cur_y = DrawAxesSelection(cur_y);
+		}
+	
 	}
 
 	private function DrawEnableButton(cur_y : int) {

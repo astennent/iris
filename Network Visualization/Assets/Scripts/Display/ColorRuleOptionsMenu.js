@@ -105,7 +105,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 				GUI.color = Color.white; 
 			}
 
-			if (GuiPlus.Button(schemeRect, schemeName)){
+			if (GUI.Button(schemeRect, schemeName)){
 				rule.setScheme(i);
 			}
 			cur_y+=30;

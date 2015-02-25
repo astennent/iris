@@ -64,7 +64,6 @@ class MainMenu extends BaseMenu {
 			if (GuiPlus.Button(button_position, save)){
 				WorkspaceManager.toggleSelectingSaveFile();
 			}
-			if (button_position.Contains(mousePosition)){} //TODO: tooltips
 
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
@@ -72,7 +71,6 @@ class MainMenu extends BaseMenu {
 			if (GuiPlus.Button(button_position, load)){
 				WorkspaceManager.toggleSelectingLoadFile();				
 			}
-			if (button_position.Contains(mousePosition)){} //TODO: tooltips
 
 			cur_y += 80;
 			button_position = new Rect(x+5, cur_y, 35, 35);
@@ -80,7 +78,6 @@ class MainMenu extends BaseMenu {
 			if (GuiPlus.Button(button_position, search) || (Input.GetButtonDown("Search") && Input.GetButton("Ctrl"))){
 				chooseMenu(SearchMenu);
 			}
-			if (button_position.Contains(mousePosition)){} //TODO: tooltips
 			
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
@@ -88,7 +85,6 @@ class MainMenu extends BaseMenu {
 			if (GuiPlus.Button(button_position, display)){
 				chooseMenu(ColorRuleMenu);
 			}
-			if (button_position.Contains(mousePosition)){}
 			
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
@@ -96,8 +92,6 @@ class MainMenu extends BaseMenu {
 			if (GuiPlus.Button(button_position, gear)){
 				chooseMenu(TerminalMenu);
 			}
-			if (button_position.Contains(mousePosition)){}
-
 
 			cur_y += 40;
 			button_position = new Rect(x+5, cur_y, 35, 35);
@@ -113,8 +107,6 @@ class MainMenu extends BaseMenu {
 			if (GuiPlus.Button(button_position, plane)){
 				PlanarityController.toggleFlat();
 			}
-			if (button_position.Contains(mousePosition)){}
-
 			
 			cur_y += 80;
 			button_position = new Rect(x+5, cur_y, 35, 35);
