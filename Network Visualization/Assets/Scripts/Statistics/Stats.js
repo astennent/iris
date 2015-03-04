@@ -3,11 +3,15 @@
 //This class is extended by Attribute so that the public getter methods can be called directly.
 class Stats {
 
+	@System.NonSerialized
+	protected var m_file : DataFile;
+	var column_index : int; // This is public for serialization.
+
 	private var minValue : float;
 	private var maxValue : float;
 	private var countValue : int;
 	private var sumValue : float;
-	private var attribute : Attribute;
+
 	private var uniqueValueCount : int;
 
 	private var valid : boolean = false;
@@ -17,12 +21,11 @@ class Stats {
 	
 	var defaultNumeric : float = 0; //getNumeric return value for when a value is not a valid number.
 
-	function setStatsAttribute(attribute : Attribute) {
+	function Stats() {
 		minValue = 0;
 		maxValue = 0;
 		countValue = 0;
 		sumValue = 0;
-		this.attribute = attribute;
 	}
 
 	function getMin() {
@@ -71,8 +74,7 @@ class Stats {
 
 		values = new List.<float>();
 		uniqueValues = new HashSet.<float>();
-
-		if (attribute.getFile().linking_table) {
+		if (m_file.linking_table) {
 			updateValuesForLinkingTable();
 		} else {
 			updateValuesForNormalTable();
@@ -85,7 +87,7 @@ class Stats {
 	private function updateValuesForLinkingTable() {
 		// Find all files that are be connected with the linking table.
 		var filesToCheck = new HashSet.<DataFile>();
-		for (var fkey in attribute.getFile().getForeignKeys()) {
+		for (var fkey in m_file.getForeignKeys()) {
 			filesToCheck.Add(fkey.getToFile());
 		}
 
@@ -110,7 +112,7 @@ class Stats {
 	}
 
 	private function updateValuesForNormalTable() {
-		var nodes = attribute.getFile().getNodes(true);
+		var nodes = m_file.getNodes(true);
 		for (var node in nodes) {
 			addValue(node);
 		}
@@ -118,7 +120,7 @@ class Stats {
 
 	//Adds a single data point to the collection
 	private function addValue(data : Data) {
-		var val = data.GetNumeric(attribute);
+		var val = data.GetNumeric(column_index);
 		values.Add(val);
 		uniqueValues.Add(val);
 	}
@@ -126,7 +128,7 @@ class Stats {
 	//Marks stats as invalid. They will be updated whenever they are required.
 	public function invalidate() {
 		valid = false;
-		ColorController.handleAttributeInvalidate(attribute);
+		ColorController.handleAttributeInvalidate(m_file.attributes[column_index]);
 	}
 
 	private function calculateStats() {
@@ -157,18 +159,18 @@ class Stats {
 
 		valid = true;
 
-		// Is this useless optimization?
+		// We don't need to hold onto these and waste RAM.
 		values.Clear();
 		uniqueValues.Clear();
 	}
 
 	public function genFractionalColor(data : Data) : Color {
-		var num = data.GetNumeric(attribute);
+		var num = data.GetNumeric(column_index);
 		return ColorController.GenFractionalColor(getFraction(num));
 	}
 
 	public function getFraction(data : Data) {
-		return getFraction(data.GetNumeric(attribute));
+		return getFraction(data.GetNumeric(column_index));
 	}
 
 	//Returns a value between 0 and 1.

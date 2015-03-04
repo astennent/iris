@@ -1,9 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GuiPlus\FilePicker.js">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Statistics\Stats.js">
     <Files>
-      <File FileName="Assets\Scripts\Statistics\Stats.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GuiPlus\FilePicker.js" Line="85" Column="26" />
+      <File FileName="Assets\Scripts\Statistics\Stats.js" Line="11" Column="1" />
+      <File FileName="Assets\Scripts\Data\ForeignKey.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GuiPlus\FilePicker.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Workspace\FileManager.js" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>

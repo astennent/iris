@@ -262,7 +262,7 @@ function DrawTickLabels() {
 	
 	var graphing = GraphController.isGraphing() && draw_tick_labels && draw_axes;
 	for (var axis_index = 0 ; axis_index < 3 ; axis_index++) { 
-		var attribute = GraphController.getAxes()[axis_index];
+		var attribute = GraphController.getAxis(axis_index);
 		if (attribute == null) {
 			continue;
 		}
@@ -297,7 +297,7 @@ private static function getPivotPosition(index : int, axis_index : int, count : 
 }
 
 //called by graph controller when a axis's attribute changes
-static function updateAxis(axis_index : int ){
+static function updateAxis(axis_index : int ) {
 	var attribute = GraphController.getAxes()[axis_index];
 	var originalCount = (attribute != null) ? attribute.getUniqueValueCount()-1 : 0;
 

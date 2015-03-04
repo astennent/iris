@@ -1,10 +1,14 @@
 #pragma strict
 
+@System.NonSerialized
 private var keyPairs = new List.<Attribute[] >(); //array of tuples. [ [from,to] [from,to] [from,to]...]
 var keyPairIds = new List.<List.<int> >(); //matching array of attribute tuples for serialization
 
+@System.NonSerialized
 private var from_file : DataFile; 
+@System.NonSerialized
 private var to_file : DataFile;
+@System.NonSerialized
 private var source_file : DataFile;
 
 // Keep track of the file id's for serialization.

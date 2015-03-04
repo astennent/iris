@@ -1,21 +1,21 @@
 #pragma strict
 
 var column_name :String;
-var column_index : int;
 var is_shown : boolean = false; //for display on the screen.
 var is_pkey : boolean = false;
 
 var file_uuid : int; //uuid of the file to which this attribute belongs
-private var file : DataFile;
 
-private var restrictedNameCache = new Dictionary.<int, String>();
+private var m_restrictedNameCache = new Dictionary.<int, String>();
 
 static var FKEY_COLOR = new Color(1, .5, 0);
 static var PKEY_COLOR = new Color(1, .5, .5);
 static var SHOWN_COLOR = new Color(1, 1, .5);
 static var TIME_SERIES_COLOR = new Color(.2, 1, .5);
 
+@System.NonSerialized
 private var associatedForeignKeysFrom = new HashSet.<ForeignKey>();
+@System.NonSerialized
 private var associatedForeignKeysTo = new HashSet.<ForeignKey>();
 
 //TimeFrame variables
@@ -33,20 +33,20 @@ class Attribute extends Stats {
 	//Constructor
 	public function Attribute(file : DataFile, column_name : String, column_index : int) {
 		this.file_uuid = file.uuid;
-		this.file = file;
+		m_file = file;
 		this.column_index = column_index;
 		this.column_name = column_name;
-		setStatsAttribute(this);
+		super(); // base constructor
 		uuid = WorkspaceManager.generateUUID();
 	}
 
 	function ToggleShown(){
 		is_shown = !is_shown;
-		file.updateNodeNames();
+		m_file.updateNodeNames();
 	}
 
 	function TogglePkey(){
-		if (!file.isActivated() && !file.isActivating()) {
+		if (!m_file.isActivated() && !m_file.isActivating()) {
 			is_pkey = !is_pkey;
 		}
 	}
@@ -55,7 +55,7 @@ class Attribute extends Stats {
 		if (pixels < 10) {
 			return "";
 		}
-		if (!(pixels in restrictedNameCache)){
+		if (!(pixels in m_restrictedNameCache)){
 			var restrictedName : String = column_name; 
 			var had_to_adjust = false;
 			while (true) {
@@ -71,9 +71,9 @@ class Attribute extends Stats {
 			if (had_to_adjust) {
 				restrictedName = restrictedName.Substring(0, restrictedName.Length*2/3) + "~" +  restrictedName.Substring(restrictedName.Length*2/3+1);
 			}
-			restrictedNameCache[pixels] = restrictedName;
+			m_restrictedNameCache[pixels] = restrictedName;
 		}
-		return restrictedNameCache[pixels];
+		return m_restrictedNameCache[pixels];
 	}
 
 	function getColumnName(){
@@ -83,7 +83,7 @@ class Attribute extends Stats {
 	function setColumnName(new_name : String) {
 		if (new_name != column_name) {
 			column_name = new_name;
-			restrictedNameCache = new Dictionary.<int, String>();
+			m_restrictedNameCache = new Dictionary.<int, String>();
 		}
 	}
 
@@ -110,7 +110,7 @@ class Attribute extends Stats {
 			colors.Add(FKEY_COLOR);
 		}
 
-		if (file.timeFrame.usesAttribute(this)) {
+		if (m_file.timeFrame.usesAttribute(this)) {
 			colors.Add(TIME_SERIES_COLOR);
 		}
 
@@ -127,8 +127,8 @@ class Attribute extends Stats {
 		this.timeFrameFormat = format;
 		timeFrameFormatWarning = TimeParser.getFormatWarning(format);
 		validTimeFrameFormat = (timeFrameFormatWarning == "");
-		if (file.timeFrame != null) { //This should only be false on startup.
-			file.timeFrame.updateValid();
+		if (m_file.timeFrame != null) { //This should only be false on startup.
+			m_file.timeFrame.updateValid();
 		}
 	}
 	function hasValidTimeFrameFormat() {
@@ -162,12 +162,11 @@ class Attribute extends Stats {
 	}
 
 	function getFile() {
-		return file;
+		return m_file;
 	}
 
 	function OnWorkspaceLoad() {
-		setStatsAttribute(this);
-		file = FileManager.getFileFromUUID(file_uuid);
+		m_file = FileManager.getFileFromUUID(file_uuid);
 		setTimeFrameFormat(timeFrameFormat);
 	}
 

@@ -3,8 +3,11 @@
 //Every datafile gets one Timeframe which specifies the columns for start and end with timeseries.
 class TimeFrame {
 
+	@System.NonSerialized
 	private var file : DataFile;
+	@System.NonSerialized
 	private var startColumns = new List.<Attribute>();
+	@System.NonSerialized
 	private var endColumns = new List.<Attribute>();
 
 	private var validStart = true; //is every column valid?
