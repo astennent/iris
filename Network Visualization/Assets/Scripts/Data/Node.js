@@ -48,9 +48,9 @@ class Node extends TimeObject {
 		
 		sizing_type = 0; //by # edges
 			
-		renderer.material = new Material(NetworkController.getNodeTexture());
+		GetComponent.<Renderer>().material = new Material(NetworkController.getNodeTexture());
 		lineMat = new Material(NetworkController.getLineTexture());
-		renderer.material.color = color;	
+		GetComponent.<Renderer>().material.color = color;	
 		resetHaloColor();	
 
 		initialized = true;
@@ -60,7 +60,7 @@ class Node extends TimeObject {
 
 	function setColor(c : Color, colorEdges : boolean){
 		color = c;
-		renderer.material.color = color;
+		GetComponent.<Renderer>().material.color = color;
 		if (colorEdges){
 			for (edge in edges){
 				edge.updateColor();
@@ -193,9 +193,9 @@ class Node extends TimeObject {
 
 	//called every frame, based on graphing.
 	function setRender(enable : boolean){
-		renderer.enabled = enable;
+		GetComponent.<Renderer>().enabled = enable;
 		if (reticle != null) {
-			reticle.renderer.enabled = enable;
+			reticle.GetComponent.<Renderer>().enabled = enable;
 		}
 	}
 
@@ -284,7 +284,7 @@ class Node extends TimeObject {
 	}
 
 	function LateUpdate () {
-		if (renderer.isVisible && !GraphController.isGraphing()){
+		if (GetComponent.<Renderer>().isVisible && !GraphController.isGraphing()){
 			label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
 			var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*desired_size/10;
 			label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 3.0, 20.0);

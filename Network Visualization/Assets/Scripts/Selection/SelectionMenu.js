@@ -114,7 +114,7 @@ class SelectionMenu extends BaseMenu {
 		var numNodes = SelectionController.getNumSelected();
 		var node = SelectionController.getPrimaryNode();
 		
-		GUI.color = node.getMenuColor();
+		GUI.color = Color.white;
 		var outerRect = new Rect(x, cur_y, width, MenuController.getScreenHeight()-cur_y);
 
 		var extra_vertical_space : int;
@@ -131,7 +131,7 @@ class SelectionMenu extends BaseMenu {
 		outerRect.height-=extra_vertical_space;
 
 		var source_attrs = node.getSource().getAttributes();
-		var data_height = 20;
+		var data_height = 25;
 		var innerHeight = source_attrs.Count * data_height;
 
 		var contentWidth : float;
@@ -152,7 +152,7 @@ class SelectionMenu extends BaseMenu {
 				var attribute = source_attrs[index];
 
 				GUI.color = attribute.genFractionalColor(node); 
-				GuiPlus.Box(new Rect(0, data_scroll_y, contentWidth, data_height), "");
+				GuiPlus.Box(new Rect(0, data_scroll_y, contentWidth/2-5, data_height), "");
 
 				var attr_name = attribute.getRestrictedName(width/2-10);	
 				var attr_rect = new Rect(5, data_scroll_y, contentWidth/2, data_height);
@@ -163,6 +163,7 @@ class SelectionMenu extends BaseMenu {
 				attr_value_rect.width -= 5;
 
 				var attr_value = node.Get(index)+"";
+				GUI.color = Color.white;
 				var new_value = GUI.TextField(attr_value_rect, attr_value);
 
 				//Update the data point.

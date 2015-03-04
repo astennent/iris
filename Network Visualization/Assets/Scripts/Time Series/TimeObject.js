@@ -9,7 +9,7 @@ class TimeObject extends Data {
 	private var validTime : boolean = true;
 
 	function Update() {
-		renderer.enabled = hasValidTime();
+		GetComponent.<Renderer>().enabled = hasValidTime();
 	}
 
 	//Called when the current date changes in the TimeLine or when the TimeObject's date is changed.

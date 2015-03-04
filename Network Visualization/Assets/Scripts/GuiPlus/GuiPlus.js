@@ -277,6 +277,7 @@ public class GuiPlus extends MonoBehaviour {
 					if (leftButtonUp && rect.Contains(mousePosition)) {
 						GuiPlus.leftButtonUp = false;
 						retVal = !wasSelected;
+						Debug.Log(wasSelected);
 					} else {
 						retVal = wasSelected;
 					}

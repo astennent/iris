@@ -118,7 +118,7 @@ class Dropdown extends MonoBehaviour {
 					var hypenRatio = 1.3; //arbitrary number that looks pretty good.
 
 					//Create a button for the blank option.
-					if (GuiPlus.Button(position, "- " * (hypenCount * hypenRatio))) {
+					if (GUI.Button(position, "- " * (hypenCount * hypenRatio))) {
 						optionBox.open = false;
 						dropdown.selectedIndex = -1;
 					}
@@ -127,7 +127,7 @@ class Dropdown extends MonoBehaviour {
 					for (var optionIndex = 0 ; optionIndex < options.length ; optionIndex++) {
 
 						//Create a button for the current option.
-						if (GuiPlus.Button(position, options[optionIndex])) {
+						if (GUI.Button(position, options[optionIndex])) {
 							optionBox.open = false;
 							dropdown.selectedIndex = optionIndex;
 						}

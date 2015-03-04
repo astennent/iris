@@ -23,7 +23,7 @@ class Bar extends MonoBehaviour {
 		transform.position = Vector3.Lerp(transform.position, desiredPosition, 0.5);
 		transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, 0.5);
 
-		renderer.enabled = (GraphController.isGraphing() && GraphController.isUsingMethodWithBars());
+		GetComponent.<Renderer>().enabled = (GraphController.isGraphing() && GraphController.isUsingMethodWithBars());
 	}
 
 	function snapToBottom() {
