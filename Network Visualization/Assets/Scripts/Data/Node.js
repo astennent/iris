@@ -7,8 +7,6 @@ class Node extends TimeObject {
 	private var label : GameObject;
 
 	private var edges : LinkedList.<Edge>;
-	var edgePrefab : GameObject;
-	var lineMat : Material;
 	private var color : Color;
 
 	var reticlePrefab : Reticle; //used to instantiate reticle
@@ -35,8 +33,9 @@ class Node extends TimeObject {
 	static var BASE_DESIRED_DISTANCE : float = 50.0;
 
 	static function Instantiate(source : DataFile, sourceRow : List.<String>) {
+		var instance = GameObject.Instantiate( NetworkController.nodePrefab).GetComponent.<Node>();
 		var randPosition = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-		var instance = GameObject.Instantiate( NetworkController.nodePrefab, randPosition, new Quaternion(0,0,0,0) ).GetComponent.<Node>();
+		instance.transform.position = randPosition;
 		instance.source = source;
 		
 		// Initialize the text label.
@@ -54,7 +53,6 @@ class Node extends TimeObject {
     	instance.m_initialized = true;
 
 		instance.GetComponent.<Renderer>().material = new Material(NetworkController.getNodeTexture());
-		instance.lineMat = new Material(NetworkController.getLineTexture());
 		instance.edges = new LinkedList.<Edge>();
 		instance.setColor(ColorController.GenRandomColor(0), false); //random bright color;
 		instance.resetHaloColor();	
@@ -83,8 +81,8 @@ class Node extends TimeObject {
 				return edge;
 			}
 		}
-		var newEdge = GameObject.Instantiate(edgePrefab).GetComponent(Edge);
-		newEdge.Init(edgeSource, lineMat, color, isOutgoing, this, other, foreignKey);
+		var newEdge = Edge.Initialize(edgeSource, color, isOutgoing, this, other, foreignKey);
+		newEdge.Initialize(edgeSource, color, isOutgoing, this, other, foreignKey);
 		edges.AddLast( newEdge );
 		UpdateSize();
 		return newEdge;

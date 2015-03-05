@@ -4,6 +4,9 @@ import System.IO;
 static var nodePrefab : GameObject;
 var instanceNodePrefab : GameObject;
 
+static var edgePrefab : GameObject;
+var instanceEdgePrefab : GameObject;
+
 static var gameSpeed : float = 1;
 private static var paused : boolean = false;
 
@@ -33,6 +36,7 @@ static function getReticleTexture() {
 
 function Start() {
 	nodePrefab = instanceNodePrefab;
+   edgePrefab = instanceEdgePrefab;
 }
 
 static function SetSpeed(speed : float){

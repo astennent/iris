@@ -11,18 +11,20 @@ class Edge extends TimeObject {
 
 	private var lineRenderer : LineRenderer;
 
-	function Init (source : DataFile, m : Material, c : Color, o : boolean, f : Node, t :Node, fkey : ForeignKey) {
-		color = c;
-		isOutgoing = o;
-		from = f;
-		to = t;
-		foreignKey = fkey;
-		lineRenderer = GetComponent(LineRenderer);
-		lineRenderer.material = m;
-		lineRenderer.material.color = color;
+	static function Initialize(source : DataFile, color : Color, outgoing : boolean, fromNode : Node, toNode :Node, fkey : ForeignKey) {
+		var instance = GameObject.Instantiate(NetworkController.edgePrefab).GetComponent.<Edge>();
+		instance.color = color;
+		instance.isOutgoing = outgoing;
+		instance.from = fromNode;
+		instance.to = toNode;
+		instance.foreignKey = fkey;
+		instance.lineRenderer = instance.GetComponent(LineRenderer);
+		instance.lineRenderer.material = new Material(NetworkController.getLineTexture());
+		instance.lineRenderer.material.color = instance.color;
 
-		this.source = source;	
-		m_initialized = true;	
+		instance.source = source;	
+		instance.m_initialized = true;	
+		return instance;
 	}
 
 	function LateUpdate () {
