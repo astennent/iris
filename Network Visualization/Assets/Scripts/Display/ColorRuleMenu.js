@@ -85,7 +85,8 @@ class ColorRuleMenu extends BaseMenu {
 		for (var i = 1 ; i < rules.Count ; i++){
 
 			var rule = ColorController.rules[i];
-			var rule_color = rule.color; rule_color.a = 1;
+			var rule_color = rule.getMenuColor(); 
+			rule_color.a = 1;
 			GUI.color = rule_color;
 
 			var buttonRect = ruleRects[rule];
@@ -126,7 +127,7 @@ class ColorRuleMenu extends BaseMenu {
 
 			//only color the Xs if it's selected.
 			if (i == rule_index){
-				GUI.color = rule.color;
+				GUI.color = rule.getMenuColor();
 			} else {
 				GUI.color = Color.white;
 			}
@@ -155,7 +156,7 @@ class ColorRuleMenu extends BaseMenu {
 			rule_index = index;
 			if (rule_index > -1){
 				var rule : ColorRule = ColorController.rules[rule_index];
-				ColorPicker.setColor(rule.color);
+				ColorPicker.setColor(rule.getColor());
 				EnableDisplay(ColorRuleOptionsMenu);
 				if (rule_index > 0) {
 					EnableDisplay(ColorRuleFilterMenu);

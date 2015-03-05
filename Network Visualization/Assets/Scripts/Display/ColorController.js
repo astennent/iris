@@ -98,7 +98,7 @@ static function ApplyRule(rule : ColorRule, change_color : boolean, change_size 
 		var nodeList = rule.getNodes();
 		for (node in nodeList) {
 			var color = rule.getColor();
-			ColorNodeForRule(node, rule, color, change_color, change_size);
+			rule.Apply(node, color, change_color, change_size);
 		}			
 	} else if (rule_type == 3){ //attr
 		if (rule.getAttribute() != null) {
@@ -122,7 +122,7 @@ private static function ApplyFallbackRule(rule : ColorRule, change_color : boole
 			var nodes = file.getNodes();
 			for (var node in nodes){
 				var color : Color = rule.getColor();
-				ColorNodeForRule(node, rule, color, change_color, change_size);
+				rule.Apply(node, color, change_color, change_size);
 			}
 		}
 	} // Note that rule_type should not be 3 with a fallback rule.
@@ -132,14 +132,14 @@ static function ColorByCluster(cluster_id : int, rule  : ColorRule, change_color
 	var color : Color = rule.getColor();
 	var nodes = ClusterController.group_dict[cluster_id];	
 	for (var node in nodes){
-		ColorNodeForRule(node, rule, color, change_color, change_size);
+		rule.Apply(node, color, change_color, change_size);
 	}
 }
 
 static function ColorBySource(file : DataFile, rule  : ColorRule, change_color : boolean , change_size : boolean){
 	var color : Color = rule.getColor();
 	for (var node in file.getNodes()){
-		ColorNodeForRule(node, rule, color, change_color, change_size);
+		rule.Apply(node, color, change_color, change_size);
 	}
 }
 //color nodes based on a certain attribute value.
@@ -150,41 +150,8 @@ static function ColorByAttribute(attribute : Attribute, value : String, rule  : 
 
 	for (var node in file.getNodes()){
 		if (node.Get(attr_index) == value) { 
-			ColorNodeForRule(node, rule, color, change_color, change_size);
+			rule.Apply(node, color, change_color, change_size);
 		}
-	}
-}
-
-static function ColorNodeForRule(node : Node, rule : ColorRule, color : Color, change_color : boolean , change_size : boolean) : void {
-	var coloring_halo = rule.coloring_halo;
-	var coloring_node = rule.coloring_node;
-
-	var variation : float = getAdjustedVariation(rule);
-
-	//Override color in the case of coloring by centrality or continuous variable.
-	if (rule.getColoringMethod() == 2) {
-		color = GenCentralityColor(rule, node);
-		variation = 0;
-	} else if (rule.getColoringMethod() == 3) {
-		var continuousAttribute = rule.getContinuousAttribute();
-		if (continuousAttribute != null) {
-			color = continuousAttribute.genFractionalColor(node);
-		} else {
-			color = Color.white;
-		}
-		variation = 0;
-	}
-	
-	if (change_color) {
-		if (coloring_halo){
-			node.setHaloColor(NudgeColor(color, variation));
-		} 
-		if (coloring_node) {
-			node.setColor(NudgeColor(color, variation), true);
-		}
-	}
-	if (change_size && rule.isChangingSize()) {
-		node.setSizingInfo(rule.getSizingScale(), rule.getSizingType(), rule.getContinuousAttribute());
 	}
 }
 

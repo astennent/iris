@@ -69,16 +69,16 @@ class ColorRuleOptionsMenu extends BaseMenu {
 
 	function DrawColorCustom(cur_y : int) {
 		ColorPicker.Init(x, cur_y, false);
-		var original_color = rule.color;
-		rule.color = ColorPicker.getColor();
+		var originalColor = rule.getColor();
+		var updatedColor = ColorPicker.getColor();
 
 		cur_y += 190;
-		var original_variation = rule.variation;
+		var originalVariation = rule.variation;
 		GuiPlus.Label(new Rect(x+10, cur_y, 130, 20), "Randomness: " + rule.variation.ToString("f2"));
 		rule.variation = GUI.HorizontalSlider(Rect(x+140, cur_y+5, width-150, 20), rule.variation, 0.0, 1.0);
 
-		if (rule.color != original_color || rule.variation != original_variation){
-			ColorController.ApplyRule(rule);
+		if (originalColor != updatedColor || rule.variation != originalVariation){
+			ColorController.ApplyRule(rule, true, false);
 		}
 		cur_y += 30;
 		return cur_y;
@@ -99,7 +99,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 			var schemeRect = new Rect(0, cur_y, width, 30);
 
 			if (rule.getScheme() == i) { 
-				GUI.color = rule.color;
+				GUI.color = rule.getMenuColor();
 				GUI.color.a = 1; //just in case the custom color is transparent. 
 			} else {
 				GUI.color = Color.white; 

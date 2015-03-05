@@ -38,7 +38,7 @@ class ColorRule {
 	static var COLORING_CONTINUOUS_ATTR = 3;
 	var coloring_method = COLORING_SCHEME;	
 
-	var color : Color;
+	var m_color : Color;
 	var variation : float;
 	var scheme_index : int;
 	var centrality_type : int; //corresponds to ColorController.centrality_types
@@ -60,7 +60,7 @@ class ColorRule {
 
 		coloring_node = coloring_halo = true;
 
-		color = ColorController.GenRandomColor(scheme_index); //BRIGHT
+		m_color = ColorController.GenRandomColor(scheme_index); //BRIGHT
 		setScheme(0, false);  //bright
 		variation = 0.3;
 
@@ -85,7 +85,7 @@ class ColorRule {
 		switch (coloring_method) {
 			case COLORING_CUSTOM:
 			case COLORING_CONTINUOUS_ATTR:
-				output = color;
+				output = m_color;
 				break;
 			case COLORING_SCHEME:
 				output = ColorController.GenRandomColor(scheme_index);
@@ -97,12 +97,22 @@ class ColorRule {
 		return output;
 	}
 
+	// getColor() will perform operations that lead to random color results. This
+	// will always return a consistent color that can be used for displaying the rule.
+	function getMenuColor() {
+		return m_color;
+	}
+
+	function setColor(color : Color) {
+		m_color = color;
+	}
+
 	function setScheme(index : int){
 		setScheme(index, true);
 	}
 	function setScheme(index : int, applyImmediately : boolean) {
 		scheme_index = index;
-		color = ColorController.GenRandomColor(scheme_index);
+		m_color = ColorController.GenRandomColor(scheme_index);
 		if (applyImmediately) {
 			ColorController.ApplyRule(this, true, false);
 		}
@@ -297,6 +307,37 @@ class ColorRule {
 		continuous_attribute = FileManager.getAttributeFromUUID(continuous_attribute_uuid);
 		attribute = FileManager.getAttributeFromUUID(attribute_uuid);
 		//Apply rule?
+	}
+
+
+	function Apply(node : Node, color : Color, change_color : boolean, change_size : boolean) {
+		var variation : float = ColorController.getAdjustedVariation(this);
+
+		//Override color in the case of coloring by centrality or continuous variable.
+		if (getColoringMethod() == 2) {
+			color = ColorController.GenCentralityColor(this, node);
+			variation = 0;
+		} else if (getColoringMethod() == 3) {
+			var continuousAttribute = this.getContinuousAttribute();
+			if (continuousAttribute != null) {
+				color = continuousAttribute.genFractionalColor(node);
+			} else {
+				color = Color.white;
+			}
+			variation = 0;
+		}
+		
+		if (change_color) {
+			if (coloring_halo){
+				node.setHaloColor(ColorController.NudgeColor(color, variation));
+			} 
+			if (coloring_node) {
+				node.setColor(ColorController.NudgeColor(color, variation), true);
+			}
+		}
+		if (change_size && isChangingSize()) {
+			node.setSizingInfo(getSizingScale(), getSizingType(), getContinuousAttribute());
+		}
 	}
 
 }
