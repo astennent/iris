@@ -7,6 +7,7 @@ class TimeObject extends Data {
 	var startDate : Date = DEFAULT_DATE;
 	var endDate : Date = DEFAULT_DATE;
 	private var validTime : boolean = true;
+	protected var m_initialized = false;
 
 	function Update() {
 		GetComponent.<Renderer>().enabled = hasValidTime();
@@ -101,9 +102,9 @@ class TimeObject extends Data {
 	function Set(attribute : Attribute, value : String) {
 		//Actually change the value
 		super.Set(attribute, value);
-		
+
 		//Update visible values in case that changed.
-		if (initialized) {
+		if (m_initialized) {
 			UpdateDate();
 		}
 	}

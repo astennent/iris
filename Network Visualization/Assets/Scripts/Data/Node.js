@@ -34,28 +34,37 @@ class Node extends TimeObject {
 
 	static var BASE_DESIRED_DISTANCE : float = 50.0;
 
-
-	function Init(color : Color, source : DataFile) {
-		this.color = color;
-		this.source = source;
-
-		label = GameObject.Instantiate(labelObject, transform.position, transform.rotation);
-		label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
-		label.transform.parent = this.transform;
-		UpdateSize();
+	static function Instantiate(source : DataFile, sourceRow : List.<String>) {
+		var randPosition = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
+		var instance = GameObject.Instantiate( NetworkController.nodePrefab, randPosition, new Quaternion(0,0,0,0) ).GetComponent.<Node>();
+		instance.source = source;
 		
-		edges = new LinkedList.<Edge>();
+		// Initialize the text label.
+		instance.label = GameObject.Instantiate(instance.labelObject, instance.transform.position, instance.transform.rotation);
+		instance.label.GetComponent(GUIText).anchor = TextAnchor.MiddleCenter;
+		instance.label.transform.parent = instance.transform;
+
+		// Populate node's data store with information from the row.
+		for (var i : int = 0 ; i < sourceRow.Count ; i++){
+    		if (i < source.attributes.Count){ //in case there are stray commas or whatever
+	    		var attribute = source.attributes[i];
+	    		instance.Set(attribute, sourceRow[i]);
+    		}
+    	}
+    	instance.m_initialized = true;
+
+		instance.GetComponent.<Renderer>().material = new Material(NetworkController.getNodeTexture());
+		instance.lineMat = new Material(NetworkController.getLineTexture());
+		instance.edges = new LinkedList.<Edge>();
+		instance.setColor(ColorController.GenRandomColor(0), false); //random bright color;
+		instance.resetHaloColor();	
 		
-		sizing_type = 0; //by # edges
+		instance.sizing_type = 0; //by # edges
+		instance.UpdateSize();
+		instance.UpdateDate();
+		instance.UpdateName();
 			
-		GetComponent.<Renderer>().material = new Material(NetworkController.getNodeTexture());
-		lineMat = new Material(NetworkController.getLineTexture());
-		GetComponent.<Renderer>().material.color = color;	
-		resetHaloColor();	
-
-		initialized = true;
-		UpdateName();
-		UpdateDate();
+		return instance;
 	}
 
 	function setColor(c : Color, colorEdges : boolean){
@@ -247,6 +256,10 @@ class Node extends TimeObject {
 
 
 	function UpdateName(){
+		if (!m_initialized) {
+			return;
+		}
+
 		var name_string = "";
 		var attributes = source.getAttributes();
 		for (var attribute in attributes) {
@@ -397,12 +410,17 @@ class Node extends TimeObject {
 		super.Set(attribute, value);
 		
 		//Update visible values in case that changed.
-		if (initialized) {
+		if (attribute.is_shown) {
 			UpdateName();
 		}
+		UpdateDate();
 	}
 
 	function UpdateDate() {
+		if (!m_initialized) {
+			return;
+		}
+
 		//update its own date.
 		super.UpdateDate();
 		if (source.linking_table) {

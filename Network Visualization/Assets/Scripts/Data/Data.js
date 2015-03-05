@@ -5,7 +5,6 @@ class Data extends MonoBehaviour {
 
 	//Used by Node and Edge.
 	protected var source : DataFile;
-	protected var initialized = false;
 
 	private var attr_dict = new Dictionary.<Attribute, Datum>();
 	private var index_dict = new Dictionary.<int, Datum>();
@@ -30,7 +29,7 @@ class Data extends MonoBehaviour {
 		dataSource.index_dict[attribute.column_index] = datum;
 		
 		// The attribute's statistics will be recalculated when requested
-		if (initialized) attribute.invalidate(); 
+		attribute.invalidate(); 
 	}
 
 	function Get(attribute : Attribute) {

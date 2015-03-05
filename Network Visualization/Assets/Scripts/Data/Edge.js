@@ -21,8 +21,8 @@ class Edge extends TimeObject {
 		lineRenderer.material = m;
 		lineRenderer.material.color = color;
 
-		this.source = source;		
-		initialized = true;
+		this.source = source;	
+		m_initialized = true;	
 	}
 
 	function LateUpdate () {

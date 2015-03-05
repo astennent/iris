@@ -360,30 +360,15 @@ class DataFile extends LoadableFile {
 		var fileContents = getFileContents();
 		for (var rowIndex = contentIndex; rowIndex < fileContents.Count && rowIndex < contentIndex+activationCutoff; rowIndex++) {
 
-			var row = fileContents[rowIndex];
+			var row : List.<String> = fileContents[rowIndex];
+			var node = Node.Instantiate(this, row);
 
-		    var randPos : Vector3 = new Vector3(Random.Range(-1000, 1000), Random.Range(-1000, 1000), Random.Range(-1000, 1000));
-			var node : Node = GameObject.Instantiate(NetworkController.nodePrefab, randPos, new Quaternion(0,0,0,0)).GetComponent(Node);
-
-	    	for (var i : int = 0 ; i < row.Count ; i++){
-	    		if (i < attributes.Count){ //in case there are stray commas or whatever
-		    		var attribute = attributes[i];
-		    		var val : String = row[i];
-		    		node.Set(attribute, val);
-	    		}
-	    	}
-
-			var randColor : Color = ColorController.GenRandomColor(0); //random bright color
-			node.Init(randColor, this);
-	    	
 	    	//Add the node to the dict as a key/value pair of pkeys/node.
 	    	var key = new Array();
 	    	for (var pkey_index in pkey_indices){
 	    		key.Push(node.Get(pkey_index));
 	    	}
 	    	nodes[key.toString()] = node;
-	    	node.UpdateName();
-
 
 	    	ProgressBar.setProgress(rowIndex * 1.0 / fileContents.Count);
 	    }
