@@ -77,7 +77,7 @@ class ColorRule {
 
 	function setColoringMethod(m : int) {
 		coloring_method = m;
-		ColorController.ApplyRule(this, true, false);
+		Apply(true, false);
 	}
 
 	function getColor() {
@@ -107,6 +107,13 @@ class ColorRule {
 		m_color = color;
 	}
 
+	function getAdjustedVariation() {
+		if (coloring_method == COLORING_CENTRALITY || (coloring_method == COLORING_SCHEME  && scheme_index == 2)){
+			return 0;
+		}
+		return variation;
+	}
+
 	function setScheme(index : int){
 		setScheme(index, true);
 	}
@@ -114,7 +121,7 @@ class ColorRule {
 		scheme_index = index;
 		m_color = ColorController.GenRandomColor(scheme_index);
 		if (applyImmediately) {
-			ColorController.ApplyRule(this, true, false);
+			Apply(true, false);
 		}
 	}
 
@@ -124,7 +131,7 @@ class ColorRule {
 
 	function setFilterMethod(index : int) {
 		filter_method = index;
-		ColorController.ApplyRule(this);
+		Apply();
 	}
 
 	function getFilterMethod() {
@@ -134,7 +141,7 @@ class ColorRule {
 	//Centrality Variables
 	function setCentralityType(index : int) {
 		centrality_type = index;
-		ColorController.ApplyRule(this);
+		Apply();
 	}
 	function getCentralityType() {
 		return centrality_type;
@@ -142,7 +149,7 @@ class ColorRule {
 
 	function toggleInvertCentrality() {
 		invert_centrality = !invert_centrality;
-		ColorController.ApplyRule(this);
+		Apply();
 	}
 	function getInvertCentrality() {
 		return invert_centrality;
@@ -150,7 +157,7 @@ class ColorRule {
 
 	function toggleInterCluster() {
 		inter_cluster = !inter_cluster;
-		ColorController.ApplyRule(this);
+		Apply();
 	}
 	function getInterCluster() {
 		return inter_cluster;
@@ -205,8 +212,12 @@ class ColorRule {
 	function usesSource(input : int){
 		return sources.Contains(input);
 	}
-	function getSources(){
-		return sources;
+	function getSources() : List.<DataFile> {
+		var output : List.<DataFile> = new List.<DataFile>();
+		for (source_id in sources) {
+			output.Add(FileManager.getFileFromUUID(source_id));
+		} 
+		return output;
 	}
 	function toggleSource(input : int) {
 		if (usesSource(input)) {
@@ -310,14 +321,86 @@ class ColorRule {
 		//Apply rule?
 	}
 
+	function Apply() {
+		Apply(true, true);
+	}
 
-	function Apply(node : Node, color : Color, change_color : boolean, change_size : boolean) {
-		var variation : float = ColorController.getAdjustedVariation(this);
+	function Apply(change_color : boolean, change_size : boolean) {
+		var rule_type = getFilterMethod();
+		switch (filter_method) {
+			case FILTER_SOURCE:
+				var sources : List.<DataFile> = (isFallback())
+						? FileManager.getFiles() 
+						: getSources();
+				for (var source in sources) {
+					ApplyToCollection(source.getNodes(), change_color, change_size, true);
+				}
+			break;
+
+			case FILTER_CLUSTER:
+				if (isFallback()) {
+					var allClusters = ClusterController.group_dict.Values;
+					for (var cluster : List.<Node> in allClusters) {
+						ApplyToCollection(cluster, change_color, change_size, true);
+					}
+				}
+				else {
+					for (var cluster_id in clusters) {
+						var nodeSet = ClusterController.group_dict[cluster_id];	
+						ApplyToCollection(nodeSet, change_color, change_size, true);
+					}
+				}
+			break;
+
+			case FILTER_NODE:
+				if (isFallback()) {
+					for (var file in FileManager.getFiles()) {
+						var fileNodes = file.getNodes();
+						ApplyToCollection(fileNodes, change_color, change_size, false);
+					}
+				}
+				else {
+					ApplyToCollection(nodes, change_color, change_size, false);
+				}
+			break;
+
+			case FILTER_ATTRIBUTE:
+				if (!attribute) {
+					break;
+				}
+				var color = getColor();
+				var attrFile : DataFile = attribute.getFile();
+				var attrIndex : int = attrFile.getAttributes().IndexOf(attribute);
+				for (var node in attrFile.getNodes()){
+					if (node.Get(attrIndex) == attribute_value) { 
+						ApplyToNode(node, color, change_color, change_size);
+					}
+				}
+			break;
+		}
+	}
+
+	private function ApplyToCollection(collection : System.Collections.IEnumerable, 
+			change_color : boolean, change_size : boolean, preserveColor : boolean) {
+		if (preserveColor) {
+			var color = getColor();
+		}
+		for (var item in collection) {
+			if (!preserveColor) {
+				color = getColor();
+			}
+			var node = item as Node; //To get around the implicit cast warning
+			ApplyToNode(node, color, change_color, change_size);
+		}
+	}
+
+	private function ApplyToNode(node : Node, color : Color, change_color : boolean, change_size : boolean) {
+		var adjustedVariation : float = getAdjustedVariation();
 
 		//Override color in the case of coloring by centrality or continuous variable.
 		if (getColoringMethod() == 2) {
 			color = ColorController.GenCentralityColor(this, node);
-			variation = 0;
+			adjustedVariation = 0;
 		} else if (getColoringMethod() == 3) {
 			var continuousAttribute = this.getContinuousAttribute();
 			if (continuousAttribute != null) {
@@ -325,15 +408,15 @@ class ColorRule {
 			} else {
 				color = Color.white;
 			}
-			variation = 0;
+			adjustedVariation = 0;
 		}
 		
 		if (change_color) {
 			if (coloring_halo){
-				node.setHaloColor(ColorController.NudgeColor(color, variation));
+				node.setHaloColor(ColorController.NudgeColor(color, adjustedVariation));
 			} 
 			if (coloring_node) {
-				node.setColor(ColorController.NudgeColor(color, variation), true);
+				node.setColor(ColorController.NudgeColor(color, adjustedVariation), true);
 			}
 		}
 		if (change_size && isChangingSize()) {

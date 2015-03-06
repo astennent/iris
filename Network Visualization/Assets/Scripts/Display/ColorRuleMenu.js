@@ -128,6 +128,7 @@ class ColorRuleMenu extends BaseMenu {
 			//only color the Xs if it's selected.
 			if (i == rule_index){
 				GUI.color = rule.getMenuColor();
+				GUI.color.a = 1;
 			} else {
 				GUI.color = Color.white;
 			}

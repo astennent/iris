@@ -49,7 +49,7 @@ static function ApplyRulesForDateChange() {
 				rule.getFilterMethod() == 1 || //Coloring by cluster 
 				rule.getColoringMethod() == 2 || rule.getColoringMethod() == 3 //Coloring by centrality or continuous attribute
 			) {
-			ApplyRule(rule);
+			rule.Apply();
 		}
 	}
 }
@@ -67,99 +67,8 @@ static function ApplyAllRules(change_color : boolean, change_size : boolean) {
 	}
 
 	for (var rule in rules){
-		ApplyRule(rule, change_color, change_size);
+		rule.Apply(change_color, change_size);
 	}
-}
-
-static function ApplyRule(rule: ColorRule) {
-	//Note that change_color and change_size are for small changes in the menu.
-	ApplyRule(rule, true, true);
-}
-
-
-static function ApplyRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
-	if (rule.isFallback()) {
-		ApplyFallbackRule(rule, change_color, change_size);
-		return;
-	}
-
-	var rule_type = rule.getFilterMethod();
-	if (rule_type == 0) {  //source
-		for (var source_id : int in rule.getSources()) {
-			var source = FileManager.getFileFromUUID(source_id);
-			ColorBySource(source, rule, change_color, change_size);
-		}
-	} else if (rule_type == 1) { //cluster
-		var clusterList = rule.getClusters();
-		for (var cluster_id in clusterList) {
-			ColorByCluster(cluster_id, rule, change_color, change_size);
-		}
-	} else if (rule_type == 2) { //node			
-		var nodeList = rule.getNodes();
-		for (node in nodeList) {
-			var color = rule.getColor();
-			rule.Apply(node, color, change_color, change_size);
-		}			
-	} else if (rule_type == 3){ //attr
-		if (rule.getAttribute() != null) {
-			ColorByAttribute(rule.getAttribute(), rule.getAttributeValue(), rule, change_color, change_size);
-		}
-	}
-}
-
-private static function ApplyFallbackRule(rule : ColorRule, change_color : boolean, change_size : boolean) {
-	var rule_type = rule.getFilterMethod();
-	if (rule_type == 0) {
-			for (var source : DataFile in FileManager.files) {
-				ColorBySource(source, rule, change_color, change_size);
-			}
-	} else if (rule_type == 1) {
-			for (var entry in ClusterController.group_dict){ //loop over the cluster ids
-				ColorByCluster(entry.Key, rule, change_color, change_size);
-			}
-	} else if (rule_type == 2) {
-		for (var file in FileManager.files){
-			var nodes = file.getNodes();
-			for (var node in nodes){
-				var color : Color = rule.getColor();
-				rule.Apply(node, color, change_color, change_size);
-			}
-		}
-	} // Note that rule_type should not be 3 with a fallback rule.
-}
-
-static function ColorByCluster(cluster_id : int, rule  : ColorRule, change_color : boolean , change_size : boolean){
-	var color : Color = rule.getColor();
-	var nodes = ClusterController.group_dict[cluster_id];	
-	for (var node in nodes){
-		rule.Apply(node, color, change_color, change_size);
-	}
-}
-
-static function ColorBySource(file : DataFile, rule  : ColorRule, change_color : boolean , change_size : boolean){
-	var color : Color = rule.getColor();
-	for (var node in file.getNodes()){
-		rule.Apply(node, color, change_color, change_size);
-	}
-}
-//color nodes based on a certain attribute value.
-static function ColorByAttribute(attribute : Attribute, value : String, rule  : ColorRule, change_color : boolean , change_size : boolean){
-	var color : Color = rule.getColor();
-	var file : DataFile = attribute.getFile();
-	var attr_index : int = file.getAttributes().IndexOf(attribute);
-
-	for (var node in file.getNodes()){
-		if (node.Get(attr_index) == value) { 
-			rule.Apply(node, color, change_color, change_size);
-		}
-	}
-}
-
-static function getAdjustedVariation(rule : ColorRule){
-	if (rule.getColoringMethod() == 2 || rule.getColoringMethod() == 1  && rule.getScheme() == 2){
-		return 0;
-	}
-	return rule.variation;
 }
 
 //Alters the color a small amount for variety.
@@ -327,9 +236,9 @@ static function handleDateChange() {
 	for (var rule in rules) {
 		
 		if (rule.getColoringMethod() == ColorRule.COLORING_CENTRALITY) { //centrality
-			ApplyRule(rule, true, true);
+			rule.Apply(true, true);
 		} else { //Don't recolor if it's not centrality.
-			ApplyRule(rule, false, true);
+			rule.Apply(false, true);
 		}
 	}
 }
@@ -342,7 +251,7 @@ static function handleAttributeInvalidate(invalid_attr : Attribute) {
 		if ( isFilteringByAttribute || isSizingByAttribute || isColoringbyAttribute) {
 			var change_color = (isFilteringByAttribute || isColoringbyAttribute);
 			var change_size = (isFilteringByAttribute || isSizingByAttribute);
-			ApplyRule(rule, change_color, change_size);
+			rule.Apply(change_color, change_size);
 		}
 	}
 }

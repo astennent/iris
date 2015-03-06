@@ -81,7 +81,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 			if (originalColor != updatedColor) {
 				rule.setColor(updatedColor);
 			}
-			ColorController.ApplyRule(rule, true, false);
+			rule.Apply(true, false);
 		}
 		cur_y += 30;
 		return cur_y;
@@ -209,7 +209,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		if ( (!rule.coloring_halo && original_halo) || (!rule.coloring_node && original_node)) {
 			ColorController.ApplyAllRules(true, false);
 		} else if ((rule.coloring_halo && !original_halo) || (rule.coloring_node && !original_node)) {
-			ColorController.ApplyRule(rule);
+			rule.Apply();
 		}
 
 		return cur_y + 35;	
@@ -253,7 +253,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 
 		if (ruleChanged){
 			if (rule.isChangingSize()) {
-				ColorController.ApplyRule(rule, false, true);
+				rule.Apply(false, true);
 			} else {
 				ColorController.ApplyAllRules(false, true);
 			}

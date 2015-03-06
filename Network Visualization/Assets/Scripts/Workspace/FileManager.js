@@ -67,6 +67,10 @@ static function getFileNames() : String[]{
 	return output;
 }
 
+static function getFiles() {
+	return files;
+}
+
 //returns the index of the file created, or -2 if nothing is made.
 static function Load(fname : String) : int {
     return Load(fname, false);
