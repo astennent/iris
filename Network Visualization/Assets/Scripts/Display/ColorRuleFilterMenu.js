@@ -75,7 +75,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 		var temp_y = 0;
 		for (var file : DataFile in files) {
 			var usedSourceBefore = rule.usesSource(file.uuid);
-			var usedSourceAfter = GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.uuid)), file.shortName());
+			var usedSourceAfter = GuiPlus.Toggle (Rect (5, temp_y, width-5, 20), (rule.usesSource(file.uuid)), file.getDisplayName());
 			if (usedSourceAfter != usedSourceBefore) {
 				rule.toggleSource(file.uuid);
 			}			
@@ -176,7 +176,7 @@ class ColorRuleFilterMenu extends BaseMenu {
 		var temp_y = -20;
 		for (var file : DataFile in FileManager.files){
 			temp_y += 20;
-			GuiPlus.Label(Rect (5, temp_y, width-5, 20), file.shortName() + ":");
+			GuiPlus.Label(Rect (5, temp_y, width-5, 20), file.getDisplayName() + ":");
 			temp_y += 20;
 
 			for (var attribute in file.getAttributes()){

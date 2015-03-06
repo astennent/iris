@@ -66,7 +66,7 @@ class FileMenu extends BaseMenu {
 		var dropHeight = 500;
 		var filesList = new String[FileManager.files.Count];
 		for (var i = 0 ; i < FileManager.files.Count ; i++) {
-			filesList[i] = FileManager.files[i].shortName();
+			filesList[i] = FileManager.files[i].getDisplayName();
 		}
 		var new_selected_index = Dropdown.Select(selection_rect, dropHeight, filesList, selected_file_index, DROPDOWN_ID, "Select a File");
 		if (new_selected_index != selected_file_index) {

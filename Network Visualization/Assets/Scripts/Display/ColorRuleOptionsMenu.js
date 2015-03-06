@@ -69,7 +69,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 
 	function DrawColorCustom(cur_y : int) {
 		ColorPicker.Init(x, cur_y, false);
-		var originalColor = rule.getColor();
+		var originalColor = rule.getMenuColor();
 		var updatedColor = ColorPicker.getColor();
 
 		cur_y += 190;
@@ -77,7 +77,10 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		GuiPlus.Label(new Rect(x+10, cur_y, 130, 20), "Randomness: " + rule.variation.ToString("f2"));
 		rule.variation = GUI.HorizontalSlider(Rect(x+140, cur_y+5, width-150, 20), rule.variation, 0.0, 1.0);
 
-		if (originalColor != updatedColor || rule.variation != originalVariation){
+		if (originalColor != updatedColor || rule.variation != originalVariation) {
+			if (originalColor != updatedColor) {
+				rule.setColor(updatedColor);
+			}
 			ColorController.ApplyRule(rule, true, false);
 		}
 		cur_y += 30;
@@ -175,7 +178,7 @@ class ColorRuleOptionsMenu extends BaseMenu {
 		attributeScrollPosition = GuiPlus.BeginScrollView (outerBox, attributeScrollPosition, innerBox);
 			var scroll_y = 0;
 			for (var file : DataFile in FileManager.files){
-				GuiPlus.Label(Rect (5, scroll_y, width-5, 20), file.shortName() + ":");
+				GuiPlus.Label(Rect (5, scroll_y, width-5, 20), file.getDisplayName() + ":");
 				scroll_y += 20;
 
 				for (var attribute in file.getAttributes()){

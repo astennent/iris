@@ -13,7 +13,7 @@ class LoadableFile {
 	protected var cachedFileContents : List.<List.<String> >; //Contents are stored after load.
 
 	//gets everything in the file name after the trailing /
-	function shortName(){
+	function getDisplayName(){
 		if (fname.Contains("\\")){
 			return fname.Substring(fname.LastIndexOf("\\")+1);
 		} else if (fname.Contains("/")){

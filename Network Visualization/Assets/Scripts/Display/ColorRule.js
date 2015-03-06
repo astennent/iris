@@ -164,7 +164,7 @@ class ColorRule {
 			} else if (count == 1) {
 				var sourceEnumerator = sources.GetEnumerator();
 				sourceEnumerator.MoveNext();
-				return FileManager.getFileFromUUID(sourceEnumerator.Current).shortName() + "";
+				return FileManager.getFileFromUUID(sourceEnumerator.Current).getDisplayName() + "";
 			} else {
 				return sources.Count + " sources";
 			}
@@ -272,6 +272,7 @@ class ColorRule {
 		//Automatically switch to coloring the file of the selected attribute.
 		sources.Clear();
 		sources.Add(continuous_attribute.getFile().uuid); 
+		Debug.Log(continuous_attribute.getFile().getDisplayName());
 		this.setFilterMethod(FILTER_SOURCE); 
 	}
 

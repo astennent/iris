@@ -62,7 +62,7 @@ function Update() {
 static function getFileNames() : String[]{
 	var output = new String[files.Count];
 	for (var i = 0 ; i < files.Count ; i++) {
-		output[i] = files[i].shortName();
+		output[i] = files[i].getDisplayName();
 	}
 	return output;
 }
@@ -114,7 +114,7 @@ static function RemoveFile(index : int) {
 
 	} else {
 		Terminal.E("Cannot remove file with dependencies: There are " +
-				dependent_files.Count + " files dependent on " + files[index].shortName());
+				dependent_files.Count + " files dependent on " + files[index].getDisplayName());
 	}
 }
 
