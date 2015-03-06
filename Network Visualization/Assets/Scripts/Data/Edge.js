@@ -78,4 +78,8 @@ class Edge extends TimeObject {
 		Destroy(gameObject);
 	}
 
+	function isRendered() {
+		return lineRenderer.enabled;
+	}
+
 }

@@ -117,30 +117,30 @@ class Node extends TimeObject {
 			for (var edge in edges) {
 				var other_node : Node = edge.to;
 
-				//Do not process the edge if the edge or node is not in the correct time.
-				if (!edge.hasValidTime() || !other_node.hasValidTime()) {
+				//Do not process the edge if the edge or node is not visible (because of time or some other reason).
+				if (!edge.isRendered() || !other_node.isRendered()) {
 					continue;
 				}
 
-				var motion = calculateMotionRelativeTo(other_node, other_node.desired_size, null, edge);
+				var motion = calculateMotionRelativeTo(other_node, edge);
 				netMotion += motion;
 			}
 			
-		    desiredPosition = originalPosition + netMotion;
-	    	transform.rotation = oldRotation;
+			desiredPosition = originalPosition + netMotion;
+			transform.rotation = oldRotation;
 		}
-	    
-	    transform.position = Vector3.Lerp(originalPosition, desiredPosition, 0.5);
-	    var size = Mathf.Lerp(transform.localScale.x, desired_size, 0.5);
+
+		transform.position = Vector3.Lerp(originalPosition, desiredPosition, 0.5);
+		var size = Mathf.Lerp(transform.localScale.x, desired_size, 0.5);
 		transform.localScale = new Vector3(size, size, size);
 
-	    if (PlanarityController.isFlat()){
-	    	transform.position.z/=1.15;
-	    } 
+		if (PlanarityController.isFlat()){
+			transform.position.z/=1.15;
+		}
 	
 	}
 
-	function calculateMotionRelativeTo(other_node : Node, other_size: float, original_node : Node, edge : Edge) {
+	function calculateMotionRelativeTo(other_node : Node, edge : Edge) {
 
 		//Calculate the desired distance.
 		var foreignKey = edge.foreignKey;
@@ -181,7 +181,7 @@ class Node extends TimeObject {
 		}
 		
 		var target = other_node.transform.position;
-		var sizeCompensation = (desired_size+other_size)/10;
+		var sizeCompensation = (desired_size+other_node.desired_size)/10;
 
 		var speed = (Vector3.Distance(transform.position, target) - (desiredDistance+sizeCompensation) )*.01;
 		speed = Mathf.Max(speed, -1);
@@ -204,6 +204,9 @@ class Node extends TimeObject {
 		if (reticle != null) {
 			reticle.GetComponent.<Renderer>().enabled = enable;
 		}
+	}
+	function isRendered() {
+		return GetComponent.<Renderer>().enabled;
 	}
 
 	function UpdateSize() {
