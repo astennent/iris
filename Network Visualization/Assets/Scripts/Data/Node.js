@@ -298,15 +298,25 @@ class Node extends TimeObject {
 	}
 
 	function LateUpdate () {
+
+		// Handle label drawing and positioning
 		if (GetComponent.<Renderer>().isVisible && !GraphController.isGraphing()){
-			label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
-			var fontSize : float = 800/Vector3.Distance(Camera.main.transform.position, transform.position)*desired_size/10;
-			label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 3.0, 20.0);
-			label.GetComponent(GUIText).text = display_name;
-		}	else {
+			var distanceToCamera = Vector3.Distance(Camera.main.transform.position, transform.position);
+
+			if (distanceToCamera < 300) {
+				label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
+				
+				var fontSize : float = 230*desired_size/distanceToCamera;
+				label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 10.0, 20.0);
+				label.GetComponent(GUIText).text = display_name;
+			} else {
+				label.GetComponent(GUIText).text = "";
+			}
+		} else {
 			label.GetComponent(GUIText).text = "";
 		}
 
+		// Handle date-based resizing
 		if (dateValidationResizeRequired) {
 			dateValidationResizeRequired = false;
 			UpdateSize();
