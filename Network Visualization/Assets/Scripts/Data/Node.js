@@ -286,8 +286,6 @@ class Node extends TimeObject {
 		return new Color(color.r, color.g, color.b);
 	}
 
-
-
 	function OnMouseOver() {
 		if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)){
 			SelectionController.NodeClick(this);
@@ -305,7 +303,7 @@ class Node extends TimeObject {
 
 			if (distanceToCamera < 300) {
 				label.transform.position = Camera.main.WorldToViewportPoint(transform.position);
-				
+
 				var fontSize : float = 230*desired_size/distanceToCamera;
 				label.GetComponent(GUIText).fontSize = Mathf.Clamp(fontSize, 10.0, 20.0);
 				label.GetComponent(GUIText).text = display_name;

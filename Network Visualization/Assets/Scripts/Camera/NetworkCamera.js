@@ -12,6 +12,12 @@ class NetworkCamera extends MonoBehaviour {
 	var desired_distance : float = 100;
 	var bubbleSize : int = 0;
 
+	// Adjusts the speed of rotation based on distance from selection center.
+	static var DISTANCE_MODIFIER = .008;
+
+	// Adjusts zoom speed based on distance from selection center.
+	static var ZOOM_DSTANCE_MODIFIER = .5;
+
 	private var spinning = false;
 
 	static function StartCamera() {
@@ -36,11 +42,15 @@ class NetworkCamera extends MonoBehaviour {
 			return;
 		} 
 
+		//Save the original position and rotation for Lerping.
 		var selectionCenter : Vector3 = CalculateSelectionCenter();		
+		var originalRotation : Quaternion = transform.rotation;
+		var originalPosition : Vector3 = transform.position;
+		var current_distance : float = Vector3.Distance(selectionCenter, originalPosition);
+
 		var coordinates = Camera.main.WorldToScreenPoint(selectionCenter);
 		var mouseCoords = Input.mousePosition;
 
-	
 		// Update the value of spinning
 		var mouseClicked = (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1));
 		var isBlocked = GuiPlus.isBlocked();
@@ -86,18 +96,15 @@ class NetworkCamera extends MonoBehaviour {
 		desired_distance -= z*desired_distance;
 		desired_distance = Mathf.Clamp(desired_distance, 1, 1000);
 
-		//Save the original position and rotation for Lerping.
-		var originalRotation : Quaternion = transform.rotation;
-		var originalPosition : Vector3 = transform.position;
-		var current_distance : float = Vector3.Distance(selectionCenter, originalPosition);
 
 		//Calculate target position based on x and y movement..
 		var targetPosition : Vector3 = transform.position;
-		targetPosition += transform.right*-x;
-		targetPosition += transform.up*-y;
+		var distanceAdjust = Mathf.Pow(current_distance * DISTANCE_MODIFIER, 1);
+		targetPosition += transform.right * -x * distanceAdjust;
+		targetPosition += transform.up * -y * distanceAdjust;
 
 		//Adjust based on distance to the target
-		targetPosition += transform.forward * (current_distance - desired_distance)/2;
+		targetPosition += transform.forward * (current_distance - desired_distance) * ZOOM_DSTANCE_MODIFIER;
 
 		transform.LookAt(selectionCenter, transform.up);
 		transform.RotateAround(transform.position,transform.forward, r);

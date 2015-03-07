@@ -1,6 +1,6 @@
 #pragma strict
 
-private static var BOX_RANGE : float = 1000;
+private static var BOX_RANGE : float = 2000;
 
 static var dragging : boolean = false;
 private static var dragDistance : float = 30;
