@@ -1,12 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Display\ColorRule.js">
     <Files>
-      <File FileName="Assets\Scripts\Statistics\Stats.js" Line="124" Column="18" />
+      <File FileName="Assets\Scripts\Statistics\Stats.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Data\ForeignKey.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\GuiPlus\FilePicker.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Workspace\FileManager.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Display\ColorRule.js" Line="361" Column="60" />
+      <File FileName="Assets\Scripts\Display\ColorRule.js" Line="346" Column="17" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
